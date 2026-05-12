@@ -1,0 +1,50 @@
+[
+  {
+    "ContainingType": "CitizenConnect.API.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "CitizenConnect.Application.DTOs.Auth.LoginRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CitizenConnect.API.Controllers.AuthController",
+    "Method": "RegisterCitizen",
+    "RelativePath": "api/auth/register-citizen",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "CitizenConnect.Application.DTOs.Auth.RegisterCitizenDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CitizenConnect.API.Controllers.AuthController",
+    "Method": "RegisterPolitician",
+    "RelativePath": "api/auth/register-politician",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "CitizenConnect.Application.DTOs.Auth.RegisterPoliticianDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
