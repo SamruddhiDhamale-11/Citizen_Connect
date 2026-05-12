@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard &mdash; Citizen Connect</title>
+  <link rel="stylesheet" href="admin-dashboard.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- ===== TOP NAVBAR ===== -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="navbar-emblem">&#x1F3DB;&#xFE0F;</div>
+      <div class="navbar-brand">
+        <span class="navbar-title">Citizen Connect</span>
+        <span class="navbar-sub">Admin Dashboard</span>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <div class="navbar-user">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">System Admin</span>
+          <span class="user-role">Administrator</span>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" id="nav-Dashboard" onclick="loadContent('Dashboard', this)">
+          <i data-lucide="layout-dashboard" class="nav-icon-svg"></i>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-Ward" onclick="loadContent('Ward', this)">
+          <i data-lucide="map-pin" class="nav-icon-svg"></i>
+          <span class="nav-label">Ward</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-Demographics" onclick="loadContent('Demographics', this)">
+          <i data-lucide="users" class="nav-icon-svg"></i>
+          <span class="nav-label">Demographics</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-Area" onclick="loadContent('Area', this)">
+          <i data-lucide="map" class="nav-icon-svg"></i>
+          <span class="nav-label">Area</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-Department" onclick="loadContent('Department', this)">
+          <i data-lucide="building" class="nav-icon-svg"></i>
+          <span class="nav-label">Department</span>
+        </a>
+        <div class="nav-divider"></div>
+        <div class="sidebar-section-label">Operations</div>
+        <a href="#" class="nav-item" id="nav-Officer" onclick="loadContent('Officer', this)">
+          <i data-lucide="user-check" class="nav-icon-svg"></i>
+          <span class="nav-label">Officer</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-SOP" onclick="loadContent('SOP', this)">
+          <i data-lucide="file-text" class="nav-icon-svg"></i>
+          <span class="nav-label">SOP</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-Facility" onclick="loadContent('Facility', this)">
+          <i data-lucide="landmark" class="nav-icon-svg"></i>
+          <span class="nav-label">Facility</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-Institution" onclick="loadContent('Institution', this)">
+          <i data-lucide="school" class="nav-icon-svg"></i>
+          <span class="nav-label">Institution</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+      <div id="content">
+        <!-- Default welcome screen — replaced by loadContent() -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Welcome, Admin &#x1F44B;</h1>
+            <p class="page-subtitle">Select a module from the sidebar to get started</p>
+          </div>
+          <div class="page-date" id="adminDate"></div>
+        </div>
+
+        <!-- Stats overview -->
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card red">
+            <div class="admin-stat-icon"><i data-lucide="map-pin"></i></div>
+            <div class="admin-stat-body">
+              <div class="admin-stat-num">40</div>
+              <div class="admin-stat-label">Total Wards</div>
+            </div>
+          </div>
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-icon"><i data-lucide="users"></i></div>
+            <div class="admin-stat-body">
+              <div class="admin-stat-num">1,847</div>
+              <div class="admin-stat-label">Registered Citizens</div>
+            </div>
+          </div>
+          <div class="admin-stat-card green">
+            <div class="admin-stat-icon"><i data-lucide="user-check"></i></div>
+            <div class="admin-stat-body">
+              <div class="admin-stat-num">62</div>
+              <div class="admin-stat-label">Active Officers</div>
+            </div>
+          </div>
+          <div class="admin-stat-card orange">
+            <div class="admin-stat-icon"><i data-lucide="building"></i></div>
+            <div class="admin-stat-body">
+              <div class="admin-stat-num">18</div>
+              <div class="admin-stat-label">Departments</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick access modules -->
+        <div class="section-label">Quick Access</div>
+        <div class="admin-module-grid">
+          <button class="admin-module-btn" onclick="loadContent('Ward', document.getElementById('nav-Ward'))">
+            <i data-lucide="map-pin" class="admin-module-icon"></i>
+            <span class="admin-module-name">Ward</span>
+            <span class="admin-module-desc">Manage ward boundaries and data</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('Demographics', document.getElementById('nav-Demographics'))">
+            <i data-lucide="users" class="admin-module-icon"></i>
+            <span class="admin-module-name">Demographics</span>
+            <span class="admin-module-desc">Population and citizen statistics</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('Officer', document.getElementById('nav-Officer'))">
+            <i data-lucide="user-check" class="admin-module-icon"></i>
+            <span class="admin-module-name">Officer</span>
+            <span class="admin-module-desc">Assign and manage field officers</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('Department', document.getElementById('nav-Department'))">
+            <i data-lucide="building" class="admin-module-icon"></i>
+            <span class="admin-module-name">Department</span>
+            <span class="admin-module-desc">Configure civic departments</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('SOP', document.getElementById('nav-SOP'))">
+            <i data-lucide="file-text" class="admin-module-icon"></i>
+            <span class="admin-module-name">SOP</span>
+            <span class="admin-module-desc">Standard operating procedures</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('Facility', document.getElementById('nav-Facility'))">
+            <i data-lucide="landmark" class="admin-module-icon"></i>
+            <span class="admin-module-name">Facility</span>
+            <span class="admin-module-desc">Public facilities and amenities</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('Institution', document.getElementById('nav-Institution'))">
+            <i data-lucide="school" class="admin-module-icon"></i>
+            <span class="admin-module-name">Institution</span>
+            <span class="admin-module-desc">Schools, hospitals, civic bodies</span>
+          </button>
+          <button class="admin-module-btn" onclick="loadContent('Area', document.getElementById('nav-Area'))">
+            <i data-lucide="map" class="admin-module-icon"></i>
+            <span class="admin-module-name">Area</span>
+            <span class="admin-module-desc">Geographic area management</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- end layout -->
+
+  <script src="admin-dashboard.js"></script>
+</body>
+</html>
