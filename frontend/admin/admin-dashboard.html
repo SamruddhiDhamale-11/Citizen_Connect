@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard &mdash; Citizen Connect</title>
+  <title>Admin Dashboard — Citizen Connect</title>
   <link rel="stylesheet" href="admin-dashboard.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -19,15 +17,15 @@
       <div class="navbar-emblem">&#x1F3DB;&#xFE0F;</div>
       <div class="navbar-brand">
         <span class="navbar-title">Citizen Connect</span>
-        <span class="navbar-sub">Admin Dashboard</span>
+        <span class="navbar-sub">Admin Control Panel</span>
       </div>
     </div>
     <div class="navbar-right">
       <div class="navbar-user">
-        <div class="user-avatar">A</div>
+        <div class="user-avatar" id="userAvatar">A</div>
         <div class="user-info">
-          <span class="user-name">System Admin</span>
-          <span class="user-role">Administrator</span>
+          <span class="user-name" id="userName">Admin User</span>
+          <span class="user-role">System Administrator</span>
         </div>
       </div>
       <button class="btn-logout" onclick="logout()">Logout</button>
@@ -40,141 +38,555 @@
 
     <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-section-label">Main Menu</div>
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" id="nav-Dashboard" onclick="loadContent('Dashboard', this)">
-          <i data-lucide="layout-dashboard" class="nav-icon-svg"></i>
+        <a href="#" class="nav-item active" onclick="showPanel('dashboard', this)">
+          <span class="nav-icon">&#x1F3E0;</span>
           <span class="nav-label">Dashboard</span>
         </a>
-        <a href="#" class="nav-item" id="nav-Ward" onclick="loadContent('Ward', this)">
-          <i data-lucide="map-pin" class="nav-icon-svg"></i>
-          <span class="nav-label">Ward</span>
+        <a href="#" class="nav-item" onclick="showPanel('area-overview', this)">
+          <span class="nav-icon">&#x1F5FA;&#xFE0F;</span>
+          <span class="nav-label">Area Overview Setup</span>
         </a>
-        <a href="#" class="nav-item" id="nav-Demographics" onclick="loadContent('Demographics', this)">
-          <i data-lucide="users" class="nav-icon-svg"></i>
-          <span class="nav-label">Demographics</span>
+        <a href="#" class="nav-item" onclick="showPanel('ward-management', this)">
+          <span class="nav-icon">&#x1F3D8;&#xFE0F;</span>
+          <span class="nav-label">Ward / Village Management</span>
         </a>
-        <a href="#" class="nav-item" id="nav-Area" onclick="loadContent('Area', this)">
-          <i data-lucide="map" class="nav-icon-svg"></i>
-          <span class="nav-label">Area</span>
+        <a href="#" class="nav-item" onclick="showPanel('citizen-management', this)">
+          <span class="nav-icon">&#x1F465;</span>
+          <span class="nav-label">Citizen Management</span>
         </a>
-        <a href="#" class="nav-item" id="nav-Department" onclick="loadContent('Department', this)">
-          <i data-lucide="building" class="nav-icon-svg"></i>
-          <span class="nav-label">Department</span>
+        <a href="#" class="nav-item" onclick="showPanel('complaints-management', this)">
+          <span class="nav-icon">&#x1F4CB;</span>
+          <span class="nav-label">Complaints Management</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPanel('announcements', this)">
+          <span class="nav-icon">&#x1F4E2;</span>
+          <span class="nav-label">Announcements</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPanel('schemes', this)">
+          <span class="nav-icon">&#x1F4DC;</span>
+          <span class="nav-label">Schemes &amp; Services</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPanel('staff-management', this)">
+          <span class="nav-icon">&#x1F477;</span>
+          <span class="nav-label">Staff Management</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPanel('reports', this)">
+          <span class="nav-icon">&#x1F4CA;</span>
+          <span class="nav-label">Reports &amp; Analytics</span>
         </a>
         <div class="nav-divider"></div>
-        <div class="sidebar-section-label">Operations</div>
-        <a href="#" class="nav-item" id="nav-Officer" onclick="loadContent('Officer', this)">
-          <i data-lucide="user-check" class="nav-icon-svg"></i>
-          <span class="nav-label">Officer</span>
-        </a>
-        <a href="#" class="nav-item" id="nav-SOP" onclick="loadContent('SOP', this)">
-          <i data-lucide="file-text" class="nav-icon-svg"></i>
-          <span class="nav-label">SOP</span>
-        </a>
-        <a href="#" class="nav-item" id="nav-Facility" onclick="loadContent('Facility', this)">
-          <i data-lucide="landmark" class="nav-icon-svg"></i>
-          <span class="nav-label">Facility</span>
-        </a>
-        <a href="#" class="nav-item" id="nav-Institution" onclick="loadContent('Institution', this)">
-          <i data-lucide="school" class="nav-icon-svg"></i>
-          <span class="nav-label">Institution</span>
+        <a href="#" class="nav-item" onclick="showPanel('settings', this)">
+          <span class="nav-icon">&#x2699;&#xFE0F;</span>
+          <span class="nav-label">Settings</span>
         </a>
       </nav>
     </aside>
 
     <!-- ===== MAIN CONTENT ===== -->
     <main class="main-content">
-      <div id="content">
-        <!-- Default welcome screen — replaced by loadContent() -->
+
+      <!-- ============================================================
+           PANEL: DASHBOARD (Default)
+           ============================================================ -->
+      <div class="panel active" id="panel-dashboard">
+
         <div class="page-header">
           <div>
-            <h1 class="page-title">Welcome, Admin &#x1F44B;</h1>
-            <p class="page-subtitle">Select a module from the sidebar to get started</p>
+            <h1 class="page-title">Welcome back, Admin &#x1F44B;</h1>
+            <p class="page-subtitle">Here's a system-wide overview of Citizen Connect</p>
           </div>
-          <div class="page-date" id="adminDate"></div>
+          <div class="page-date" id="pageDate"></div>
         </div>
 
-        <!-- Stats overview -->
-        <div class="admin-stats-grid">
-          <div class="admin-stat-card red">
-            <div class="admin-stat-icon"><i data-lucide="map-pin"></i></div>
-            <div class="admin-stat-body">
-              <div class="admin-stat-num">40</div>
-              <div class="admin-stat-label">Total Wards</div>
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FEF2F2; color:#C21807;">&#x1F465;</div>
+            <div class="stat-body">
+              <div class="stat-number">4,820</div>
+              <div class="stat-label">Total Citizens</div>
             </div>
+            <div class="stat-badge info">+38 this week</div>
           </div>
-          <div class="admin-stat-card blue">
-            <div class="admin-stat-icon"><i data-lucide="users"></i></div>
-            <div class="admin-stat-body">
-              <div class="admin-stat-num">1,847</div>
-              <div class="admin-stat-label">Registered Citizens</div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FEF3C7; color:#D97706;">&#x1F4CB;</div>
+            <div class="stat-body">
+              <div class="stat-number">312</div>
+              <div class="stat-label">Open Complaints</div>
             </div>
+            <div class="stat-badge pending">Needs Action</div>
           </div>
-          <div class="admin-stat-card green">
-            <div class="admin-stat-icon"><i data-lucide="user-check"></i></div>
-            <div class="admin-stat-body">
-              <div class="admin-stat-num">62</div>
-              <div class="admin-stat-label">Active Officers</div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#F0FDF4; color:#16a34a;">&#x2705;</div>
+            <div class="stat-body">
+              <div class="stat-number">1,047</div>
+              <div class="stat-label">Resolved Complaints</div>
             </div>
+            <div class="stat-badge resolved">77% Rate</div>
           </div>
-          <div class="admin-stat-card orange">
-            <div class="admin-stat-icon"><i data-lucide="building"></i></div>
-            <div class="admin-stat-body">
-              <div class="admin-stat-num">18</div>
-              <div class="admin-stat-label">Departments</div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#EFF6FF; color:#2563EB;">&#x1F4E2;</div>
+            <div class="stat-body">
+              <div class="stat-number">18</div>
+              <div class="stat-label">Active Announcements</div>
             </div>
+            <div class="stat-badge info">Live</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#F5F3FF; color:#7C3AED;">&#x1F477;</div>
+            <div class="stat-body">
+              <div class="stat-number">64</div>
+              <div class="stat-label">Staff Members</div>
+            </div>
+            <div class="stat-badge gold">Active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#ECFDF5; color:#059669;">&#x1F4DC;</div>
+            <div class="stat-body">
+              <div class="stat-number">23</div>
+              <div class="stat-label">Active Schemes</div>
+            </div>
+            <div class="stat-badge resolved">Running</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FFF7ED; color:#EA580C;">&#x1F3D8;&#xFE0F;</div>
+            <div class="stat-body">
+              <div class="stat-number">12</div>
+              <div class="stat-label">Wards / Villages</div>
+            </div>
+            <div class="stat-badge gold">Managed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FDF2F8; color:#9D174D;">&#x1F4A1;</div>
+            <div class="stat-body">
+              <div class="stat-number">189</div>
+              <div class="stat-label">Suggestions Received</div>
+            </div>
+            <div class="stat-badge info">Under Review</div>
           </div>
         </div>
 
-        <!-- Quick access modules -->
-        <div class="section-label">Quick Access</div>
-        <div class="admin-module-grid">
-          <button class="admin-module-btn" onclick="loadContent('Ward', document.getElementById('nav-Ward'))">
-            <i data-lucide="map-pin" class="admin-module-icon"></i>
-            <span class="admin-module-name">Ward</span>
-            <span class="admin-module-desc">Manage ward boundaries and data</span>
+        <!-- Quick Actions -->
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="showPanel('area-overview', document.querySelector('[onclick*=area-overview]'))">
+            <span class="quick-icon">&#x1F5FA;&#xFE0F;</span>
+            <span>Area Overview Setup</span>
           </button>
-          <button class="admin-module-btn" onclick="loadContent('Demographics', document.getElementById('nav-Demographics'))">
-            <i data-lucide="users" class="admin-module-icon"></i>
-            <span class="admin-module-name">Demographics</span>
-            <span class="admin-module-desc">Population and citizen statistics</span>
+          <button class="quick-btn" onclick="showPanel('complaints-management', document.querySelector('[onclick*=complaints-management]'))">
+            <span class="quick-icon">&#x1F4CB;</span>
+            <span>Manage Complaints</span>
           </button>
-          <button class="admin-module-btn" onclick="loadContent('Officer', document.getElementById('nav-Officer'))">
-            <i data-lucide="user-check" class="admin-module-icon"></i>
-            <span class="admin-module-name">Officer</span>
-            <span class="admin-module-desc">Assign and manage field officers</span>
+          <button class="quick-btn" onclick="showPanel('announcements', document.querySelector('[onclick*=announcements]'))">
+            <span class="quick-icon">&#x1F4E2;</span>
+            <span>Post Announcement</span>
           </button>
-          <button class="admin-module-btn" onclick="loadContent('Department', document.getElementById('nav-Department'))">
-            <i data-lucide="building" class="admin-module-icon"></i>
-            <span class="admin-module-name">Department</span>
-            <span class="admin-module-desc">Configure civic departments</span>
+          <button class="quick-btn" onclick="showPanel('reports', document.querySelector('[onclick*=reports]'))">
+            <span class="quick-icon">&#x1F4CA;</span>
+            <span>View Reports</span>
           </button>
-          <button class="admin-module-btn" onclick="loadContent('SOP', document.getElementById('nav-SOP'))">
-            <i data-lucide="file-text" class="admin-module-icon"></i>
-            <span class="admin-module-name">SOP</span>
-            <span class="admin-module-desc">Standard operating procedures</span>
-          </button>
-          <button class="admin-module-btn" onclick="loadContent('Facility', document.getElementById('nav-Facility'))">
-            <i data-lucide="landmark" class="admin-module-icon"></i>
-            <span class="admin-module-name">Facility</span>
-            <span class="admin-module-desc">Public facilities and amenities</span>
-          </button>
-          <button class="admin-module-btn" onclick="loadContent('Institution', document.getElementById('nav-Institution'))">
-            <i data-lucide="school" class="admin-module-icon"></i>
-            <span class="admin-module-name">Institution</span>
-            <span class="admin-module-desc">Schools, hospitals, civic bodies</span>
-          </button>
-          <button class="admin-module-btn" onclick="loadContent('Area', document.getElementById('nav-Area'))">
-            <i data-lucide="map" class="admin-module-icon"></i>
-            <span class="admin-module-name">Area</span>
-            <span class="admin-module-desc">Geographic area management</span>
-          </button>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="section-title" style="margin-top:28px;">System Progress Overview</div>
+        <div class="progress-grid">
+          <div class="progress-card">
+            <div class="progress-card-header">
+              <div class="progress-card-title">Complaint Resolution Rate</div>
+              <div class="progress-card-value">77%</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill green" style="width:77%"></div>
+            </div>
+            <div class="progress-card-meta">1,047 resolved of 1,359 total</div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-card-header">
+              <div class="progress-card-title">Citizen Engagement Rate</div>
+              <div class="progress-card-value">26%</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill blue" style="width:26%"></div>
+            </div>
+            <div class="progress-card-meta">1,253 active of 4,820 registered</div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-card-header">
+              <div class="progress-card-title">Scheme Coverage</div>
+              <div class="progress-card-value">61%</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill orange" style="width:61%"></div>
+            </div>
+            <div class="progress-card-meta">2,940 citizens covered under active schemes</div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-card-header">
+              <div class="progress-card-title">Area Data Completion</div>
+              <div class="progress-card-value">68%</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill red" style="width:68%"></div>
+            </div>
+            <div class="progress-card-meta">10 of 15 sections filled across all wards</div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="section-title" style="margin-top:28px;">Recent System Activity</div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-dot complaint"></div>
+            <div class="activity-body">
+              <div class="activity-title">New complaint filed — Broken road near Ward 7 market</div>
+              <div class="activity-meta">2 minutes ago &middot; <span class="badge-status pending-text">Pending</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot resolved"></div>
+            <div class="activity-body">
+              <div class="activity-title">Complaint resolved — Water supply disruption in Ward 3</div>
+              <div class="activity-meta">18 minutes ago &middot; <span class="badge-status resolved-text">Resolved</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot suggestion"></div>
+            <div class="activity-body">
+              <div class="activity-title">New citizen registered — Priya Mehta, Ward 12</div>
+              <div class="activity-meta">1 hour ago &middot; <span class="badge-status review-text">New Registration</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot announcement"></div>
+            <div class="activity-body">
+              <div class="activity-title">Announcement published — Water supply maintenance on 15 May</div>
+              <div class="activity-meta">3 hours ago &middot; <span class="badge-status info-text">Published</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot complaint"></div>
+            <div class="activity-body">
+              <div class="activity-title">Staff assigned — Rajesh Kumar assigned to Ward 5 complaints</div>
+              <div class="activity-meta">5 hours ago &middot; <span class="badge-status review-text">Assigned</span></div>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
 
-  </div><!-- end layout -->
+      <!-- ============================================================
+           PANEL: AREA OVERVIEW SETUP
+           ============================================================ -->
+      <div class="panel" id="panel-area-overview">
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Area Overview Setup</h1>
+            <p class="page-subtitle">Configure and manage complete area information for your jurisdiction</p>
+          </div>
+          <div class="area-action-buttons">
+            <button class="btn-action btn-ghost" onclick="resetAreaData()">&#x21BA; Reset Data</button>
+            <button class="btn-action btn-outline-red" onclick="saveDraft()">&#x1F4BE; Save Draft</button>
+            <button class="btn-action btn-outline-red" onclick="updateInfo()">&#x270F;&#xFE0F; Update Information</button>
+            <button class="btn-action btn-primary" onclick="publishArea()">&#x1F4E4; Publish</button>
+          </div>
+        </div>
+
+        <!-- Area Information Summary -->
+        <div class="area-info-card">
+          <div class="area-info-grid">
+            <div class="area-info-item">
+              <div class="area-info-label">Area Name</div>
+              <div class="area-info-value" id="areaName">Not Added</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Area Type</div>
+              <div class="area-info-value" id="areaType">Not Added</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Parent Authority</div>
+              <div class="area-info-value" id="areaAuthority">Not Added</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Last Updated</div>
+              <div class="area-info-value" id="areaLastUpdated">Not Updated</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Area Status</div>
+              <div class="area-info-value">
+                <span class="area-status-badge draft" id="areaStatusBadge">Draft</span>
+              </div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Completion</div>
+              <div class="area-info-value completion-value" id="areaCompletion">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden progress tracking elements (used by JS, not displayed) -->
+        <span id="completedCount" style="display:none">0</span>
+        <span id="partialCount"   style="display:none">0</span>
+        <span id="emptyCount"     style="display:none">0</span>
+        <span id="globalProgressFill" style="display:none"></span>
+        <span id="globalProgressPct"  style="display:none"></span>
+
+        <!-- Section Cards Grid -->
+        <div class="section-title">Area Sections</div>
+        <div class="section-cards-grid" id="sectionCardsGrid">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
+
+      <!-- ============================================================
+           PANEL: SECTION DETAIL (dynamically populated)
+           ============================================================ -->
+      <div class="panel" id="panel-section-detail">
+
+        <!-- Top Action Bar -->
+        <div class="sd-action-bar">
+          <button class="sd-back-btn" onclick="closeSectionDetail()">
+            <span class="sd-back-arrow">&#x2190;</span> Back to Area Overview
+          </button>
+          <div class="sd-action-right">
+            <button class="btn-action btn-ghost" id="sdBtnDelete" onclick="deleteSectionData()">&#x1F5D1; Delete Data</button>
+            <button class="btn-action btn-ghost" id="sdBtnSaveDraft" onclick="saveSectionDraft()">&#x1F4BE; Save Draft</button>
+            <button class="btn-action btn-outline-red" id="sdBtnUpdate" onclick="updateSectionData()">&#x270F;&#xFE0F; Update</button>
+            <button class="btn-action btn-primary" id="sdBtnSubmit" onclick="submitSectionData()">&#x2713; Submit</button>
+          </div>
+        </div>
+
+        <!-- Section Header -->
+        <div class="sd-header">
+          <div class="sd-header-left">
+            <div class="sd-breadcrumb">Area Overview Setup &rsaquo; <span id="sdBreadcrumbName">Section</span></div>
+            <h1 class="sd-title" id="sdTitle">Section Title</h1>
+            <p class="sd-subtitle" id="sdSubtitle">Section description</p>
+            <div class="sd-last-saved" id="sdLastSaved">Not saved yet</div>
+          </div>
+          <div class="sd-header-right">
+            <span class="section-card-status" id="sdStatusBadge">Empty</span>
+            <div class="sd-progress-mini">
+              <div class="sd-progress-track">
+                <div class="sd-progress-fill" id="sdProgressFill" style="width:0%"></div>
+              </div>
+              <span class="sd-progress-pct" id="sdProgressPct">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-Column Layout -->
+        <div class="sd-layout">
+
+          <!-- LEFT: Data Entry Form -->
+          <div class="sd-form-col">
+            <div class="sd-form-card">
+              <div class="sd-form-card-header">
+                <span class="sd-form-card-icon" id="sdFormIcon">&#x1F4DD;</span>
+                <div>
+                  <div class="sd-form-card-title">Enter Information</div>
+                  <div class="sd-form-card-sub">Fields can be left empty. Partial saves are allowed.</div>
+                </div>
+              </div>
+              <div class="sd-form-body" id="sdFormBody">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Saved Data Preview -->
+          <div class="sd-preview-col">
+            <div class="sd-preview-card">
+              <div class="sd-preview-header">
+                <span class="sd-preview-icon">&#x1F4CB;</span>
+                <div>
+                  <div class="sd-preview-title">Saved Information</div>
+                  <div class="sd-preview-sub">Previously entered data for this section</div>
+                </div>
+              </div>
+              <div class="sd-preview-body" id="sdPreviewBody">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: WARD / VILLAGE MANAGEMENT
+           ============================================================ -->
+      <div class="panel" id="panel-ward-management">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Ward / Village Management</h1>
+            <p class="page-subtitle">Manage all wards and villages under your jurisdiction</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F3D8;&#xFE0F;</div>
+          <div class="placeholder-title">Ward / Village Management</div>
+          <div class="placeholder-desc">This module is under development. Ward and village data management will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: CITIZEN MANAGEMENT
+           ============================================================ -->
+      <div class="panel" id="panel-citizen-management">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Citizen Management</h1>
+            <p class="page-subtitle">View and manage all registered citizens</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F465;</div>
+          <div class="placeholder-title">Citizen Management</div>
+          <div class="placeholder-desc">This module is under development. Citizen registration and profile management will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: COMPLAINTS MANAGEMENT
+           ============================================================ -->
+      <div class="panel" id="panel-complaints-management">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Complaints Management</h1>
+            <p class="page-subtitle">Review, assign, and resolve citizen complaints</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F4CB;</div>
+          <div class="placeholder-title">Complaints Management</div>
+          <div class="placeholder-desc">This module is under development. Full complaint lifecycle management will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: ANNOUNCEMENTS
+           ============================================================ -->
+      <div class="panel" id="panel-announcements">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Announcements</h1>
+            <p class="page-subtitle">Create and manage public announcements for citizens</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F4E2;</div>
+          <div class="placeholder-title">Announcements</div>
+          <div class="placeholder-desc">This module is under development. Announcement creation and publishing will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: SCHEMES & SERVICES
+           ============================================================ -->
+      <div class="panel" id="panel-schemes">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Schemes &amp; Services</h1>
+            <p class="page-subtitle">Manage government schemes and civic services</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F4DC;</div>
+          <div class="placeholder-title">Schemes &amp; Services</div>
+          <div class="placeholder-desc">This module is under development. Scheme management and citizen enrollment will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: STAFF MANAGEMENT
+           ============================================================ -->
+      <div class="panel" id="panel-staff-management">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Staff Management</h1>
+            <p class="page-subtitle">Manage staff accounts, roles, and assignments</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F477;</div>
+          <div class="placeholder-title">Staff Management</div>
+          <div class="placeholder-desc">This module is under development. Staff onboarding, role assignment, and performance tracking will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: REPORTS & ANALYTICS
+           ============================================================ -->
+      <div class="panel" id="panel-reports">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Reports &amp; Analytics</h1>
+            <p class="page-subtitle">System-wide data insights and downloadable reports</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x1F4CA;</div>
+          <div class="placeholder-title">Reports &amp; Analytics</div>
+          <div class="placeholder-desc">This module is under development. Comprehensive analytics and report generation will be available here.</div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PANEL: SETTINGS
+           ============================================================ -->
+      <div class="panel" id="panel-settings">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Configure system preferences and admin settings</p>
+          </div>
+        </div>
+        <div class="placeholder-panel">
+          <div class="placeholder-icon">&#x2699;&#xFE0F;</div>
+          <div class="placeholder-title">Settings</div>
+          <div class="placeholder-desc">This module is under development. System configuration and preference management will be available here.</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast hidden" id="toast">
+    <span class="toast-icon" id="toastIcon">&#x2705;</span>
+    <span id="toastMsg">Action completed successfully!</span>
+  </div>
+
+  <!-- ===== QUICK VIEW MODAL ===== -->
+  <div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Section Details</div>
+        <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIRMATION MODAL ===== -->
+  <div class="modal-overlay hidden" id="confirmOverlay" onclick="confirmNo()">
+    <div class="modal-card confirm-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="confirmTitle">Confirm Action</div>
+        <button class="modal-close" onclick="confirmNo()">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-message" id="confirmMessage">Are you sure?</p>
+        <div class="confirm-actions">
+          <button class="btn-action btn-ghost" onclick="confirmNo()">Cancel</button>
+          <button class="btn-action btn-primary" onclick="confirmYes()">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="admin-dashboard.js"></script>
 </body>
