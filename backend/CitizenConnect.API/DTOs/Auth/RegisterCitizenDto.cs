@@ -22,6 +22,8 @@
 
         public string PreferredLanguage { get; set; } = "EN";
 
+        public string Password { get; set; } = string.Empty;
+
         public string Captcha { get; set; } = string.Empty;
     }
 }
