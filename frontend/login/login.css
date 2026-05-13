@@ -1363,6 +1363,10 @@ input[type="number"] { -moz-appearance: textfield; }
   display: block;
   width: 100%;
   height: 48px;
+  /* Do NOT set width/height via CSS — canvas size is set in JS
+     using getBoundingClientRect() to match actual rendered size.
+     The width:100% here only controls display scaling, not the
+     internal drawing buffer which is managed by generateCaptcha(). */
 }
 
 /* Refresh button */

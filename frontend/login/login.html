@@ -50,9 +50,9 @@
             </div>
 
             <div class="form-group">
-              <label for="loginPassword"><strong>Password</strong> <span class="optional-tag">(Optional)</span></label>
+              <label for="loginPassword"><strong>Password</strong> <span class="req">*</span></label>
               <div class="input-icon-wrap">
-                <input type="password" id="loginPassword" placeholder="Enter your password (optional)" />
+                <input type="password" id="loginPassword" placeholder="Enter your password" required />
                 <span class="toggle-pw" onclick="togglePassword('loginPassword', this)">🗡</span>
               </div>
             </div>
@@ -188,12 +188,10 @@
               <label><strong>Are you from this ward?</strong> <span class="req">*</span></label>
               <div class="radio-group">
                 <label class="radio-label">
-                  <input type="radio" name="wardConfirm" value="yes" />
-                  Yes, I belong to this ward
+                  <input type="radio" name="wardConfirm" value="yes" /> Yes, I belong to this ward
                 </label>
                 <label class="radio-label">
-                  <input type="radio" name="wardConfirm" value="no" />
-                  No, I am not from this ward
+                  <input type="radio" name="wardConfirm" value="no" /> No, I am not from this ward
                 </label>
               </div>
             </div>
@@ -201,20 +199,12 @@
             <div class="form-group">
               <label><strong>Residency Type</strong> <span class="req">*</span></label>
               <div class="radio-group">
-                <label class="radio-label"><input type="radio" name="residentType" value="resident" /> Resident</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="working" /> Working Here</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="business" /> Business Owner</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="property_rent" /> Property Owner (Rent)</label>
-                <label class="radio-label" id="otherRadioLabel">
-                  <input type="radio" name="residentType" value="other" onchange="toggleOtherInput(this)" /> Other
-                </label>
+                <label class="radio-label"><input type="radio" name="residentType" value="1" /> Resident</label>
+                <label class="radio-label"><input type="radio" name="residentType" value="2" /> Working Here</label>
+                <label class="radio-label"><input type="radio" name="residentType" value="3" /> Business Owner</label>
+                <label class="radio-label"><input type="radio" name="residentType" value="4" /> Property Owner (Rent)</label>
+                <label class="radio-label"><input type="radio" name="residentType" value="5" /> Other</label>
               </div>
-            </div>
-
-            <!-- "Other" text input — shown only when Other is selected -->
-            <div class="form-group hidden" id="otherResidentGroup">
-              <label for="c-otherResident"><strong>Please specify</strong> <span class="req">*</span></label>
-              <input type="text" id="c-otherResident" placeholder="Describe your residency type" />
             </div>
 
             <!-- Voter Registration Question -->
@@ -370,23 +360,22 @@
 
             <div class="form-group">
               <label for="p-jurisdiction"><strong>Jurisdiction Type</strong> <span class="req">*</span></label>
-              <select id="p-jurisdiction">
-                <option value="">— Select —</option>
-                <option value="municipal">Municipal</option>
-                <option value="legislative">Legislative Assembly</option>
-                <option value="parliamentary">Parliamentary</option>
+              <select id="p-jurisdiction" required>
+                <option value="">Loading jurisdiction types…</option>
               </select>
+              <span class="field-hint" id="p-jurisdiction-hint" style="display:none;color:#c0392b;">
+                Jurisdiction data unavailable. Please try again later.
+              </span>
             </div>
 
-            <div class="form-row-two">
-              <div class="form-group">
-                <label for="p-wardNumber"><strong>Ward Number</strong> <span class="req">*</span></label>
-                <input type="text" id="p-wardNumber" placeholder="Ward / constituency no." />
-              </div>
-              <div class="form-group">
-                <label for="p-wardName"><strong>Ward Name</strong> <span class="req">*</span></label>
-                <input type="text" id="p-wardName" placeholder="Ward / constituency name" />
-              </div>
+            <div class="form-group">
+              <label for="p-ward"><strong>Ward</strong> <span class="req">*</span></label>
+              <select id="p-ward" required>
+                <option value="">Loading wards…</option>
+              </select>
+              <span class="field-hint" id="p-ward-hint" style="display:none;color:#c0392b;">
+                Ward data unavailable. Please try again later.
+              </span>
             </div>
 
             <div class="form-group">

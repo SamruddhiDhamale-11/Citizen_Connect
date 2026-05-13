@@ -86,19 +86,27 @@ function showLogin() {
   currentRole = '';
 }
 
-function showSuccess() {
+function showSuccess(apiMessage, redirectUrl) {
   document.getElementById('registerCard').classList.add('hidden');
   document.getElementById('loginCard').classList.add('hidden');
   const card = document.getElementById('successCard');
   card.classList.remove('hidden');
 
+  const subEl = card.querySelector('.success-sub');
+  if (subEl && apiMessage) subEl.textContent = apiMessage;
+
   setTimeout(() => {
     document.getElementById('progressBar').style.width = '100%';
   }, 100);
 
+  // After progress bar completes, redirect to the appropriate dashboard
   setTimeout(() => {
-    alert('Redirecting to dashboard... (Demo: no backend connected)');
-    showLogin();
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    } else {
+      resetRegisterForm();
+      showLogin();
+    }
   }, 4600);
 }
 
@@ -234,21 +242,8 @@ function syncWhatsApp(checkbox) {
   }
 }
 function toggleOtherInput(radio) {
-  const group = document.getElementById('otherResidentGroup');
-  if (radio.value === 'other' && radio.checked) {
-    group.classList.remove('hidden');
-  } else {
-    group.classList.add('hidden');
-  }
+  // Kept for backward compatibility — no longer used with dropdown UI
 }
-
-// Also hide when another radio is selected
-document.addEventListener('change', function (e) {
-  if (e.target.name === 'residentType' && e.target.value !== 'other') {
-    document.getElementById('otherResidentGroup').classList.add('hidden');
-    document.getElementById('c-otherResident').value = '';
-  }
-});
 
 // ================================================================
 // VALIDATION
@@ -306,10 +301,10 @@ function validateStep(step) {
   // ---- STEP 1 ----
   if (step === 1) {
     if (currentRole === 'citizen') {
-      const firstName    = document.getElementById('c-firstName').value.trim();
-      const lastName     = document.getElementById('c-lastName').value.trim();
-      const wardConfirm  = document.querySelector('input[name="wardConfirm"]:checked');
-      const residentType = document.querySelector('input[name="residentType"]:checked');
+      const firstName       = document.getElementById('c-firstName').value.trim();
+      const lastName        = document.getElementById('c-lastName').value.trim();
+      const wardConfirm     = document.querySelector('input[name="wardConfirm"]:checked');
+      const residentType    = document.querySelector('input[name="residentType"]:checked');
 
       if (!firstName || !lastName) {
         showErrorWithVoice(errId(1), 'Please enter your First Name and Last Name.', 'err-name-required');
@@ -320,15 +315,8 @@ function validateStep(step) {
         return false;
       }
       if (!residentType) {
-        showErrorWithVoice(errId(1), 'Please select your residency type.', 'err-resident-required');
+        showErrorWithVoice(errId(1), 'Please select your Residency Type.', 'err-resident-required');
         return false;
-      }
-      if (residentType.value === 'other') {
-        const otherText = document.getElementById('c-otherResident').value.trim();
-        if (!otherText) {
-          showErrorWithVoice(errId(1), 'Please specify your residency type.', 'err-resident-other');
-          return false;
-        }
       }
       // Voter registration question
       const isVoter = document.querySelector('input[name="isVoter"]:checked');
@@ -409,12 +397,16 @@ function validateStep(step) {
 
     if (currentRole === 'politician') {
       const jurisdiction = document.getElementById('p-jurisdiction').value;
-      const wardNumber   = document.getElementById('p-wardNumber').value.trim();
-      const wardName     = document.getElementById('p-wardName').value.trim();
+      const wardId       = document.getElementById('p-ward').value;
       const position     = document.getElementById('p-position').value;
 
-      if (!jurisdiction || !wardNumber || !wardName || !position) {
+      if (!jurisdiction || !wardId || !position) {
         showErrorWithVoice(errId(2), 'Please fill all required fields before proceeding.', 'err-fields-required');
+        return false;
+      }
+      // Block submission if master data failed to load
+      if (_masterData.failed) {
+        showErrorWithVoice(errId(2), 'Ward and Jurisdiction data could not be loaded. Please refresh the page.', 'err-fields-required');
         return false;
       }
     }
@@ -426,9 +418,92 @@ function validateStep(step) {
 }
 
 // ================================================================
-// SUBMIT REGISTRATION
+// REGISTER — LOADING STATE HELPERS
 // ================================================================
-function submitRegistration() {
+function setRegisterLoading(isLoading) {
+  // Target the Register button in whichever step-3 panel is visible
+  const btns = document.querySelectorAll(
+    '#step3-citizen button.btn-primary, #step3-politician button.btn-primary'
+  );
+  btns.forEach(btn => {
+    if (isLoading) {
+      btn.disabled        = true;
+      btn.dataset.origText = btn.textContent;
+      btn.textContent     = 'Registering…';
+      btn.style.opacity   = '0.75';
+      btn.style.cursor    = 'not-allowed';
+    } else {
+      btn.disabled      = false;
+      btn.textContent   = btn.dataset.origText || 'Register';
+      btn.style.opacity = '';
+      btn.style.cursor  = '';
+    }
+  });
+}
+
+// ================================================================
+// REGISTER — BUILD REQUEST BODIES
+// ================================================================
+function buildCitizenPayload(captchaVal) {
+  const firstName       = document.getElementById('c-firstName').value.trim();
+  const lastName        = document.getElementById('c-lastName').value.trim();
+  const mobile          = document.getElementById('c-mobile').value.trim();
+  const email           = document.getElementById('c-email').value.trim();
+  const gender          = document.getElementById('c-gender').value;
+  const dob             = document.getElementById('c-dob').value;
+  const residentType    = document.querySelector('input[name="residentType"]:checked');
+  const isVoter         = document.querySelector('input[name="isVoter"]:checked');
+  const password        = document.getElementById('c-password').value;
+
+  const wardConfirm     = document.querySelector('input[name="wardConfirm"]:checked');
+  const wardId          = wardConfirm && wardConfirm.value === 'yes' ? 1 : 2;
+  const residenceTypeId = residentType ? parseInt(residentType.value, 10) : 1;
+
+  return {
+    firstName:         firstName,
+    lastName:          lastName,
+    mobileNo:          mobile,
+    email:             email || '',
+    gender:            gender,
+    dateOfBirth:       dob,
+    wardId:            wardId,
+    residenceTypeId:   residenceTypeId,
+    isVoterRegistered: isVoter ? isVoter.value === 'yes' : false,
+    preferredLanguage: 'English',
+    password:          password,
+    captcha:           captchaVal,
+  };
+}
+
+function buildPoliticianPayload(captchaVal) {
+  const firstName      = document.getElementById('p-firstName').value.trim();
+  const lastName       = document.getElementById('p-lastName').value.trim();
+  const mobile         = document.getElementById('p-mobile').value.trim();
+  const email          = document.getElementById('p-email').value.trim();
+  const jurisdictionId = parseInt(document.getElementById('p-jurisdiction').value, 10);
+  const wardId         = parseInt(document.getElementById('p-ward').value, 10);
+  const position       = document.getElementById('p-position').value;
+  const password       = document.getElementById('p-password').value;
+
+  return {
+    firstName:          firstName,
+    lastName:           lastName,
+    mobileNo:           mobile,
+    email:              email || '',
+    partyName:          '',
+    politicianRole:     position,
+    governmentId:       String(wardId),
+    wardId:             wardId,
+    jurisdictionTypeId: jurisdictionId,
+    password:           password,
+    captcha:            captchaVal,
+  };
+}
+
+// ================================================================
+// SUBMIT REGISTRATION  (replaces the old demo-only version)
+// ================================================================
+async function submitRegistration() {
   const e3 = errId(3);
   clearError(e3);
 
@@ -445,6 +520,7 @@ function submitRegistration() {
   const confirm  = document.getElementById(confirmId).value;
   const terms    = document.getElementById(termsId).checked;
 
+  // ---- Password validation ----
   if (!password || !confirm) {
     showErrorWithVoice(e3, 'Please fill all required fields before proceeding.', 'err-password-required');
     return;
@@ -458,14 +534,14 @@ function submitRegistration() {
     return;
   }
 
-  // Politician: ID proof required
+  // ---- Politician: ID proof required ----
   if (currentRole === 'politician') {
     const idProof = document.getElementById('p-idProof');
     if (!idProof.files || idProof.files.length === 0) {
       showErrorWithVoice(e3, 'Please upload your ID proof document.', 'err-idproof-required');
       return;
     }
-    const file = idProof.files[0];
+    const file    = idProof.files[0];
     const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
     if (!allowed.includes(file.type)) {
       showErrorWithVoice(e3, 'Invalid file type. Please upload a PDF, JPG, or PNG.', 'err-idproof-type');
@@ -477,12 +553,13 @@ function submitRegistration() {
     }
   }
 
+  // ---- Terms ----
   if (!terms) {
     showErrorWithVoice(e3, 'You must accept the Terms & Conditions to register.', 'err-terms-required');
     return;
   }
 
-  // ---- Registration CAPTCHA check ----
+  // ---- Captcha ----
   const { inputId: regCaptchaInputId } = _getRegCaptchaIds();
   const regCaptchaInput = document.getElementById(regCaptchaInputId);
   const regCaptchaVal   = regCaptchaInput ? regCaptchaInput.value.trim() : '';
@@ -498,10 +575,62 @@ function submitRegistration() {
     return;
   }
 
-  // Refresh captcha after successful registration (for next use)
-  generateRegCaptcha();
+  // ---- All local checks passed — call API ----
+  setRegisterLoading(true);
 
-  showSuccess();
+  try {
+    const endpoint = currentRole === 'citizen'
+      ? API_BASE + '/register-citizen'
+      : API_BASE + '/register-politician';
+
+    const payload = currentRole === 'citizen'
+      ? buildCitizenPayload(regCaptchaVal)
+      : buildPoliticianPayload(regCaptchaVal);
+
+    const response = await fetch(endpoint, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+
+    // Parse JSON safely
+    let data;
+    try {
+      data = await response.json();
+    } catch (_) {
+      throw new Error('Server returned an unexpected response. Please try again.');
+    }
+
+    if (!response.ok || !data.success) {
+      // Backend returned failure — show message, keep form intact
+      showError(e3, data.message || 'Registration failed. Please check your details and try again.');
+      generateRegCaptcha();
+      return;
+    }
+
+    // ---- Success ----
+    generateRegCaptcha();   // refresh captcha for next use
+
+    // Store session so dashboard knows who is logged in
+    localStorage.setItem('userId', data.userId);
+    localStorage.setItem('role',   data.role);
+
+    // Use frontend path map — never trust backend redirectUrl for file-based routing
+    const regRedirect = currentRole === 'politician'
+      ? '../politician/politician-dashboard.html'
+      : '../citizen/citizen-dashboard.html';
+
+    showSuccess(data.message, regRedirect);
+
+  } catch (err) {
+    showError(
+      e3,
+      err.message || 'Unable to connect to the server. Please check your connection and try again.'
+    );
+    generateRegCaptcha();
+  } finally {
+    setRegisterLoading(false);
+  }
 }
 
 // ================================================================
@@ -529,9 +658,18 @@ function submitRegistration() {
 let _captchaValue = '';
 
 function generateCaptcha() {
+  const canvas = document.getElementById('captchaCanvas');
+  if (!canvas) return;
+
+  // Match canvas internal resolution to its CSS display size
+  // This prevents blurry/distorted rendering when CSS width:100% is applied
+  const rect = canvas.getBoundingClientRect();
+  const dpr  = window.devicePixelRatio || 1;
+  canvas.width  = Math.round(rect.width  || 180) * dpr;
+  canvas.height = Math.round(rect.height || 48)  * dpr;
+
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   let code = '';
-  // Ensure new code is always different from the last one
   do {
     code = '';
     for (let i = 0; i < 6; i++) {
@@ -540,24 +678,26 @@ function generateCaptcha() {
   } while (code === _captchaValue);
   _captchaValue = code;
 
-  const canvas = document.getElementById('captchaCanvas');
-  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
   const H = canvas.height;
 
+  ctx.scale(dpr, dpr);
+  const W2 = W / dpr;
+  const H2 = H / dpr;
+
   // Background
-  ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0, 0, W2, H2);
   ctx.fillStyle = '#F9F9F9';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, W2, H2);
 
   // Noise lines
   for (let i = 0; i < 5; i++) {
     ctx.strokeStyle = 'rgba(194,24,7,' + (0.08 + Math.random() * 0.12) + ')';
     ctx.lineWidth   = 1;
     ctx.beginPath();
-    ctx.moveTo(Math.random() * W, Math.random() * H);
-    ctx.lineTo(Math.random() * W, Math.random() * H);
+    ctx.moveTo(Math.random() * W2, Math.random() * H2);
+    ctx.lineTo(Math.random() * W2, Math.random() * H2);
     ctx.stroke();
   }
 
@@ -565,24 +705,22 @@ function generateCaptcha() {
   for (let i = 0; i < 30; i++) {
     ctx.fillStyle = 'rgba(0,0,0,' + (0.05 + Math.random() * 0.1) + ')';
     ctx.beginPath();
-    ctx.arc(Math.random() * W, Math.random() * H, 1, 0, Math.PI * 2);
+    ctx.arc(Math.random() * W2, Math.random() * H2, 1, 0, Math.PI * 2);
     ctx.fill();
   }
 
   // Draw each character with slight rotation and offset
-  const fonts = ['bold 22px Inter', 'bold 20px Segoe UI', 'bold 21px Arial'];
+  const fonts  = ['bold 22px Inter', 'bold 20px Segoe UI', 'bold 21px Arial'];
   const colors = ['#C21807', '#1F1F1F', '#9B1405', '#4A4A4A'];
-  const charW = W / code.length;
+  const charW  = W2 / code.length;
 
   for (let i = 0; i < code.length; i++) {
     ctx.save();
-    const x = charW * i + charW / 2;
-    const y = H / 2 + 4;
-    ctx.translate(x, y);
+    ctx.translate(charW * i + charW / 2, H2 / 2 + 4);
     ctx.rotate((Math.random() - 0.5) * 0.4);
-    ctx.font      = fonts[Math.floor(Math.random() * fonts.length)];
-    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-    ctx.textAlign = 'center';
+    ctx.font         = fonts[Math.floor(Math.random() * fonts.length)];
+    ctx.fillStyle    = colors[Math.floor(Math.random() * colors.length)];
+    ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(code[i], 0, 0);
     ctx.restore();
@@ -613,6 +751,16 @@ function _getRegCaptchaIds() {
 }
 
 function generateRegCaptcha() {
+  const { canvasId, inputId } = _getRegCaptchaIds();
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+
+  // Match canvas internal resolution to its CSS display size
+  const rect = canvas.getBoundingClientRect();
+  const dpr  = window.devicePixelRatio || 1;
+  canvas.width  = Math.round(rect.width  || 180) * dpr;
+  canvas.height = Math.round(rect.height || 48)  * dpr;
+
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   let code = '';
   do {
@@ -623,39 +771,40 @@ function generateRegCaptcha() {
   } while (code === _regCaptchaValue);
   _regCaptchaValue = code;
 
-  const { canvasId, inputId } = _getRegCaptchaIds();
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
   const H = canvas.height;
 
-  ctx.clearRect(0, 0, W, H);
+  ctx.scale(dpr, dpr);
+  const W2 = W / dpr;
+  const H2 = H / dpr;
+
+  ctx.clearRect(0, 0, W2, H2);
   ctx.fillStyle = '#F9F9F9';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, W2, H2);
 
   for (let i = 0; i < 5; i++) {
     ctx.strokeStyle = 'rgba(194,24,7,' + (0.08 + Math.random() * 0.12) + ')';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(Math.random() * W, Math.random() * H);
-    ctx.lineTo(Math.random() * W, Math.random() * H);
+    ctx.moveTo(Math.random() * W2, Math.random() * H2);
+    ctx.lineTo(Math.random() * W2, Math.random() * H2);
     ctx.stroke();
   }
   for (let i = 0; i < 30; i++) {
     ctx.fillStyle = 'rgba(0,0,0,' + (0.05 + Math.random() * 0.1) + ')';
     ctx.beginPath();
-    ctx.arc(Math.random() * W, Math.random() * H, 1, 0, Math.PI * 2);
+    ctx.arc(Math.random() * W2, Math.random() * H2, 1, 0, Math.PI * 2);
     ctx.fill();
   }
 
   const fonts  = ['bold 22px Inter', 'bold 20px Segoe UI', 'bold 21px Arial'];
   const colors = ['#C21807', '#1F1F1F', '#9B1405', '#4A4A4A'];
-  const charW  = W / code.length;
+  const charW  = W2 / code.length;
 
   for (let i = 0; i < code.length; i++) {
     ctx.save();
-    ctx.translate(charW * i + charW / 2, H / 2 + 4);
+    ctx.translate(charW * i + charW / 2, H2 / 2 + 4);
     ctx.rotate((Math.random() - 0.5) * 0.4);
     ctx.font         = fonts[Math.floor(Math.random() * fonts.length)];
     ctx.fillStyle    = colors[Math.floor(Math.random() * colors.length)];
@@ -673,26 +822,153 @@ function validateRegCaptcha(userInput) {
   return userInput.trim().toLowerCase() === _regCaptchaValue.toLowerCase();
 }
 
-// Generate captcha on page load
+// Generate captcha on page load — defer to after first paint so
+// getBoundingClientRect() returns the real rendered size
 (function () {
+  function init() {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(generateCaptcha);
+    });
+  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', generateCaptcha);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    generateCaptcha();
+    init();
   }
 })();
 
 // ================================================================
+// API CONFIGURATION
+// ================================================================
+const API_BASE        = 'http://localhost:5079/api/auth';
+const MASTER_API_BASE = 'http://localhost:5079/api/master';
+
+// ================================================================
+// MASTER DATA — loaded once on page load, used to populate dropdowns
+// ================================================================
+let _masterData = {
+  wards:             [],   // { wardId, wardName, wardNumber } — used for politician dropdown
+  jurisdictionTypes: [],   // { jurisdictionTypeId, jurisdictionTypeName }
+  loaded:            false,
+  failed:            false,
+};
+
+async function loadMasterData() {
+  try {
+    const [wardsRes, jurisdictionRes] = await Promise.all([
+      fetch(MASTER_API_BASE + '/wards'),
+      fetch(MASTER_API_BASE + '/jurisdiction-types'),
+    ]);
+
+    if (!wardsRes.ok || !jurisdictionRes.ok) {
+      throw new Error('One or more master data endpoints failed.');
+    }
+
+    _masterData.wards             = await wardsRes.json();
+    _masterData.jurisdictionTypes = await jurisdictionRes.json();
+    _masterData.loaded            = true;
+    _masterData.failed            = false;
+
+    populateMasterDropdowns();
+  } catch (err) {
+    console.error('Failed to load master data:', err);
+    _masterData.failed = true;
+    showMasterDataError();
+  }
+}
+
+function populateMasterDropdowns() {
+  // ---- Politician: Jurisdiction Type dropdown ----
+  const pJurisdiction = document.getElementById('p-jurisdiction');
+  if (pJurisdiction) {
+    pJurisdiction.innerHTML = '<option value="">— Select Jurisdiction Type —</option>';
+    _masterData.jurisdictionTypes.forEach(j => {
+      const opt = document.createElement('option');
+      opt.value       = j.jurisdictionTypeId;
+      opt.textContent = j.jurisdictionTypeName;
+      pJurisdiction.appendChild(opt);
+    });
+  }
+
+  // ---- Politician: Ward dropdown ----
+  const pWard = document.getElementById('p-ward');
+  if (pWard) {
+    pWard.innerHTML = '<option value="">— Select Ward —</option>';
+    _masterData.wards.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value       = w.wardId;
+      opt.textContent = w.wardName + (w.wardNumber ? ' (Ward ' + w.wardNumber + ')' : '');
+      pWard.appendChild(opt);
+    });
+  }
+}
+
+function showMasterDataError() {
+  // Show error hints and disable dropdowns that failed to load (politician only)
+  const hints = ['p-jurisdiction-hint', 'p-ward-hint'];
+  hints.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'block';
+  });
+
+  const dropdowns = ['p-jurisdiction', 'p-ward'];
+  dropdowns.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = '<option value="">Unavailable — please refresh</option>';
+      el.disabled  = true;
+    }
+  });
+}
+
+// Load master data as soon as the page is ready
+(function () {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadMasterData);
+  } else {
+    loadMasterData();
+  }
+})();
+
+// ================================================================
+// LOGIN LOADING STATE HELPERS
+// ================================================================
+function setLoginLoading(isLoading) {
+  const btn = document.querySelector('#loginForm button[type="submit"]');
+  if (!btn) return;
+  if (isLoading) {
+    btn.disabled = true;
+    btn.textContent = 'Logging in…';
+    btn.style.opacity = '0.75';
+    btn.style.cursor  = 'not-allowed';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Login to Portal';
+    btn.style.opacity = '';
+    btn.style.cursor  = '';
+  }
+}
+
+// ================================================================
+// ROLE → REDIRECT URL MAP
+// ================================================================
+const ROLE_REDIRECT = {
+  'Citizen':    '../citizen/citizen-dashboard.html',
+  'Politician': '../politician/politician-dashboard.html',
+  'Admin':      '../admin/admin-dashboard.html',
+};
+
+// ================================================================
 // LOGIN FORM SUBMIT
 // ================================================================
-document.getElementById('loginForm').addEventListener('submit', function (e) {
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
   clearError('loginError');
 
-  const role          = document.getElementById('loginRole').value;
-  const email         = document.getElementById('loginEmail').value.trim();
-  const password      = document.getElementById('loginPassword').value;
-  const captchaInput  = document.getElementById('captchaInput').value.trim();
+  const role     = document.getElementById('loginRole').value;
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const captchaInput = document.getElementById('captchaInput').value.trim();
 
   // ---- Role check ----
   if (!role) {
@@ -703,6 +979,12 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
   // ---- Email / Mobile check ----
   if (!email) {
     showError('loginError', 'Please enter your Email Address or Mobile Number.');
+    return;
+  }
+
+  // ---- Password required ----
+  if (!password) {
+    showError('loginError', 'Please enter your password.');
     return;
   }
 
@@ -719,23 +1001,49 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
     return;
   }
 
-  // ---- Password logic ----
-  // CASE 1: Password provided → must be correct (demo: any non-empty value passes)
-  // CASE 2: Password empty  → captcha-only login (already verified above)
-  if (password) {
-    // Demo mode: accept any password. In production, verify against backend.
-    // If password were wrong: showError('loginError', 'Incorrect password.'); generateCaptcha(); return;
-  }
+  // ---- Call backend API ----
+  setLoginLoading(true);
 
-  // ---- All checks passed — redirect ----
-  if (role === 'citizen') {
-    window.location.href = '../citizen/citizen-dashboard.html';
-  } else if (role === 'politician') {
-    window.location.href = '../politician/politician-dashboard.html';
-  } else if (role === 'admin') {
-    window.location.href = '../admin/admin-dashboard.html';
-  } else {
-    alert('Login successful! (Demo mode)');
+  try {
+    const response = await fetch(API_BASE + '/login', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        emailOrMobile: email,
+        password:      password,
+        captcha:       captchaInput
+      })
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (_) {
+      throw new Error('Server returned an unexpected response. Please try again.');
+    }
+
+    if (!response.ok || !data.success) {
+      showError('loginError', data.message || 'Login failed. Please check your credentials.');
+      generateCaptcha();
+      return;
+    }
+
+    // ---- Success — store session and redirect ----
+    localStorage.setItem('userId', data.userId);
+    localStorage.setItem('role',   data.role);
+
+    // Always use frontend path map — backend redirectUrl uses server-relative paths
+    const redirectUrl = ROLE_REDIRECT[data.role] || ROLE_REDIRECT['Citizen'];
+    window.location.href = redirectUrl;
+
+  } catch (err) {
+    showError(
+      'loginError',
+      err.message || 'Unable to connect to the server. Please check your connection and try again.'
+    );
+    generateCaptcha();
+  } finally {
+    setLoginLoading(false);
   }
 });
 
@@ -793,17 +1101,17 @@ document.getElementById('p-password').addEventListener('input', function () {
 function resetRegisterFormFields() {
   // Clear citizen fields
   ['c-firstName', 'c-middleName', 'c-lastName',
-   'c-dob', 'c-mobile', 'c-whatsapp', 'c-email', 'c-otherResident'].forEach(id => {
+   'c-dob', 'c-mobile', 'c-whatsapp', 'c-email'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   const cGender = document.getElementById('c-gender');
   if (cGender) cGender.value = '';
-  // Reset wardConfirm, residentType, and voter radios
+  // Reset ward confirm and residency type radios
   document.querySelectorAll('input[name="wardConfirm"]').forEach(r => r.checked = false);
   document.querySelectorAll('input[name="residentType"]').forEach(r => r.checked = false);
+  // Reset voter radio
   document.querySelectorAll('input[name="isVoter"]').forEach(r => r.checked = false);
-  document.getElementById('otherResidentGroup').classList.add('hidden');
   // Reset WhatsApp checkbox and readonly state
   const sameAsMobile = document.getElementById('c-sameAsMobile');
   if (sameAsMobile) {
@@ -820,13 +1128,15 @@ function resetRegisterFormFields() {
   if (pwStr) { pwStr.textContent = ''; pwStr.style.color = ''; }
 
   // Clear politician fields
-  ['p-firstName', 'p-middleName', 'p-lastName', 'p-age', 'p-mobile', 'p-email', 'p-address',
-   'p-wardNumber', 'p-wardName'].forEach(id => {
+  ['p-firstName', 'p-middleName', 'p-lastName', 'p-age', 'p-mobile', 'p-email', 'p-address'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // Reset politician dropdowns to first option
   const pJuris = document.getElementById('p-jurisdiction');
   if (pJuris) pJuris.value = '';
+  const pWard = document.getElementById('p-ward');
+  if (pWard) pWard.value = '';
   const pGender = document.getElementById('p-gender');
   if (pGender) pGender.value = '';
   const pPos = document.getElementById('p-position');
