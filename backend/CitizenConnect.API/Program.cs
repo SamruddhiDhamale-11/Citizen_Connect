@@ -1,44 +1,71 @@
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
 using CitizenConnect.Infrastructure.Data;
-
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// ==============================
+// CONTROLLERS
+// ==============================
 builder.Services.AddControllers();
 
-
-// DATABASE CONNECTION
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-// SERVICE REGISTRATION
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-
-// SWAGGER
+// ==============================
+// SWAGGER / OPENAPI
+// ==============================
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
 
+// ==============================
+// EF CORE - SQL SERVER
+// ==============================
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ==============================
+// APPLICATION SERVICES
+// ==============================
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// ==============================
+// CORS - Allow frontend origins
+// ==============================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "http://127.0.0.1:5501",
+                "http://localhost:5501")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
+// ==============================
+// MIDDLEWARE PIPELINE
+// ==============================
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// CORS must come before routing, auth, and controllers
+app.UseCors("AllowFrontend");
+
+// Skip HTTPS redirection in development to avoid port-resolution warnings
+// when the frontend calls HTTP endpoints directly
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 
