@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CitizenConnect.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+82f4fff1e096137a8c04cf5ad72e98d399555f33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ec7459a65cc5f72ee504794a3716b2eba96b9bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("CitizenConnect.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CitizenConnect.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

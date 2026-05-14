@@ -66,6 +66,194 @@ namespace CitizenConnect.API.Migrations
                     b.ToTable("Citizens");
                 });
 
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.Complaint", b =>
+                {
+                    b.Property<int>("ComplaintId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComplaintId"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CitizenId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ComplaintCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ComplaintNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WardId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ComplaintId");
+
+                    b.HasIndex("CitizenId");
+
+                    b.HasIndex("ComplaintCategoryId");
+
+                    b.HasIndex("ComplaintNumber")
+                        .IsUnique();
+
+                    b.HasIndex("WardId");
+
+                    b.ToTable("Complaints");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintCategory", b =>
+                {
+                    b.Property<int>("ComplaintCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComplaintCategoryId"));
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ComplaintCategoryId");
+
+                    b.ToTable("ComplaintCategories");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintImage", b =>
+                {
+                    b.Property<int>("ComplaintImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComplaintImageId"));
+
+                    b.Property<int>("ComplaintId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ComplaintImageId");
+
+                    b.HasIndex("ComplaintId");
+
+                    b.ToTable("ComplaintImages");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusHistory", b =>
+                {
+                    b.Property<int>("ComplaintStatusHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComplaintStatusHistoryId"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ChangedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ComplaintId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OldStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ComplaintStatusHistoryId");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("ComplaintId");
+
+                    b.ToTable("ComplaintStatusHistories");
+                });
+
             modelBuilder.Entity("CitizenConnect.Domain.Entities.JurisdictionType", b =>
                 {
                     b.Property<int>("JurisdictionTypeId")
@@ -363,6 +551,63 @@ namespace CitizenConnect.API.Migrations
                     b.Navigation("Ward");
                 });
 
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.Complaint", b =>
+                {
+                    b.HasOne("CitizenConnect.Domain.Entities.Citizen", "Citizen")
+                        .WithMany("Complaints")
+                        .HasForeignKey("CitizenId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CitizenConnect.Domain.Entities.ComplaintCategory", "ComplaintCategory")
+                        .WithMany("Complaints")
+                        .HasForeignKey("ComplaintCategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CitizenConnect.Domain.Entities.Ward", "Ward")
+                        .WithMany("Complaints")
+                        .HasForeignKey("WardId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Citizen");
+
+                    b.Navigation("ComplaintCategory");
+
+                    b.Navigation("Ward");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintImage", b =>
+                {
+                    b.HasOne("CitizenConnect.Domain.Entities.Complaint", "Complaint")
+                        .WithMany("ComplaintImages")
+                        .HasForeignKey("ComplaintId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Complaint");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusHistory", b =>
+                {
+                    b.HasOne("CitizenConnect.Domain.Entities.User", "ChangedByUser")
+                        .WithMany("ComplaintStatusHistories")
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CitizenConnect.Domain.Entities.Complaint", "Complaint")
+                        .WithMany("ComplaintStatusHistories")
+                        .HasForeignKey("ComplaintId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ChangedByUser");
+
+                    b.Navigation("Complaint");
+                });
+
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Politician", b =>
                 {
                     b.HasOne("CitizenConnect.Domain.Entities.JurisdictionType", "JurisdictionType")
@@ -412,6 +657,23 @@ namespace CitizenConnect.API.Migrations
                     b.Navigation("JurisdictionType");
                 });
 
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.Citizen", b =>
+                {
+                    b.Navigation("Complaints");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.Complaint", b =>
+                {
+                    b.Navigation("ComplaintImages");
+
+                    b.Navigation("ComplaintStatusHistories");
+                });
+
+            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintCategory", b =>
+                {
+                    b.Navigation("Complaints");
+                });
+
             modelBuilder.Entity("CitizenConnect.Domain.Entities.JurisdictionType", b =>
                 {
                     b.Navigation("Politicians");
@@ -433,12 +695,16 @@ namespace CitizenConnect.API.Migrations
                 {
                     b.Navigation("Citizen");
 
+                    b.Navigation("ComplaintStatusHistories");
+
                     b.Navigation("Politician");
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Ward", b =>
                 {
                     b.Navigation("Citizens");
+
+                    b.Navigation("Complaints");
 
                     b.Navigation("Politicians");
                 });

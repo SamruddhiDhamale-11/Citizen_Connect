@@ -154,3 +154,4 @@ C:\Users\sudhir.CRGINDIA\Desktop\Citizen_Connect\backend\CitizenConnect.API\obj\
 C:\Users\sudhir.CRGINDIA\Desktop\Citizen_Connect\backend\CitizenConnect.API\obj\Debug\net8.0\CitizenConnect.API.pdb
 C:\Users\sudhir.CRGINDIA\Desktop\Citizen_Connect\backend\CitizenConnect.API\obj\Debug\net8.0\CitizenConnect.API.genruntimeconfig.cache
 C:\Users\sudhir.CRGINDIA\Desktop\Citizen_Connect\backend\CitizenConnect.API\obj\Debug\net8.0\ref\CitizenConnect.API.dll
+C:\Users\sudhir.CRGINDIA\Desktop\Citizen_Connect\backend\CitizenConnect.API\bin\Debug\net8.0\CitizenConnect.API.staticwebassets.runtime.json

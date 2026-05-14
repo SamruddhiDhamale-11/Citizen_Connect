@@ -3,92 +3,164 @@
   "WorkspaceRootPath": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\authresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\authresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075725_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260512075725_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\iadminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\iadminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\admin\\complaintstatushistorydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\admin\\complaintstatushistorydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\admin\\updatecomplaintstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\admin\\updatecomplaintstatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\complaintstatushistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\complaintstatushistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260514092648_AddComplaintStatusHistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260514092648_AddComplaintStatusHistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\complaint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\complaint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\complaintservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\complaintservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\controllers\\complaintcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:controllers\\complaintcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\citizenconnect.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:citizenconnect.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\icomplaintservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\icomplaintservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\complaint\\complaintdetailsdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\complaint\\complaintdetailsdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\complaint\\complaintresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\complaint\\complaintresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\complaint\\createcomplaintdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\complaint\\createcomplaintdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260514070910_AddComplaintModule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260514070910_AddComplaintModule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\complaintimage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\complaintimage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\common\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\common\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\ward.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\ward.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\citizen.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\citizen.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\complaintcategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\complaintcategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\enums\\complaintstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\enums\\complaintstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075313_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260512075313_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512074835_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20260512074835_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\citizen.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\citizen.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\loginrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\loginrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\citizenconnect.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:citizenconnect.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\migrations\\20260512075725_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:migrations\\20260512075725_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\authresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\authresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\interfaces\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:interfaces\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\registerpoliticiandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\registerpoliticiandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\registerpoliticiandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\registerpoliticiandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\registercitizendto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\registercitizendto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\registercitizendto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\registercitizendto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\dtos\\auth\\loginrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:dtos\\auth\\loginrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\politician.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\politician.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\politician.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\politician.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\residencetype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\residencetype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\jurisdictiontype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\jurisdictiontype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\jurisdictiontype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\jurisdictiontype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\ward.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\ward.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\residencetype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\residencetype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\common\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C7EBC793-F3CD-4E1A-8F4E-2B8F58B16884}|CitizenConnect.API.csproj|solutionrelative:domain\\common\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|c:\\users\\sudhir.crgindia\\desktop\\citizen_connect\\backend\\citizenconnect.api\\domain\\entities\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{26B193DB-436A-E3E2-86FF-CFF7F9F63532}|CitizenConnect.API.csproj|solutionrelative:domain\\entities\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -98,11 +170,23 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 4,
           "Children": [
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 29,
               "Title": "LoginRequestDto.cs",
               "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\LoginRequestDto.cs",
               "RelativeDocumentMoniker": "DTOs\\Auth\\LoginRequestDto.cs",
@@ -111,279 +195,318 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-12T07:30:49.758Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "20260512075725_InitialCreate.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075725_InitialCreate.cs",
-              "RelativeDocumentMoniker": "Migrations\\20260512075725_InitialCreate.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075725_InitialCreate.cs",
-              "RelativeToolTip": "Migrations\\20260512075725_InitialCreate.cs",
-              "ViewState": "AgIAAFUAAAAAAAAAAAAgwAoAAAAaAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:57:25.267Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "20260512075313_InitialCreate.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075313_InitialCreate.cs",
-              "RelativeDocumentMoniker": "Migrations\\20260512075313_InitialCreate.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075313_InitialCreate.cs",
-              "RelativeToolTip": "Migrations\\20260512075313_InitialCreate.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:53:13.345Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "20260512074835_InitialCreate.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512074835_InitialCreate.cs",
-              "RelativeDocumentMoniker": "Migrations\\20260512074835_InitialCreate.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512074835_InitialCreate.cs",
-              "RelativeToolTip": "Migrations\\20260512074835_InitialCreate.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:48:35.319Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAABLAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-12T07:45:36.376Z",
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "Controllers\\AuthController.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAYwBQAAAA8AAAAAAAAAA==",
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AdminController.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "Controllers\\AdminController.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAIwEUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:41:19.24Z",
+              "WhenOpened": "2026-05-14T09:36:58.301Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "AuthResponseDto.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\AuthResponseDto.cs",
-              "RelativeDocumentMoniker": "DTOs\\Auth\\AuthResponseDto.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\AuthResponseDto.cs",
-              "RelativeToolTip": "DTOs\\Auth\\AuthResponseDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:36:31.666Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "CitizenConnect.API",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
-              "RelativeDocumentMoniker": "CitizenConnect.API.csproj",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
-              "RelativeToolTip": "CitizenConnect.API.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-05-12T07:16:49.915Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ApplicationDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Infrastructure\\Data\\ApplicationDbContext.cs",
-              "RelativeDocumentMoniker": "Infrastructure\\Data\\ApplicationDbContext.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Infrastructure\\Data\\ApplicationDbContext.cs",
-              "RelativeToolTip": "Infrastructure\\Data\\ApplicationDbContext.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA8AAAApAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:17:52.184Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAuwC4AAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAB8AAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-12T07:41:48.517Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "AuthService.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\AuthService.cs",
-              "RelativeDocumentMoniker": "Interfaces\\Services\\AuthService.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\AuthService.cs",
-              "RelativeToolTip": "Interfaces\\Services\\AuthService.cs",
-              "ViewState": "AgIAAH0AAAAAAAAAAAAuwKEAAAABAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "AdminService.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\AdminService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\Services\\AdminService.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\AdminService.cs",
+              "RelativeToolTip": "Interfaces\\Services\\AdminService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:40:13.302Z",
+              "WhenOpened": "2026-05-14T09:32:58.338Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "IAuthService.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IAuthService.cs",
-              "RelativeDocumentMoniker": "Interfaces\\Services\\IAuthService.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IAuthService.cs",
-              "RelativeToolTip": "Interfaces\\Services\\IAuthService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "IAdminService.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IAdminService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\Services\\IAdminService.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IAdminService.cs",
+              "RelativeToolTip": "Interfaces\\Services\\IAdminService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:39:44.85Z",
+              "WhenOpened": "2026-05-14T09:32:10.818Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ComplaintStatusHistoryDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Admin\\ComplaintStatusHistoryDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Admin\\ComplaintStatusHistoryDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Admin\\ComplaintStatusHistoryDto.cs",
+              "RelativeToolTip": "DTOs\\Admin\\ComplaintStatusHistoryDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T09:31:10.154Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UpdateComplaintStatusDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Admin\\UpdateComplaintStatusDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Admin\\UpdateComplaintStatusDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Admin\\UpdateComplaintStatusDto.cs",
+              "RelativeToolTip": "DTOs\\Admin\\UpdateComplaintStatusDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T09:30:07.692Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "Citizen.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Citizen.cs",
-              "RelativeDocumentMoniker": "Domain\\Entities\\Citizen.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Citizen.cs",
-              "RelativeToolTip": "Domain\\Entities\\Citizen.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:13:01.399Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "RegisterPoliticianDto.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterPoliticianDto.cs",
-              "RelativeDocumentMoniker": "DTOs\\Auth\\RegisterPoliticianDto.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterPoliticianDto.cs",
-              "RelativeToolTip": "DTOs\\Auth\\RegisterPoliticianDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:35:58.449Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "RegisterCitizenDto.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterCitizenDto.cs",
-              "RelativeDocumentMoniker": "DTOs\\Auth\\RegisterCitizenDto.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterCitizenDto.cs",
-              "RelativeToolTip": "DTOs\\Auth\\RegisterCitizenDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:35:27.133Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "Politician.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Politician.cs",
-              "RelativeDocumentMoniker": "Domain\\Entities\\Politician.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Politician.cs",
-              "RelativeToolTip": "Domain\\Entities\\Politician.cs",
+              "Title": "20260514092648_AddComplaintStatusHistory.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260514092648_AddComplaintStatusHistory.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260514092648_AddComplaintStatusHistory.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260514092648_AddComplaintStatusHistory.cs",
+              "RelativeToolTip": "Migrations\\20260514092648_AddComplaintStatusHistory.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:13:13.901Z",
+              "WhenOpened": "2026-05-14T09:26:48.335Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "ResidenceType.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ResidenceType.cs",
-              "RelativeDocumentMoniker": "Domain\\Entities\\ResidenceType.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ResidenceType.cs",
-              "RelativeToolTip": "Domain\\Entities\\ResidenceType.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "DocumentIndex": 10,
+              "Title": "Complaint.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Complaint.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\Complaint.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Complaint.cs",
+              "RelativeToolTip": "Domain\\Entities\\Complaint.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAAAiwDUAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:13:44.465Z",
+              "WhenOpened": "2026-05-14T06:38:41.269Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "JurisdictionType.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\JurisdictionType.cs",
-              "RelativeDocumentMoniker": "Domain\\Entities\\JurisdictionType.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\JurisdictionType.cs",
-              "RelativeToolTip": "Domain\\Entities\\JurisdictionType.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:13:58.117Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "Ward.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Ward.cs",
-              "RelativeDocumentMoniker": "Domain\\Entities\\Ward.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Ward.cs",
-              "RelativeToolTip": "Domain\\Entities\\Ward.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:13:30.899Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 9,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\User.cs",
               "RelativeDocumentMoniker": "Domain\\Entities\\User.cs",
               "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\User.cs",
               "RelativeToolTip": "Domain\\Entities\\User.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABkAAAAAAAAAAAAYwCkAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-12T07:12:35.702Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Infrastructure\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Infrastructure\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Infrastructure\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Infrastructure\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAANcAAAAAAAAAAAAkwOMAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:17:52.184Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ComplaintStatusHistory.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ComplaintStatusHistory.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\ComplaintStatusHistory.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ComplaintStatusHistory.cs",
+              "RelativeToolTip": "Domain\\Entities\\ComplaintStatusHistory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T09:06:24.727Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\Services\\AuthService.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\AuthService.cs",
+              "RelativeToolTip": "Interfaces\\Services\\AuthService.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAmwBsAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:40:13.302Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ComplaintService.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\ComplaintService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\Services\\ComplaintService.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\ComplaintService.cs",
+              "RelativeToolTip": "Interfaces\\Services\\ComplaintService.cs",
+              "ViewState": "AgIAAJsAAAAAAAAAAAAwwKMAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T07:19:32.209Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ComplaintController.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\ComplaintController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ComplaintController.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\ComplaintController.cs",
+              "RelativeToolTip": "Controllers\\ComplaintController.cs",
+              "ViewState": "AgIAADgAAAAAAAAAAAAwwFkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T07:25:53.118Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "CitizenConnect.API.csproj",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
+              "RelativeDocumentMoniker": "CitizenConnect.API.csproj",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
+              "RelativeToolTip": "CitizenConnect.API.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-05-12T07:16:49.915Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "IComplaintService.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IComplaintService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\Services\\IComplaintService.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IComplaintService.cs",
+              "RelativeToolTip": "Interfaces\\Services\\IComplaintService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T07:18:19.87Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 16,
-              "Title": "Role.cs",
-              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Role.cs",
-              "RelativeDocumentMoniker": "Domain\\Entities\\Role.cs",
-              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Role.cs",
-              "RelativeToolTip": "Domain\\Entities\\Role.cs",
+              "Title": "ComplaintDetailsDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Complaint\\ComplaintDetailsDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Complaint\\ComplaintDetailsDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Complaint\\ComplaintDetailsDto.cs",
+              "RelativeToolTip": "DTOs\\Complaint\\ComplaintDetailsDto.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAuwBsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T07:14:01.341Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "ComplaintResponseDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Complaint\\ComplaintResponseDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Complaint\\ComplaintResponseDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Complaint\\ComplaintResponseDto.cs",
+              "RelativeToolTip": "DTOs\\Complaint\\ComplaintResponseDto.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAA5wBIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T07:13:26.455Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "CreateComplaintDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Complaint\\CreateComplaintDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Complaint\\CreateComplaintDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Complaint\\CreateComplaintDto.cs",
+              "RelativeToolTip": "DTOs\\Complaint\\CreateComplaintDto.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAowBwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T07:11:49.698Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "20260514070910_AddComplaintModule.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260514070910_AddComplaintModule.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260514070910_AddComplaintModule.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260514070910_AddComplaintModule.cs",
+              "RelativeToolTip": "Migrations\\20260514070910_AddComplaintModule.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T07:12:48.166Z",
+              "WhenOpened": "2026-05-14T07:09:10.292Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ComplaintImage.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ComplaintImage.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\ComplaintImage.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ComplaintImage.cs",
+              "RelativeToolTip": "Domain\\Entities\\ComplaintImage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T06:39:28.43Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Ward.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Ward.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\Ward.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Ward.cs",
+              "RelativeToolTip": "Domain\\Entities\\Ward.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:13:30.899Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "ComplaintCategory.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ComplaintCategory.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\ComplaintCategory.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ComplaintCategory.cs",
+              "RelativeToolTip": "Domain\\Entities\\ComplaintCategory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T06:37:24.38Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "ComplaintStatus.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Enums\\ComplaintStatus.cs",
+              "RelativeDocumentMoniker": "Domain\\Enums\\ComplaintStatus.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Enums\\ComplaintStatus.cs",
+              "RelativeToolTip": "Domain\\Enums\\ComplaintStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-14T06:35:56.077Z",
               "EditorCaption": ""
             },
             {
@@ -394,10 +517,180 @@
               "RelativeDocumentMoniker": "Domain\\Common\\BaseEntity.cs",
               "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Common\\BaseEntity.cs",
               "RelativeToolTip": "Domain\\Common\\BaseEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-12T07:11:43.662Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Citizen.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Citizen.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\Citizen.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Citizen.cs",
+              "RelativeToolTip": "Domain\\Entities\\Citizen.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:13:01.399Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:41:19.24Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "20260512075313_InitialCreate.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075313_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260512075313_InitialCreate.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075313_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260512075313_InitialCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:53:13.345Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "20260512074835_InitialCreate.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512074835_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260512074835_InitialCreate.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512074835_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260512074835_InitialCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:48:35.319Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-05-12T07:45:36.376Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "AuthResponseDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\AuthResponseDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Auth\\AuthResponseDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\AuthResponseDto.cs",
+              "RelativeToolTip": "DTOs\\Auth\\AuthResponseDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:36:31.666Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "20260512075725_InitialCreate.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075725_InitialCreate.cs",
+              "RelativeDocumentMoniker": "Migrations\\20260512075725_InitialCreate.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Migrations\\20260512075725_InitialCreate.cs",
+              "RelativeToolTip": "Migrations\\20260512075725_InitialCreate.cs",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAgwAoAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:57:25.267Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IAuthService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\Services\\IAuthService.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Interfaces\\Services\\IAuthService.cs",
+              "RelativeToolTip": "Interfaces\\Services\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:39:44.85Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "RegisterPoliticianDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterPoliticianDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Auth\\RegisterPoliticianDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterPoliticianDto.cs",
+              "RelativeToolTip": "DTOs\\Auth\\RegisterPoliticianDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:35:58.449Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "RegisterCitizenDto.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterCitizenDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\Auth\\RegisterCitizenDto.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\DTOs\\Auth\\RegisterCitizenDto.cs",
+              "RelativeToolTip": "DTOs\\Auth\\RegisterCitizenDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:35:27.133Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "Politician.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Politician.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\Politician.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Politician.cs",
+              "RelativeToolTip": "Domain\\Entities\\Politician.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:13:13.901Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "ResidenceType.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ResidenceType.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\ResidenceType.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\ResidenceType.cs",
+              "RelativeToolTip": "Domain\\Entities\\ResidenceType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:13:44.465Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "JurisdictionType.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\JurisdictionType.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\JurisdictionType.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\JurisdictionType.cs",
+              "RelativeToolTip": "Domain\\Entities\\JurisdictionType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:13:58.117Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "Role.cs",
+              "DocumentMoniker": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Role.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\Role.cs",
+              "ToolTip": "C:\\Users\\sudhir.CRGINDIA\\Desktop\\Citizen_Connect\\backend\\CitizenConnect.API\\Domain\\Entities\\Role.cs",
+              "RelativeToolTip": "Domain\\Entities\\Role.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T07:12:48.166Z"
             }
           ]
         }

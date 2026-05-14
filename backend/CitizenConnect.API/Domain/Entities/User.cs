@@ -35,5 +35,10 @@ namespace CitizenConnect.Domain.Entities
         public Citizen? Citizen { get; set; }
 
         public Politician? Politician { get; set; }
+
+        public ICollection<ComplaintStatusHistory>
+    ComplaintStatusHistories
+        { get; set; }
+    = new List<ComplaintStatusHistory>();
     }
 }

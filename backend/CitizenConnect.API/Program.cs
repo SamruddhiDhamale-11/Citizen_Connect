@@ -1,6 +1,8 @@
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
 using CitizenConnect.Infrastructure.Data;
+using CitizenConnect.Interfaces.Services;
+using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // APPLICATION SERVICES
 // ==============================
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IComplaintService, ComplaintService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 // ==============================
 // CORS - Allow frontend origins
@@ -66,6 +70,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

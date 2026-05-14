@@ -29,6 +29,14 @@ namespace CitizenConnect.Infrastructure.Data
 
         public DbSet<JurisdictionType> JurisdictionTypes => Set<JurisdictionType>();
 
+        public DbSet<Complaint> Complaints => Set<Complaint>();
+
+        public DbSet<ComplaintCategory> ComplaintCategories => Set<ComplaintCategory>();
+
+        public DbSet<ComplaintImage> ComplaintImages => Set<ComplaintImage>();
+
+        public DbSet<ComplaintStatusHistory> ComplaintStatusHistories => Set<ComplaintStatusHistory>();
+
 
         // ==============================
         // MODEL CONFIGURATION
@@ -166,6 +174,60 @@ namespace CitizenConnect.Infrastructure.Data
             modelBuilder.Entity<Ward>()
                 .Property(w => w.Longitude)
                 .HasColumnType("decimal(18,6)");
+
+            modelBuilder.Entity<Complaint>()
+    .HasOne(c => c.Citizen)
+    .WithMany(c => c.Complaints)
+    .HasForeignKey(c => c.CitizenId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<Complaint>()
+    .HasOne(c => c.Ward)
+    .WithMany(w => w.Complaints)
+    .HasForeignKey(c => c.WardId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Complaint>()
+    .HasOne(c => c.ComplaintCategory)
+    .WithMany(cc => cc.Complaints)
+    .HasForeignKey(c => c.ComplaintCategoryId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ComplaintImage>()
+    .HasOne(ci => ci.Complaint)
+    .WithMany(c => c.ComplaintImages)
+    .HasForeignKey(ci => ci.ComplaintId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<Complaint>()
+    .Property(c => c.Latitude)
+    .HasColumnType("decimal(18,6)");
+
+            modelBuilder.Entity<Complaint>()
+                .Property(c => c.Longitude)
+                .HasColumnType("decimal(18,6)");
+
+
+            modelBuilder.Entity<Complaint>()
+    .HasIndex(c => c.ComplaintNumber)
+    .IsUnique();
+
+
+            modelBuilder.Entity<ComplaintStatusHistory>()
+    .HasOne(h => h.Complaint)
+    .WithMany(c => c.ComplaintStatusHistories)
+    .HasForeignKey(h => h.ComplaintId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ComplaintStatusHistory>()
+    .HasOne(h => h.ChangedByUser)
+    .WithMany(u => u.ComplaintStatusHistories)
+    .HasForeignKey(h => h.ChangedByUserId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+
         }
     }
 }

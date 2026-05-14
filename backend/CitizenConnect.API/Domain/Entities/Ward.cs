@@ -30,5 +30,8 @@ namespace CitizenConnect.Domain.Entities
 
         public ICollection<Politician> Politicians { get; set; }
             = new List<Politician>();
+
+        public ICollection<Complaint> Complaints { get; set; }
+    = new List<Complaint>();
     }
 }
