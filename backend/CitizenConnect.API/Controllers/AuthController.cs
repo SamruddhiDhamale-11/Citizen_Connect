@@ -32,7 +32,7 @@ namespace CitizenConnect.API.Controllers
         }
 
         [HttpPost("register-politician")]
-        public async Task<IActionResult> RegisterPolitician(RegisterPoliticianDto dto)
+        public async Task<IActionResult> RegisterPolitician([FromForm] RegisterPoliticianDto dto)
         {
             var result = await _authService.RegisterPoliticianAsync(dto);
 

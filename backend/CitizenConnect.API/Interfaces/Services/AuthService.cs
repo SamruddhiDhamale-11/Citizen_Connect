@@ -200,42 +200,130 @@ namespace CitizenConnect.Application.Services
 
         public async Task<AuthResponseDto> RegisterPoliticianAsync(RegisterPoliticianDto dto)
         {
-            var user = new User
+            try
             {
-                FirstName    = dto.FirstName,
-                LastName     = dto.LastName,
-                MobileNo     = dto.MobileNo,
-                Email        = dto.Email ?? "",
-                PasswordHash = dto.Password ?? "",
-                RoleId       = 3
-            };
+                // ==============================
+                // DUPLICATE CHECK
+                // ==============================
+                var existingUser = await _context.Users
+                    .FirstOrDefaultAsync(x =>
+                        x.MobileNo == dto.MobileNo ||
+                        x.Email == dto.Email);
 
-            await _context.Users.AddAsync(user);
+                if (existingUser != null)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "User already exists"
+                    };
+                }
 
-            await _context.SaveChangesAsync();
+                // ==============================
+                // VALIDATE FOREIGN KEYS
+                // ==============================
+                // NOTE: WardId is no longer collected from the politician
+                // registration form (the ward dropdown was removed).
+                // Politicians identify their ward via WardNumber and WardName
+                // text fields. We only validate JurisdictionTypeId here.
+                var jurisdictionExists = await _context.JurisdictionTypes
+                    .AnyAsync(j => j.JurisdictionTypeId == dto.JurisdictionTypeId);
 
-            var politician = new Politician
+                if (!jurisdictionExists)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid Jurisdiction Type"
+                    };
+                }
+
+                // ==============================
+                // SAVE FILES
+                // ==============================
+                string? profilePhotoPath = null;
+                string? idProofPath      = null;
+
+                if (dto.ProfilePhoto != null && dto.ProfilePhoto.Length > 0)
+                {
+                    var ext      = Path.GetExtension(dto.ProfilePhoto.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var savePath = Path.Combine("wwwroot", "uploads", "politicians", fileName);
+                    Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+                    using var stream = new FileStream(savePath, FileMode.Create);
+                    await dto.ProfilePhoto.CopyToAsync(stream);
+                    profilePhotoPath = $"/uploads/politicians/{fileName}";
+                }
+
+                if (dto.IdProof != null && dto.IdProof.Length > 0)
+                {
+                    var ext      = Path.GetExtension(dto.IdProof.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var savePath = Path.Combine("wwwroot", "uploads", "idproofs", fileName);
+                    Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+                    using var stream = new FileStream(savePath, FileMode.Create);
+                    await dto.IdProof.CopyToAsync(stream);
+                    idProofPath = $"/uploads/idproofs/{fileName}";
+                }
+
+                // ==============================
+                // CREATE USER
+                // ==============================
+                var user = new User
+                {
+                    FirstName    = dto.FirstName,
+                    LastName     = dto.LastName,
+                    MobileNo     = dto.MobileNo,
+                    Email        = dto.Email ?? "",
+                    Gender       = dto.Gender,
+                    PasswordHash = dto.Password ?? "",
+                    RoleId       = 3
+                };
+
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+
+                // ==============================
+                // CREATE POLITICIAN
+                // ==============================
+                var politician = new Politician
+                {
+                    UserId             = user.UserId,
+                    PartyName          = dto.PartyName,
+                    PoliticianRole     = dto.PoliticianRole,
+                    Age                = dto.Age,
+                    Gender             = dto.Gender,
+                    Address            = dto.Address,
+                    GovernmentId       = dto.GovernmentId,
+                    WardNumber         = dto.WardNumber,
+                    WardName           = dto.WardName,
+                    PartName           = dto.PartName,
+                    WardId             = dto.WardId,   /* nullable — may be null */
+                    JurisdictionTypeId = dto.JurisdictionTypeId,
+                    ProfilePhoto       = profilePhotoPath,
+                    IdProofPath        = idProofPath
+                };
+
+                await _context.Politicians.AddAsync(politician);
+                await _context.SaveChangesAsync();
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Politician registered successfully",
+                    UserId  = user.UserId,
+                    Role    = "Politician",
+                    RedirectUrl = "../politician/politician-dashboard.html"
+                };
+            }
+            catch (Exception ex)
             {
-                UserId = user.UserId,
-                PartyName = dto.PartyName,
-                PoliticianRole = dto.PoliticianRole,
-                GovernmentId = dto.GovernmentId,
-                WardId = dto.WardId,
-                JurisdictionTypeId = dto.JurisdictionTypeId
-            };
-
-            await _context.Politicians.AddAsync(politician);
-
-            await _context.SaveChangesAsync();
-
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = "Politician registered successfully",
-                UserId = user.UserId,
-                Role = "Politician",
-                RedirectUrl = "../politician/politician-dashboard.html"
-            };
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = $"Registration failed: {ex.InnerException?.Message ?? ex.Message}"
+                };
+            }
         }
 
         private string GetRedirectUrl(string role)

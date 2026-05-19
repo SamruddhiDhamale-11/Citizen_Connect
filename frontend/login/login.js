@@ -246,6 +246,48 @@ function toggleOtherInput(radio) {
 }
 
 // ================================================================
+// FILE NAME DISPLAY & INLINE TYPE VALIDATION
+// Called by onchange on file inputs
+// ================================================================
+function showFileName(inputId, labelId) {
+  const input = document.getElementById(inputId);
+  const label = document.getElementById(labelId);
+  if (!input || !label) return;
+
+  if (input.files.length === 0) {
+    label.textContent = '';
+    label.style.color = '#1a8a3a';
+    return;
+  }
+
+  const file = input.files[0];
+
+  // Determine allowed types based on which input this is
+  const isPhoto   = inputId === 'p-profilePhoto';
+  const photoTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  const idTypes    = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  const allowed    = isPhoto ? photoTypes : idTypes;
+  const hint       = isPhoto ? 'JPG or PNG only' : 'PDF, JPG, or PNG only';
+
+  if (!allowed.includes(file.type)) {
+    label.textContent = '✖ Invalid file type — ' + hint;
+    label.style.color = '#c0392b';
+    input.value = '';   // clear the invalid selection
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    label.textContent = '✖ File too large — max 5 MB';
+    label.style.color = '#c0392b';
+    input.value = '';
+    return;
+  }
+
+  label.textContent = '✔ ' + file.name;
+  label.style.color = '#1a8a3a';
+}
+
+// ================================================================
 // VALIDATION
 // ================================================================
 function showError(id, msg) {
@@ -397,16 +439,19 @@ function validateStep(step) {
 
     if (currentRole === 'politician') {
       const jurisdiction = document.getElementById('p-jurisdiction').value;
-      const wardId       = document.getElementById('p-ward').value;
+      const wardNumber   = document.getElementById('p-wardNumber').value.trim();
+      const wardName     = document.getElementById('p-wardName').value.trim();
       const position     = document.getElementById('p-position').value;
+      const partyName    = document.getElementById('p-partyName').value.trim();
+      const governmentId = document.getElementById('p-governmentId').value.trim();
 
-      if (!jurisdiction || !wardId || !position) {
+      if (!jurisdiction || !wardNumber || !wardName || !position || !partyName || !governmentId) {
         showErrorWithVoice(errId(2), 'Please fill all required fields before proceeding.', 'err-fields-required');
         return false;
       }
       // Block submission if master data failed to load
       if (_masterData.failed) {
-        showErrorWithVoice(errId(2), 'Ward and Jurisdiction data could not be loaded. Please refresh the page.', 'err-fields-required');
+        showErrorWithVoice(errId(2), 'Jurisdiction data could not be loaded. Please refresh the page.', 'err-fields-required');
         return false;
       }
     }
@@ -475,29 +520,46 @@ function buildCitizenPayload(captchaVal) {
   };
 }
 
-function buildPoliticianPayload(captchaVal) {
-  const firstName      = document.getElementById('p-firstName').value.trim();
-  const lastName       = document.getElementById('p-lastName').value.trim();
-  const mobile         = document.getElementById('p-mobile').value.trim();
-  const email          = document.getElementById('p-email').value.trim();
-  const jurisdictionId = parseInt(document.getElementById('p-jurisdiction').value, 10);
-  const wardId         = parseInt(document.getElementById('p-ward').value, 10);
-  const position       = document.getElementById('p-position').value;
-  const password       = document.getElementById('p-password').value;
+function buildPoliticianFormData(captchaVal) {
+  const fd = new FormData();
 
-  return {
-    firstName:          firstName,
-    lastName:           lastName,
-    mobileNo:           mobile,
-    email:              email || '',
-    partyName:          '',
-    politicianRole:     position,
-    governmentId:       String(wardId),
-    wardId:             wardId,
-    jurisdictionTypeId: jurisdictionId,
-    password:           password,
-    captcha:            captchaVal,
-  };
+  // Personal fields
+  fd.append('firstName',   document.getElementById('p-firstName').value.trim());
+  fd.append('lastName',    document.getElementById('p-lastName').value.trim());
+  fd.append('mobileNo',    document.getElementById('p-mobile').value.trim());
+  fd.append('email',       document.getElementById('p-email').value.trim() || '');
+  fd.append('age',         document.getElementById('p-age').value.trim());
+  fd.append('gender',      document.getElementById('p-gender').value);
+  fd.append('address',     document.getElementById('p-address').value.trim());
+
+  // Political fields
+  fd.append('partyName',          document.getElementById('p-partyName').value.trim());
+  fd.append('politicianRole',     document.getElementById('p-position').value);
+  fd.append('governmentId',       document.getElementById('p-governmentId').value.trim());
+  fd.append('jurisdictionTypeId', document.getElementById('p-jurisdiction').value);
+  fd.append('wardNumber',         document.getElementById('p-wardNumber').value.trim());
+  fd.append('wardName',           document.getElementById('p-wardName').value.trim());
+
+  // Auth
+  fd.append('password', document.getElementById('p-password').value);
+  fd.append('captcha',  captchaVal);
+
+  // Files — only append if a file was selected
+  const profilePhotoInput = document.getElementById('p-profilePhoto');
+  if (profilePhotoInput && profilePhotoInput.files.length > 0) {
+    fd.append('profilePhoto', profilePhotoInput.files[0]);
+  }
+  const idProofInput = document.getElementById('p-idProof');
+  if (idProofInput && idProofInput.files.length > 0) {
+    fd.append('idProof', idProofInput.files[0]);
+  }
+
+  return fd;
+}
+
+function buildPoliticianPayload(captchaVal) {
+  // Legacy — kept for reference, replaced by buildPoliticianFormData
+  return buildPoliticianFormData(captchaVal);
 }
 
 // ================================================================
@@ -534,21 +596,37 @@ async function submitRegistration() {
     return;
   }
 
-  // ---- Politician: ID proof required ----
+  // ---- Politician: file validation ----
   if (currentRole === 'politician') {
+    const profilePhoto = document.getElementById('p-profilePhoto');
+    if (!profilePhoto.files || profilePhoto.files.length === 0) {
+      showErrorWithVoice(e3, 'Please upload your profile photo.', 'err-idproof-required');
+      return;
+    }
+    const photoFile = profilePhoto.files[0];
+    const photoAllowed = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!photoAllowed.includes(photoFile.type)) {
+      showErrorWithVoice(e3, 'Profile photo must be JPG or PNG format.', 'err-idproof-type');
+      return;
+    }
+    if (photoFile.size > 5 * 1024 * 1024) {
+      showErrorWithVoice(e3, 'Profile photo must not exceed 5 MB.', 'err-idproof-size');
+      return;
+    }
+
     const idProof = document.getElementById('p-idProof');
     if (!idProof.files || idProof.files.length === 0) {
       showErrorWithVoice(e3, 'Please upload your ID proof document.', 'err-idproof-required');
       return;
     }
-    const file    = idProof.files[0];
-    const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-    if (!allowed.includes(file.type)) {
-      showErrorWithVoice(e3, 'Invalid file type. Please upload a PDF, JPG, or PNG.', 'err-idproof-type');
+    const idFile = idProof.files[0];
+    const idAllowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!idAllowed.includes(idFile.type)) {
+      showErrorWithVoice(e3, 'ID proof must be PDF, JPG, or PNG format.', 'err-idproof-type');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      showErrorWithVoice(e3, 'File size must not exceed 5 MB.', 'err-idproof-size');
+    if (idFile.size > 5 * 1024 * 1024) {
+      showErrorWithVoice(e3, 'ID proof file must not exceed 5 MB.', 'err-idproof-size');
       return;
     }
   }
@@ -583,15 +661,25 @@ async function submitRegistration() {
       ? API_BASE + '/register-citizen'
       : API_BASE + '/register-politician';
 
-    const payload = currentRole === 'citizen'
-      ? buildCitizenPayload(regCaptchaVal)
-      : buildPoliticianPayload(regCaptchaVal);
+    let fetchOptions;
 
-    const response = await fetch(endpoint, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
-    });
+    if (currentRole === 'politician') {
+      // Politician uses multipart/form-data for file uploads
+      // Do NOT set Content-Type — browser sets it automatically with boundary
+      fetchOptions = {
+        method: 'POST',
+        body:   buildPoliticianFormData(regCaptchaVal),
+      };
+    } else {
+      // Citizen uses JSON
+      fetchOptions = {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(buildCitizenPayload(regCaptchaVal)),
+      };
+    }
+
+    const response = await fetch(endpoint, fetchOptions);
 
     // Parse JSON safely
     let data;
@@ -847,7 +935,6 @@ const MASTER_API_BASE = 'http://localhost:5079/api/master';
 // MASTER DATA — loaded once on page load, used to populate dropdowns
 // ================================================================
 let _masterData = {
-  wards:             [],   // { wardId, wardName, wardNumber } — used for politician dropdown
   jurisdictionTypes: [],   // { jurisdictionTypeId, jurisdictionTypeName }
   loaded:            false,
   failed:            false,
@@ -855,16 +942,12 @@ let _masterData = {
 
 async function loadMasterData() {
   try {
-    const [wardsRes, jurisdictionRes] = await Promise.all([
-      fetch(MASTER_API_BASE + '/wards'),
-      fetch(MASTER_API_BASE + '/jurisdiction-types'),
-    ]);
+    const jurisdictionRes = await fetch(MASTER_API_BASE + '/jurisdiction-types');
 
-    if (!wardsRes.ok || !jurisdictionRes.ok) {
-      throw new Error('One or more master data endpoints failed.');
+    if (!jurisdictionRes.ok) {
+      throw new Error('Jurisdiction types endpoint failed.');
     }
 
-    _masterData.wards             = await wardsRes.json();
     _masterData.jurisdictionTypes = await jurisdictionRes.json();
     _masterData.loaded            = true;
     _masterData.failed            = false;
@@ -889,29 +972,17 @@ function populateMasterDropdowns() {
       pJurisdiction.appendChild(opt);
     });
   }
-
-  // ---- Politician: Ward dropdown ----
-  const pWard = document.getElementById('p-ward');
-  if (pWard) {
-    pWard.innerHTML = '<option value="">— Select Ward —</option>';
-    _masterData.wards.forEach(w => {
-      const opt = document.createElement('option');
-      opt.value       = w.wardId;
-      opt.textContent = w.wardName + (w.wardNumber ? ' (Ward ' + w.wardNumber + ')' : '');
-      pWard.appendChild(opt);
-    });
-  }
 }
 
 function showMasterDataError() {
-  // Show error hints and disable dropdowns that failed to load (politician only)
-  const hints = ['p-jurisdiction-hint', 'p-ward-hint'];
+  // Show error hint and disable jurisdiction dropdown that failed to load (politician only)
+  const hints = ['p-jurisdiction-hint'];
   hints.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'block';
   });
 
-  const dropdowns = ['p-jurisdiction', 'p-ward'];
+  const dropdowns = ['p-jurisdiction'];
   dropdowns.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -1128,15 +1199,14 @@ function resetRegisterFormFields() {
   if (pwStr) { pwStr.textContent = ''; pwStr.style.color = ''; }
 
   // Clear politician fields
-  ['p-firstName', 'p-middleName', 'p-lastName', 'p-age', 'p-mobile', 'p-email', 'p-address'].forEach(id => {
+  ['p-firstName', 'p-middleName', 'p-lastName', 'p-age', 'p-mobile', 'p-email', 'p-address',
+   'p-wardNumber', 'p-wardName', 'p-partyName', 'p-governmentId'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   // Reset politician dropdowns to first option
   const pJuris = document.getElementById('p-jurisdiction');
   if (pJuris) pJuris.value = '';
-  const pWard = document.getElementById('p-ward');
-  if (pWard) pWard.value = '';
   const pGender = document.getElementById('p-gender');
   if (pGender) pGender.value = '';
   const pPos = document.getElementById('p-position');
@@ -1147,8 +1217,14 @@ function resetRegisterFormFields() {
   if (pConf) pConf.value = '';
   const pTerms = document.getElementById('p-acceptTerms');
   if (pTerms) pTerms.checked = false;
+  const pProfilePhoto = document.getElementById('p-profilePhoto');
+  if (pProfilePhoto) pProfilePhoto.value = '';
+  const pProfilePhotoName = document.getElementById('p-profilePhoto-name');
+  if (pProfilePhotoName) { pProfilePhotoName.textContent = ''; pProfilePhotoName.style.color = '#1a8a3a'; }
   const pIdProof = document.getElementById('p-idProof');
   if (pIdProof) pIdProof.value = '';
+  const pIdProofName = document.getElementById('p-idProof-name');
+  if (pIdProofName) { pIdProofName.textContent = ''; pIdProofName.style.color = '#1a8a3a'; }
   const pwStrP = document.getElementById('pwStrengthP');
   if (pwStrP) { pwStrP.textContent = ''; pwStrP.style.color = ''; }
 
