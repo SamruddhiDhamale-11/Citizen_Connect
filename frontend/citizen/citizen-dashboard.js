@@ -3,12 +3,10 @@
    ============================================================ */
 "use strict";
 
-// ---- Demo data ----
-const COMPLAINTS = [
-  { id: "CMP-001", title: "Broken streetlight on Main Road", category: "Electricity / Streetlights", desc: "The streetlight near house no. 45, Main Road has been non-functional for over 2 weeks causing safety issues at night.", location: "Main Road, near house no. 45", date: "28 Apr 2026", status: "pending", priority: "high" },
-  { id: "CMP-002", title: "Garbage not collected for 3 days", category: "Garbage & Sanitation", desc: "Municipal garbage truck has not visited our lane for 3 consecutive days. Waste is piling up causing hygiene issues.", location: "Lane 4, Sector B", date: "22 Apr 2026", status: "resolved", priority: "medium" },
-  { id: "CMP-003", title: "Pothole on Nehru Street", category: "Roads & Potholes", desc: "Large pothole near the school gate on Nehru Street. Two-wheelers have already had accidents due to this.", location: "Nehru Street, near school gate", date: "15 Apr 2026", status: "inprogress", priority: "high" },
-];
+const CITIZEN_API_BASE   = "http://localhost:5079/api/citizen";
+const COMPLAINT_API_BASE = "http://localhost:5079/api/Complaint";
+
+const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
 
 const SUGGESTIONS = [
   { id: "SUG-001", title: "Install CCTV cameras near Ward Park", category: "Public Safety & Security", desc: "The ward park has no surveillance. Installing CCTV cameras will deter anti-social activities and improve safety for families.", benefit: "Improved safety for children and families visiting the park.", date: "25 Apr 2026", status: "review", scope: "Ward" },
@@ -17,11 +15,233 @@ const SUGGESTIONS = [
 
 // ---- Init ----
 document.addEventListener("DOMContentLoaded", function () {
+  if (!requireCitizenSession()) return;
   setDate();
-  renderComplaints(COMPLAINTS);
-  renderSuggestions(SUGGESTIONS);
   setupCharCounters();
+  loadComplaintCategories();
+  loadCitizenProfile().then(function () {
+    return loadCitizenComplaints();
+  });
+  renderSuggestions(SUGGESTIONS);
 });
+
+function requireCitizenSession() {
+  const userId = localStorage.getItem("userId");
+  const role = localStorage.getItem("role");
+  if (!userId || role !== "Citizen") {
+    window.location.href = "../login/login.html";
+    return false;
+  }
+  return true;
+}
+
+async function loadCitizenProfile() {
+  const userId = localStorage.getItem("userId");
+  if (!userId) return;
+
+  try {
+    const response = await fetch(CITIZEN_API_BASE + "/profile/" + encodeURIComponent(userId));
+    let data;
+    try {
+      data = await response.json();
+    } catch (_) {
+      throw new Error("Could not read profile response.");
+    }
+
+    if (!response.ok || !data.success) {
+      applyCitizenProfileFallback();
+      return;
+    }
+
+    applyCitizenProfile(data);
+    if (data.citizenId != null) {
+      localStorage.setItem("citizenId", String(data.citizenId));
+    }
+  } catch (_) {
+    applyCitizenProfileFallback();
+  }
+}
+
+function applyCitizenProfile(profile) {
+  const firstName = profile.firstName || "Citizen";
+  const fullName = profile.fullName || firstName;
+  const initials = profile.initials || "?";
+  const wardLine = "Citizen · " + (profile.wardDisplay || "Ward —");
+  const mobile = formatMobile(profile.mobileNo);
+  const email = profile.email || "—";
+  const ward = profile.wardDisplay || "—";
+  const residency = profile.residenceTypeName || "—";
+  const registered = formatProfileDate(profile.registeredAt);
+
+  citizenProfile.citizenId = profile.citizenId != null ? profile.citizenId : null;
+  citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
+  citizenProfile.wardDisplay = profile.wardDisplay || "";
+
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = ward;
+
+  setText("greetName", firstName);
+  setText("userAvatar", initials);
+  setText("userName", fullName);
+  setText("userRole", wardLine);
+  setText("profileAvatar", initials);
+  setText("profileName", fullName);
+  setText("profileRoleBadge", wardLine);
+  setText("profileFullName", fullName);
+  setText("profileMobile", mobile);
+  setText("profileEmail", email);
+  setText("profileWard", ward);
+  setText("profileResidency", residency);
+  setText("profileRegistered", registered);
+}
+
+function applyCitizenProfileFallback() {
+  citizenProfile.citizenId = null;
+  citizenProfile.wardId = null;
+  citizenProfile.wardDisplay = "";
+  setText("greetName", "Citizen");
+  setText("userAvatar", "?");
+  setText("userName", "Citizen");
+  setText("userRole", "Citizen");
+  setText("profileAvatar", "?");
+  setText("profileName", "Citizen");
+  setText("profileRoleBadge", "Citizen");
+  setText("profileFullName", "—");
+  setText("profileMobile", "—");
+  setText("profileEmail", "—");
+  setText("profileWard", "—");
+  setText("profileResidency", "—");
+  setText("profileRegistered", "—");
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function formatMobile(mobile) {
+  if (!mobile) return "—";
+  const digits = String(mobile).replace(/\D/g, "");
+  if (digits.length === 10) {
+    return "+91 " + digits.slice(0, 5) + " " + digits.slice(5);
+  }
+  return mobile;
+}
+
+function formatProfileDate(isoOrDate) {
+  if (!isoOrDate) return "—";
+  const d = new Date(isoOrDate);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+}
+
+async function loadCitizenComplaints() {
+  const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
+  if (!citizenId) {
+    renderComplaints([]);
+    updateComplaintStats([]);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      COMPLAINT_API_BASE + "/citizen/" + encodeURIComponent(citizenId)
+    );
+    if (!response.ok) throw new Error("Failed to load complaints");
+
+    const data = await response.json();
+    const list = Array.isArray(data)
+      ? data.map(mapApiComplaintToCard)
+      : [];
+    renderComplaints(list);
+    updateComplaintStats(list);
+  } catch (_) {
+    renderComplaints([]);
+    updateComplaintStats([]);
+  }
+}
+
+function mapApiComplaintToCard(c) {
+  return {
+    id: c.complaintNumber || ("CMP-" + c.complaintId),
+    title: c.title || "",
+    category: c.categoryName || "",
+    desc: c.description || "",
+    location: c.address || "",
+    date: formatDate(new Date(c.createdAt)),
+    status: normalizeComplaintStatus(c.status),
+    priority: (c.priority || "medium").toLowerCase()
+  };
+}
+
+function normalizeComplaintStatus(status) {
+  if (!status) return "pending";
+  const s = String(status).toLowerCase().replace(/\s+/g, "");
+  if (s === "inprogress") return "inprogress";
+  if (s === "pending") return "pending";
+  if (s === "resolved") return "resolved";
+  if (s === "rejected") return "rejected";
+  return s;
+}
+
+function updateComplaintStats(complaints) {
+  const total = complaints.length;
+  const resolved = complaints.filter(function (c) {
+    return c.status === "resolved";
+  }).length;
+  const pending = complaints.filter(function (c) {
+    return c.status === "pending" || c.status === "inprogress";
+  }).length;
+
+  const statComplaints = document.getElementById("statComplaints");
+  const statResolved = document.getElementById("statResolved");
+  if (statComplaints) statComplaints.textContent = total;
+  if (statResolved) statResolved.textContent = resolved;
+
+  const pendingBadge = document.querySelector("#panel-overview .stat-badge.pending");
+  if (pendingBadge) {
+    pendingBadge.textContent = pending + (pending === 1 ? " Pending" : " Pending");
+  }
+}
+
+async function loadComplaintCategories() {
+  const select = document.getElementById("complaintCategory");
+  if (!select) return;
+
+  const placeholder = '<option value="">— Select Category —</option>';
+
+  try {
+    const response = await fetch(COMPLAINT_API_BASE + "/categories");
+    if (!response.ok) throw new Error("Categories request failed");
+
+    const categories = await response.json();
+    if (!Array.isArray(categories) || categories.length === 0) {
+      select.innerHTML = placeholder +
+        '<option value="" disabled>— No categories available —</option>';
+      return;
+    }
+
+    let html = placeholder;
+    categories.forEach(function (cat) {
+      const id = cat.complaintCategoryId;
+      const name = cat.categoryName;
+      if (id == null || !name) return;
+      html += '<option value="' + escAttr(String(id)) + '">' + escHtml(name) + "</option>";
+    });
+    select.innerHTML = html;
+  } catch (_) {
+    select.innerHTML = placeholder +
+      '<option value="" disabled>— Could not load categories —</option>';
+  }
+}
+
+function escAttr(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 function setDate() {
   const el = document.getElementById("pageDate");
@@ -70,6 +290,9 @@ function closeSidebar() {
 // ---- Logout ----
 function logout() {
   if (confirm("Are you sure you want to logout?")) {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("role");
+    localStorage.removeItem("citizenId");
     window.location.href = "../login/login.html";
   }
 }
@@ -103,12 +326,13 @@ function showFileName(inputId, displayId) {
 }
 
 // ---- Submit Complaint ----
-function submitComplaint(e) {
+async function submitComplaint(e) {
   e.preventDefault();
   const errEl = document.getElementById("complaintError");
   errEl.classList.add("hidden");
 
-  const cat      = document.getElementById("complaintCategory").value;
+  const catSelect = document.getElementById("complaintCategory");
+  const cat       = catSelect.value;
   const priority = document.getElementById("complaintPriority").value;
   const title    = document.getElementById("complaintTitle").value.trim();
   const desc     = document.getElementById("complaintDesc").value.trim();
@@ -120,22 +344,98 @@ function submitComplaint(e) {
     return;
   }
 
-  // Add to demo data
-  const newId = "CMP-00" + (COMPLAINTS.length + 1);
-  COMPLAINTS.unshift({ id: newId, title: title, category: cat, desc: desc, location: location, date: formatDate(new Date()), status: "pending", priority: priority });
-  renderComplaints(COMPLAINTS);
+  const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
+  const wardId = citizenProfile.wardId;
+  if (!citizenId || !wardId) {
+    errEl.textContent = "Unable to verify your profile. Please log in again.";
+    errEl.classList.remove("hidden");
+    return;
+  }
 
-  // Update stat
-  document.getElementById("statComplaints").textContent = COMPLAINTS.length;
+  const fileInput = document.getElementById("complaintFile");
+  if (fileInput && fileInput.files && fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    const allowed = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowed.includes(file.type)) {
+      errEl.textContent = "Attachment must be JPG or PNG format only (max 5 MB).";
+      errEl.classList.remove("hidden");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      errEl.textContent = "Attachment must not exceed 5 MB.";
+      errEl.classList.remove("hidden");
+      return;
+    }
+  }
 
-  // Reset form
-  document.getElementById("complaintForm").reset();
+  const form = document.getElementById("complaintForm");
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+  }
+
+  const fd = new FormData();
+  fd.append("CitizenId", citizenId);
+  fd.append("WardId", wardId);
+  fd.append("ComplaintCategoryId", cat);
+  fd.append("Title", title);
+  fd.append("Description", desc);
+  fd.append("Address", location);
+  fd.append("Latitude", "0");
+  fd.append("Longitude", "0");
+  fd.append("Priority", priority);
+  fd.append("IsAnonymous", document.getElementById("complaintAnon").checked ? "true" : "false");
+  if (fileInput && fileInput.files && fileInput.files.length > 0) {
+    fd.append("Files", fileInput.files[0]);
+  }
+
+  try {
+    const response = await fetch(COMPLAINT_API_BASE + "/create", {
+      method: "POST",
+      body: fd
+    });
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      throw new Error("Server returned an unexpected response.");
+    }
+
+    if (!response.ok) {
+      throw new Error(result.message || "Complaint submission failed. Please try again.");
+    }
+
+    resetComplaintForm();
+    await loadCitizenComplaints();
+
+    const complaintNumber = result.complaintNumber || result.ComplaintNumber || "";
+    showToast("", "Complaint submitted successfully! ID: " + complaintNumber);
+    showPanel("mycomplaints", document.querySelector("[onclick*=mycomplaints]"));
+  } catch (err) {
+    errEl.textContent = err.message || "Unable to submit complaint. Please try again.";
+    errEl.classList.remove("hidden");
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Complaint";
+    }
+  }
+}
+
+function resetComplaintForm() {
+  const form = document.getElementById("complaintForm");
+  if (form) form.reset();
   document.getElementById("complaintTitleCount").textContent = "0";
   document.getElementById("complaintDescCount").textContent = "0";
-  document.getElementById("complaintFileName").classList.add("hidden");
-
-  showToast("", "Complaint submitted successfully! ID: " + newId);
-  showPanel("mycomplaints", document.querySelector("[onclick*=mycomplaints]"));
+  const fileNameEl = document.getElementById("complaintFileName");
+  if (fileNameEl) fileNameEl.classList.add("hidden");
+  const errEl = document.getElementById("complaintError");
+  if (errEl) errEl.classList.add("hidden");
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
+  loadComplaintCategories();
 }
 
 // ---- Submit Suggestion ----
@@ -172,6 +472,10 @@ function submitSuggestion(e) {
 
 // ---- Reset form ----
 function resetForm(formId, errId) {
+  if (formId === "complaintForm") {
+    resetComplaintForm();
+    return;
+  }
   document.getElementById(formId).reset();
   document.getElementById(errId).classList.add("hidden");
   ["complaintTitleCount","complaintDescCount","suggestionTitleCount","suggestionDescCount","suggestionBenefitCount"].forEach(function(id) {

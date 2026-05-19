@@ -25,7 +25,7 @@
         <div class="user-avatar" id="userAvatar">R</div>
         <div class="user-info">
           <span class="user-name" id="userName">Rahul Sharma</span>
-          <span class="user-role">Citizen · Ward 12</span>
+          <span class="user-role" id="userRole">Citizen · Ward 12</span>
         </div>
       </div>
       <button class="btn-logout" onclick="logout()">Logout</button>
@@ -191,15 +191,6 @@
                 <label><strong>Complaint Category</strong> <span class="req">*</span></label>
                 <select id="complaintCategory" required>
                   <option value="">— Select Category —</option>
-                  <option value="roads">Roads &amp; Potholes</option>
-                  <option value="water">Water Supply</option>
-                  <option value="electricity">Electricity / Streetlights</option>
-                  <option value="garbage">Garbage &amp; Sanitation</option>
-                  <option value="drainage">Drainage &amp; Sewage</option>
-                  <option value="parks">Parks &amp; Public Spaces</option>
-                  <option value="noise">Noise Pollution</option>
-                  <option value="encroachment">Encroachment</option>
-                  <option value="other">Other</option>
                 </select>
               </div>
               <div class="field-group">
@@ -426,7 +417,7 @@
           <div class="profile-avatar-section">
             <div class="profile-avatar" id="profileAvatar">R</div>
             <div class="profile-name" id="profileName">Rahul Sharma</div>
-            <div class="profile-role-badge">Citizen · Ward 12</div>
+            <div id="profileRoleBadge" class="profile-role-badge">Citizen · Ward 12</div>
           </div>
           <div class="profile-details">
             <div class="profile-row">
@@ -435,23 +426,23 @@
             </div>
             <div class="profile-row">
               <span class="profile-key">Mobile</span>
-              <span class="profile-val">+91 98765 43210</span>
+              <span class="profile-val" id="profileMobile">+91 98765 43210</span>
             </div>
             <div class="profile-row">
               <span class="profile-key">Email</span>
-              <span class="profile-val">rahul.sharma@email.com</span>
+              <span class="profile-val" id="profileEmail">rahul.sharma@email.com</span>
             </div>
             <div class="profile-row">
               <span class="profile-key">Ward</span>
-              <span class="profile-val">Ward 12</span>
+              <span class="profile-val" id="profileWard">Ward 12</span>
             </div>
             <div class="profile-row">
               <span class="profile-key">Residency Type</span>
-              <span class="profile-val">Resident</span>
+              <span class="profile-val" id="profileResidency">Resident</span>
             </div>
             <div class="profile-row">
               <span class="profile-key">Registered On</span>
-              <span class="profile-val">15 January 2026</span>
+              <span class="profile-val" id="profileRegistered">15 January 2026</span>
             </div>
           </div>
         </div>

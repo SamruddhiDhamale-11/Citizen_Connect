@@ -259,10 +259,10 @@
                 <label for="p-gender"><strong>Gender</strong> <span class="req">*</span></label>
                 <select id="p-gender">
                   <option value="">— Select —</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer_not">Prefer not to say</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
                 </select>
               </div>
             </div>
@@ -368,27 +368,38 @@
               </span>
             </div>
 
-            <div class="form-group">
-              <label for="p-ward"><strong>Ward</strong> <span class="req">*</span></label>
-              <select id="p-ward" required>
-                <option value="">Loading wards…</option>
-              </select>
-              <span class="field-hint" id="p-ward-hint" style="display:none;color:#c0392b;">
-                Ward data unavailable. Please try again later.
-              </span>
+            <div class="form-row-two">
+              <div class="form-group">
+                <label for="p-wardNumber"><strong>Ward Number</strong> <span class="req">*</span></label>
+                <input type="text" id="p-wardNumber" placeholder="e.g. W-101" />
+              </div>
+              <div class="form-group">
+                <label for="p-wardName"><strong>Ward Name</strong> <span class="req">*</span></label>
+                <input type="text" id="p-wardName" placeholder="e.g. Shivaji Ward" />
+              </div>
             </div>
 
             <div class="form-group">
               <label for="p-position"><strong>Position</strong> <span class="req">*</span></label>
               <select id="p-position">
                 <option value="">— Select —</option>
-                <option value="mla">MLA</option>
-                <option value="mp">MP</option>
-                <option value="corporator">Corporator</option>
-                <option value="mayor">Mayor</option>
-                <option value="sarpanch">Sarpanch</option>
-                <option value="councillor">Councillor</option>
+                <option value="MLA">MLA</option>
+                <option value="MP">MP</option>
+                <option value="Corporator">Corporator</option>
+                <option value="Mayor">Mayor</option>
+                <option value="Sarpanch">Sarpanch</option>
+                <option value="Councillor">Councillor</option>
               </select>
+            </div>
+
+            <div class="form-group">
+              <label for="p-partyName"><strong>Party Name</strong> <span class="req">*</span></label>
+              <input type="text" id="p-partyName" placeholder="Name of political party" />
+            </div>
+
+            <div class="form-group">
+              <label for="p-governmentId"><strong>Government ID</strong> <span class="req">*</span></label>
+              <input type="text" id="p-governmentId" placeholder="Official government ID number" />
             </div>
           </div>
 
@@ -456,11 +467,33 @@
         </div>
 
         <!-- ================================================================
-             STEP 3 — POLITICIAN: Verification + Authentication
+             STEP 3 — POLITICIAN: Identity Verification + Security Setup
              ================================================================ -->
         <div class="step-panel hidden" id="step3-politician">
           <h3 class="step-heading">Step 3 — Verification &amp; Password</h3>
 
+          <!-- SECTION 1: Identity Verification (comes first) -->
+          <div class="form-section">
+            <div class="form-section-title">Identity Verification</div>
+
+            <div class="form-group">
+              <label for="p-profilePhoto"><strong>Profile Photo</strong> <span class="req">*</span></label>
+              <input type="file" id="p-profilePhoto" accept=".jpg,.jpeg,.png" class="file-input"
+                     onchange="showFileName('p-profilePhoto', 'p-profilePhoto-name')" />
+              <p class="field-hint">Accepted formats: JPG, PNG. Max size: 5 MB.</p>
+              <p class="field-hint" id="p-profilePhoto-name" style="color:#1a8a3a;margin-top:4px;"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="p-idProof"><strong>Upload ID Proof</strong> <span class="req">*</span></label>
+              <input type="file" id="p-idProof" accept=".pdf,.jpg,.jpeg,.png" class="file-input"
+                     onchange="showFileName('p-idProof', 'p-idProof-name')" />
+              <p class="field-hint">Accepted formats: PDF, JPG, PNG. Max size: 5 MB.</p>
+              <p class="field-hint" id="p-idProof-name" style="color:#1a8a3a;margin-top:4px;"></p>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Security Setup (comes after verification) -->
           <div class="form-section">
             <div class="form-section-title">Security Setup</div>
             <div class="form-group">
@@ -477,15 +510,6 @@
                 <input type="password" id="p-confirmPassword" placeholder="Re-enter your password" />
                 <span class="toggle-pw" onclick="togglePassword('p-confirmPassword', this)">🗡</span>
               </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <div class="form-section-title">Identity Verification</div>
-            <div class="form-group">
-              <label for="p-idProof"><strong>Upload ID Proof</strong> <span class="req">*</span></label>
-              <input type="file" id="p-idProof" accept=".pdf,.jpg,.jpeg,.png" class="file-input" />
-              <p class="field-hint">Accepted formats: PDF, JPG, PNG. Max size: 5 MB.</p>
             </div>
           </div>
 

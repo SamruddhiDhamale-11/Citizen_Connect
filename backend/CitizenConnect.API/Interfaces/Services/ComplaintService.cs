@@ -30,6 +30,31 @@ namespace CitizenConnect.Services
         public async Task<ComplaintResponseDto> CreateComplaintAsync(
             CreateComplaintDto dto)
         {
+            if (dto.Files != null && dto.Files.Any())
+            {
+                var allowedTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png"
+                };
+
+                foreach (var file in dto.Files)
+                {
+                    if (file.Length > 5 * 1024 * 1024)
+                    {
+                        throw new InvalidOperationException(
+                            "Each attachment must not exceed 5 MB.");
+                    }
+
+                    if (!allowedTypes.Contains(file.ContentType))
+                    {
+                        throw new InvalidOperationException(
+                            "Attachments must be JPG or PNG format only.");
+                    }
+                }
+            }
+
             // Generate Complaint Number
             string complaintNumber =
                 $"CC-{DateTime.UtcNow:yyyyMMddHHmmss}";
@@ -157,6 +182,10 @@ namespace CitizenConnect.Services
 
                     Title = c.Title,
 
+                    Description = c.Description,
+
+                    Address = c.Address,
+
                     Status = c.Status.ToString(),
 
                     Priority = c.Priority,
@@ -219,10 +248,10 @@ namespace CitizenConnect.Services
         {
             return await _context.ComplaintCategories
                 .Where(c => c.IsActive)
+                .OrderBy(c => c.CategoryName)
                 .Select(c => new
                 {
                     c.ComplaintCategoryId,
-
                     c.CategoryName
                 })
                 .Cast<object>()

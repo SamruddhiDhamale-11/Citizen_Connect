@@ -104,11 +104,13 @@ namespace CitizenConnect.Infrastructure.Data
             // ==============================
             // POLITICIAN -> WARD
             // ==============================
-
+            // WardId is optional — politicians identify their ward via
+            // WardNumber/WardName text fields; the ward dropdown was removed.
             modelBuilder.Entity<Politician>()
                 .HasOne(p => p.Ward)
                 .WithMany(w => w.Politicians)
                 .HasForeignKey(p => p.WardId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
 
 

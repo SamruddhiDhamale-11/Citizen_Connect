@@ -26,11 +26,18 @@ namespace CitizenConnect.Controllers
         public async Task<IActionResult> CreateComplaint(
             [FromForm] CreateComplaintDto dto)
         {
-            var result =
-                await _complaintService
-                    .CreateComplaintAsync(dto);
+            try
+            {
+                var result =
+                    await _complaintService
+                        .CreateComplaintAsync(dto);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
 

@@ -27,38 +27,40 @@
     { id:"wardConfirm",  type:"radio", name:"wardConfirm",
       prompt:"Are you from this ward? Say Yes or No.",
       options:[
-        { value:"yes", labels:["yes","yeah","yep","correct","right","haan","ha","belongs"] },
-        { value:"no",  labels:["no","nope","nahi","na","not","dont"] }
+        { value:"yes", labels:["Yes","yes","yeah","yep","yea","yah","ya","correct","right","haan","ha","belongs"] },
+        { value:"no",  labels:["No","no","nope","nahi","na","not","dont"] }
       ]
     },
     { id:"residentType", type:"radio", name:"residentType",
       prompt:"Say your Residency Type: Resident, Working Here, Business Owner, Property Owner, or Other.",
+      /* value MUST match login.html radio values (1–5) so the DOM can be checked */
       options:[
-        { value:"resident",      labels:["resident","residing","live here","living here","i live","i reside"] },
-        { value:"working",       labels:["working","working here","work here","employee","i work"] },
-        { value:"business",      labels:["business","business owner","shop owner","entrepreneur"] },
-        { value:"property_rent", labels:["property","property owner","rent","landlord","owner"] },
-        { value:"other",         labels:["other","others","different","else","something else"] }
+        { value:"1", labels:["Resident","resident","residing","live here","living here","i live","i reside"] },
+        { value:"2", labels:["Working Here","working","working here","work here","employee","i work"] },
+        { value:"3", labels:["Business Owner","business","business owner","shop owner","entrepreneur"] },
+        { value:"4", labels:["Property Owner (Rent)","property","property owner","property owner rent","rent","landlord","owner"] },
+        { value:"5", labels:["Other","other","others","different","else","something else"] }
       ]
     },
     { id:"c-otherResident", type:"text",
       prompt:"Please describe your residency type.",
       conditional: function() {
         var c = document.querySelector("input[name=\"residentType\"]:checked");
-        return c && c.value === "other";
+        return c && c.value === "5";
       }
     },
     { id:"isVoter", type:"radio", name:"isVoter",
       prompt:"Are you a registered voter? Say Yes or No.",
       options:[
-        { value:"yes", labels:["yes","yeah","yep","correct","haan","ha","i am","registered"] },
-        { value:"no",  labels:["no","nope","nahi","na","not","i am not","not registered"] }
+        { value:"yes", labels:["Yes","yes","yeah","yep","yea","yah","ya","correct","haan","ha","i am","registered"] },
+        { value:"no",  labels:["No","no","nope","nahi","na","not","i am not","not registered"] }
       ]
     }
   ];
 
   var C2 = [
-    { id:"c-dob",    type:"skip",  prompt:"Please select your Date of Birth using the date picker." },
+    /* type "dob" — wait for a real date-picker value; see listenCitizenDob() */
+    { id:"c-dob",    type:"dob",   prompt:"Please select your Date of Birth using the date picker." },
     { id:"c-gender", type:"select",
       prompt:"Say your Gender: Male, Female, Other, or Prefer not to say.",
       options:[
@@ -82,12 +84,31 @@
     { id:"p-lastName",   type:"text",  prompt:"Please say your Last Name." },
     { id:"p-age",        type:"text",  prompt:"Please say your Age in years." },
     { id:"p-gender",     type:"select",
+      /* Force en-IN recognition for gender — spoken words are short and
+         the same across all three languages (male/female/purush/mahila).
+         Using en-IN ensures the recogniser returns Latin text that can
+         be matched against the labels below regardless of activeLang.  */
+      srLangOverride: "en-IN",
       prompt:"Say your Gender: Male, Female, Other, or Prefer not to say.",
+      /* Values MUST match the exact HTML option values for p-gender:
+         "Male" | "Female" | "Other" | "Prefer not to say"            */
       options:[
-        { value:"male",       labels:["male","mail","man","boy","he","him","males","i am male","i am a man"] },
-        { value:"female",     labels:["female","females","woman","women","girl","she","her","lady","femail","famale","i am female"] },
-        { value:"other",      labels:["other","others","non binary","nonbinary","transgender","trans","different"] },
-        { value:"prefer_not", labels:["prefer not","prefer not to say","no answer","private","skip","rather not","not say"] }
+        { value:"Male",
+          labels:["male","mail","man","boy","he","him","males","i am male","i am a man",
+                  "purush","aadmi","aadmee","mard",
+                  "पुरुष","मर्द","लड़का","मुलगा","नर"] },
+        { value:"Female",
+          labels:["female","females","woman","women","girl","she","her","lady",
+                  "femail","famale","i am female","mahila","aurat","stri",
+                  "महिला","औरत","लड़की","स्त्री","मुलगी"] },
+        { value:"Other",
+          labels:["other","others","non binary","nonbinary","transgender","trans","different",
+                  "anya","अन्य","ट्रांसजेंडर","इतर","तृतीयपंथी"] },
+        { value:"Prefer not to say",
+          labels:["prefer not","prefer not to say","no answer","private","rather not","not say",
+                  "nahi batana","skip",
+                  "बताना नहीं चाहते","नहीं बताऊंगा","प्राइवेट",
+                  "सांगणे पसंत नाही","सांगणार नाही","खाजगी"] }
       ]
     },
     { id:"p-mobile",     type:"phone", prompt:"Please say your 10-digit Mobile Number clearly." },
@@ -97,26 +118,29 @@
 
   var P2 = [
     { id:"p-jurisdiction", type:"select",
-      prompt:"Say your Jurisdiction Type: Municipal, Legislative Assembly, or Parliamentary.",
-      options:[
-        { value:"municipal",     labels:["municipal","municipality","municipal corporation","city"] },
-        { value:"legislative",   labels:["legislative","legislative assembly","assembly","state","mla"] },
-        { value:"parliamentary", labels:["parliamentary","parliament","mp","lok sabha","rajya sabha"] }
-      ]
+      prompt:"Say your Jurisdiction Type from the list shown.",
+      /* options are populated at guide runtime from the live dropdown by
+         refreshJurisdictionOptions() — no hardcoded values here.
+         An empty array is safe: if the dropdown isn't loaded yet,
+         refreshJurisdictionOptions() returns early and the guide will
+         speak the prompt and wait for the user to select manually.    */
+      options: []
     },
     { id:"p-wardNumber", type:"text", prompt:"Please say your Ward or Constituency Number." },
     { id:"p-wardName",   type:"text", prompt:"Please say your Ward or Constituency Name." },
     { id:"p-position",   type:"select",
       prompt:"Say your Position: MLA, MP, Corporator, Mayor, Sarpanch, or Councillor.",
       options:[
-        { value:"mla",        labels:["mla","member of legislative assembly","legislative assembly member"] },
-        { value:"mp",         labels:["mp","member of parliament","parliament member"] },
-        { value:"corporator", labels:["corporator","corporation member","ward member"] },
-        { value:"mayor",      labels:["mayor","city mayor"] },
-        { value:"sarpanch",   labels:["sarpanch","village head","gram panchayat head"] },
-        { value:"councillor", labels:["councillor","councilor","council member","ward councillor"] }
+        { value:"MLA",        labels:["mla","member of legislative assembly","legislative assembly member","amdaar","आमदार"] },
+        { value:"MP",         labels:["mp","member of parliament","parliament member","khasdar","खासदार"] },
+        { value:"Corporator", labels:["corporator","corporation member","ward member","nagarasevak","नगरसेवक"] },
+        { value:"Mayor",      labels:["mayor","city mayor","mahapour","महापौर"] },
+        { value:"Sarpanch",   labels:["sarpanch","village head","gram panchayat head","सरपंच"] },
+        { value:"Councillor", labels:["councillor","councilor","council member","ward councillor","नगरसेवक"] }
       ]
-    }
+    },
+    { id:"p-partyName",    type:"text", prompt:"Please say your Party Name." },
+    { id:"p-governmentId", type:"text", prompt:"Please say your Government ID number." }
   ];
 
   var STEP_FIELDS = { c1:C1, c2:C2, p1:P1, p2:P2 };
@@ -285,9 +309,9 @@
     },
     /* ---- Politician Step 2 ---- */
     "p-jurisdiction": {
-      english: "Say your Jurisdiction Type: Municipal, Legislative Assembly, or Parliamentary.",
-      hindi:   "अपना क्षेत्राधिकार प्रकार बोलें: नगरपालिका, विधान सभा, या संसदीय।",
-      marathi: "आपला अधिकारक्षेत्र प्रकार सांगा: महानगरपालिका, विधानसभा, किंवा संसदीय।"
+      english: "Say your Jurisdiction Type from the options shown in the dropdown.",
+      hindi:   "ड्रॉपडाउन में दिखाए गए विकल्पों में से अपना क्षेत्राधिकार प्रकार बोलें।",
+      marathi: "ड्रॉपडाउनमध्ये दाखवलेल्या पर्यायांमधून आपला अधिकारक्षेत्र प्रकार सांगा।"
     },
     "p-wardNumber": {
       english: "Please say your Ward or Constituency Number.",
@@ -303,6 +327,16 @@
       english: "Say your Position: MLA, MP, Corporator, Mayor, Sarpanch, or Councillor.",
       hindi:   "अपना पद बोलें: विधायक, सांसद, कॉर्पोरेटर, महापौर, सरपंच, या पार्षद।",
       marathi: "आपले पद सांगा: आमदार, खासदार, नगरसेवक, महापौर, सरपंच, किंवा नगरसेवक।"
+    },
+    "p-partyName": {
+      english: "Please say your Party Name.",
+      hindi:   "कृपया अपनी पार्टी का नाम बोलें।",
+      marathi: "कृपया आपल्या पक्षाचे नाव सांगा।"
+    },
+    "p-governmentId": {
+      english: "Please say your Government ID number.",
+      hindi:   "कृपया अपना सरकारी आईडी नंबर बोलें।",
+      marathi: "कृपया आपला सरकारी ओळखपत्र क्रमांक सांगा।"
     },
     /* ---- UI strings ---- */
     "ui-allDone": {
@@ -385,6 +419,11 @@
       hindi:   "मिला: \"",
       marathi: "मिळाले: \""
     },
+    "ui-gotDob": {
+      english: "Date of Birth selected.",
+      hindi:   "जन्म तिथि चयनित हो गई।",
+      marathi: "जन्मतारीख निवडली."
+    },
     "ui-notRecognised": {
       english: "Option not recognised. Please say one of: ",
       hindi:   "विकल्प पहचाना नहीं गया। कृपया इनमें से एक बोलें: ",
@@ -410,29 +449,38 @@
   /* ---- Multilingual option labels for selection fields ----
      These are merged into the existing English labels arrays so
      matchOption() recognises spoken Hindi/Marathi words too.
-     Internal option VALUES are never changed.                    */
+     Keys use prefix + option value (see mergeI18nLabels / C1 field options). */
   var OPTION_LABELS_I18N = {
     /* wardConfirm */
     "wardConfirm-yes": { hindi: ["हाँ","हां","जी हाँ","सही","बिल्कुल"], marathi: ["हो","होय","बरोबर","हाँ"] },
     "wardConfirm-no":  { hindi: ["नहीं","नही","ना","नहीं है"],           marathi: ["नाही","नको","नाहीये"] },
-    /* residentType */
-    "residentType-resident":      { hindi: ["निवासी","यहाँ रहता हूँ","रहता हूँ"],                    marathi: ["रहिवासी","येथे राहतो","राहतो"] },
-    "residentType-working":       { hindi: ["यहाँ काम करता हूँ","काम करता हूँ","कर्मचारी"],          marathi: ["येथे काम करतो","काम करतो","कर्मचारी"] },
-    "residentType-business":      { hindi: ["व्यवसाय","व्यवसाय मालिक","दुकानदार","उद्यमी"],          marathi: ["व्यवसाय","व्यवसाय मालक","दुकानदार","उद्योजक"] },
-    "residentType-property_rent": { hindi: ["संपत्ति","संपत्ति मालिक","किराया","मकान मालिक"],        marathi: ["मालमत्ता","मालमत्ता मालक","भाडे","जमीनदार"] },
-    "residentType-other":         { hindi: ["अन्य","दूसरा","कुछ और"],                                 marathi: ["इतर","वेगळे","दुसरे"] },
+    /* residentType — values 1–5 match login.html */
+    "residentType-1": { hindi: ["निवासी","यहाँ रहता हूँ","रहता हूँ"],                    marathi: ["रहिवासी","येथे राहतो","राहतो"] },
+    "residentType-2": { hindi: ["यहाँ काम करता हूँ","काम करता हूँ","कर्मचारी"],          marathi: ["येथे काम करतो","काम करतो","कर्मचारी"] },
+    "residentType-3": { hindi: ["व्यवसाय","व्यवसाय मालिक","दुकानदार","उद्यमी"],          marathi: ["व्यवसाय","व्यवसाय मालक","दुकानदार","उद्योजक"] },
+    "residentType-4": { hindi: ["संपत्ति","संपत्ति मालिक","किराया","मकान मालिक"],        marathi: ["मालमत्ता","मालमत्ता मालक","भाडे","जमीनदार"] },
+    "residentType-5": { hindi: ["अन्य","दूसरा","कुछ और"],                                 marathi: ["इतर","वेगळे","दुसरे"] },
     /* isVoter */
     "isVoter-yes": { hindi: ["हाँ","हां","जी हाँ","पंजीकृत","मतदाता हूँ"],  marathi: ["हो","होय","नोंदणीकृत","मतदार आहे"] },
     "isVoter-no":  { hindi: ["नहीं","नही","पंजीकृत नहीं","मतदाता नहीं"],   marathi: ["नाही","नोंदणी नाही","मतदार नाही"] },
-    /* gender (shared by c-gender and p-gender) */
-    "gender-male":       { hindi: ["पुरुष","मर्द","लड़का"],                                    marathi: ["पुरुष","मुलगा","नर"] },
-    "gender-female":     { hindi: ["महिला","औरत","लड़की","स्त्री"],                            marathi: ["महिला","स्त्री","मुलगी"] },
-    "gender-other":      { hindi: ["अन्य","ट्रांसजेंडर","दूसरा"],                              marathi: ["इतर","तृतीयपंथी","वेगळे"] },
-    "gender-prefer_not": { hindi: ["बताना नहीं चाहते","नहीं बताऊंगा","प्राइवेट"],             marathi: ["सांगणे पसंत नाही","सांगणार नाही","खाजगी"] },
-    /* p-jurisdiction */
-    "jurisdiction-municipal":     { hindi: ["नगरपालिका","नगर निगम","शहर"],                    marathi: ["महानगरपालिका","नगरपालिका","शहर"] },
-    "jurisdiction-legislative":   { hindi: ["विधान सभा","विधानसभा","राज्य","विधायक"],         marathi: ["विधानसभा","राज्य","आमदार"] },
-    "jurisdiction-parliamentary": { hindi: ["संसदीय","संसद","सांसद","लोक सभा","राज्य सभा"],  marathi: ["संसदीय","संसद","खासदार","लोकसभा","राज्यसभा"] },
+    /* gender (shared by c-gender and p-gender)
+       Keys must match the exact option VALUES used in each dropdown:
+         c-gender: "male" | "female" | "other" | "prefer_not"
+         p-gender: "Male" | "Female" | "Other" | "Prefer not to say"
+       mergeI18nLabels() is called separately for each field with its
+       own prefix, so we keep both key variants here.                  */
+    "gender-male":              { hindi: ["पुरुष","मर्द","लड़का"],                                    marathi: ["पुरुष","मुलगा","नर"] },
+    "gender-Male":              { hindi: ["पुरुष","मर्द","लड़का"],                                    marathi: ["पुरुष","मुलगा","नर"] },
+    "gender-female":            { hindi: ["महिला","औरत","लड़की","स्त्री"],                            marathi: ["महिला","स्त्री","मुलगी"] },
+    "gender-Female":            { hindi: ["महिला","औरत","लड़की","स्त्री"],                            marathi: ["महिला","स्त्री","मुलगी"] },
+    "gender-other":             { hindi: ["अन्य","ट्रांसजेंडर","दूसरा"],                              marathi: ["इतर","तृतीयपंथी","वेगळे"] },
+    "gender-Other":             { hindi: ["अन्य","ट्रांसजेंडर","दूसरा"],                              marathi: ["इतर","तृतीयपंथी","वेगळे"] },
+    "gender-prefer_not":        { hindi: ["बताना नहीं चाहते","नहीं बताऊंगा","प्राइवेट"],             marathi: ["सांगणे पसंत नाही","सांगणार नाही","खाजगी"] },
+    "gender-Prefer not to say": { hindi: ["बताना नहीं चाहते","नहीं बताऊंगा","प्राइवेट"],             marathi: ["सांगणे पसंत नाही","सांगणार नाही","खाजगी"] },
+    /* p-jurisdiction — no hardcoded entries; options are built dynamically
+       from the live dropdown at guide/mic runtime via refreshJurisdictionOptions()
+       and injectDynamicSelectMic(). Hindi/Marathi labels are not needed here
+       because the spoken text is matched against the live option text directly. */
     /* p-position */
     "position-mla":        { hindi: ["विधायक","विधान सभा सदस्य"],                             marathi: ["आमदार","विधानसभा सदस्य"] },
     "position-mp":         { hindi: ["सांसद","संसद सदस्य"],                                   marathi: ["खासदार","संसद सदस्य"] },
@@ -462,7 +510,7 @@
     var iv = findField(C1, "isVoter");       if (iv) merge(iv.options, "isVoter");
     var cg = findField(C2, "c-gender");      if (cg) merge(cg.options, "gender");
     var pg = findField(P1, "p-gender");      if (pg) merge(pg.options, "gender");
-    var pj = findField(P2, "p-jurisdiction");if (pj) merge(pj.options, "jurisdiction");
+    /* p-jurisdiction options are built dynamically at runtime — no static merge needed */
     var pp = findField(P2, "p-position");    if (pp) merge(pp.options, "position");
   }
   mergeI18nLabels();
@@ -495,6 +543,8 @@
   var guideBar    = null;
   var guideTimer  = null;
   var phoneBuf    = "";
+  /* Citizen Step 2 DOB — remove change/input listeners when leaving this field */
+  var cDobWaitCleanup = null;
   var activeLang  = "english"; /* set during language-selection step */
   var langChosen  = false;     /* true once user has spoken a language choice */
 
@@ -600,23 +650,23 @@
 
     /* Citizen Step 1 — Ward Yes/No radio */
     injectRadioMic("wardConfirm", [
-      { value:"yes", labels:["yes","yeah","yep","correct","right","haan","ha"] },
-      { value:"no",  labels:["no","nope","nahi","na","not"] }
+      { value:"yes", labels:["Yes","yes","yeah","yep","yea","yah","ya","correct","right","haan","ha"] },
+      { value:"no",  labels:["No","no","nope","nahi","na","not"] }
     ], "Say Yes or No");
 
-    /* Citizen Step 1 — Residency Type radio */
+    /* Citizen Step 1 — Residency Type radio (values 1–5 = login.html) */
     injectRadioMic("residentType", [
-      { value:"resident",      labels:["resident","residing","live here","living here","i live"] },
-      { value:"working",       labels:["working","working here","work here","employee","i work"] },
-      { value:"business",      labels:["business","business owner","shop owner","entrepreneur"] },
-      { value:"property_rent", labels:["property","property owner","rent","landlord","owner"] },
-      { value:"other",         labels:["other","others","different","else"] }
+      { value:"1", labels:["Resident","resident","residing","live here","living here","i live"] },
+      { value:"2", labels:["Working Here","working","working here","work here","employee","i work"] },
+      { value:"3", labels:["Business Owner","business","business owner","shop owner","entrepreneur"] },
+      { value:"4", labels:["Property Owner (Rent)","property","property owner","rent","landlord","owner"] },
+      { value:"5", labels:["Other","other","others","different","else"] }
     ], "Say your residency type");
 
     /* Citizen Step 1 — Registered Voter */
     injectRadioMic("isVoter", [
-      { value:"yes", labels:["yes","yeah","yep","correct","haan","ha","i am","registered"] },
-      { value:"no",  labels:["no","nope","nahi","na","not","i am not","not registered"] }
+      { value:"yes", labels:["Yes","yes","yeah","yep","yea","yah","ya","correct","haan","ha","i am","registered"] },
+      { value:"no",  labels:["No","no","nope","nahi","na","not","i am not","not registered"] }
     ], "Say Yes or No — registered voter?");
 
     /* ---- CITIZEN STEP 2 — text / phone inputs ---- */
@@ -642,11 +692,11 @@
 
     /* Politician Step 1 — Gender select */
     injectSelectMic("p-gender", [
-      { value:"male",       labels:["male","mail","man","boy","he","him","males","i am male"] },
-      { value:"female",     labels:["female","females","woman","women","girl","she","her","lady","femail","famale"] },
-      { value:"other",      labels:["other","others","non binary","nonbinary","transgender","trans"] },
-      { value:"prefer_not", labels:["prefer not","prefer not to say","no answer","private","skip","rather not"] }
-    ], "Say: Male, Female, Other, or Prefer not to say");
+      { value:"Male",              labels:["male","mail","man","boy","he","him","males","i am male","i am a man","purush","aadmi","aadmee","पुरुष","मर्द","लड़का","मुलगा","नर"] },
+      { value:"Female",            labels:["female","females","woman","women","girl","she","her","lady","femail","famale","i am female","mahila","aurat","महिला","औरत","लड़की","स्त्री","मुलगी"] },
+      { value:"Other",             labels:["other","others","non binary","nonbinary","transgender","trans","different","अन्य","ट्रांसजेंडर","इतर","तृतीयपंथी"] },
+      { value:"Prefer not to say", labels:["prefer not","prefer not to say","no answer","private","skip","rather not","not say","बताना नहीं चाहते","नहीं बताऊंगा","प्राइवेट","सांगणे पसंत नाही","सांगणार नाही"] }
+    ], "Say: Male, Female, Other, or Prefer not to say", "en-IN");
 
     injectTextMic("p-mobile",     "Speak 10-digit Mobile Number");
     injectTextMic("p-address",    "Speak full Address");
@@ -657,22 +707,20 @@
     /* ---- POLITICIAN STEP 2 — text inputs ---- */
     injectTextMic("p-wardNumber", "Speak Ward or Constituency Number");
     injectTextMic("p-wardName",   "Speak Ward or Constituency Name");
+    injectTextMic("p-partyName",  "Speak Party Name");
+    injectTextMic("p-governmentId", "Speak Government ID");
 
-    /* Politician Step 2 — Jurisdiction select */
-    injectSelectMic("p-jurisdiction", [
-      { value:"municipal",     labels:["municipal","municipality","municipal corporation","city"] },
-      { value:"legislative",   labels:["legislative","legislative assembly","assembly","state"] },
-      { value:"parliamentary", labels:["parliamentary","parliament","mp","lok sabha"] }
-    ], "Say: Municipal, Legislative Assembly, or Parliamentary");
+    /* Politician Step 2 — Jurisdiction select (fully dynamic — reads live dropdown only) */
+    injectDynamicSelectMic("p-jurisdiction", [], "Say your Jurisdiction Type");
 
     /* Politician Step 2 — Position select */
     injectSelectMic("p-position", [
-      { value:"mla",        labels:["mla","member of legislative assembly"] },
-      { value:"mp",         labels:["mp","member of parliament","parliament member"] },
-      { value:"corporator", labels:["corporator","corporation member","ward member"] },
-      { value:"mayor",      labels:["mayor","city mayor"] },
-      { value:"sarpanch",   labels:["sarpanch","village head","gram panchayat head"] },
-      { value:"councillor", labels:["councillor","councilor","council member"] }
+      { value:"MLA",        labels:["mla","member of legislative assembly","legislative assembly member","amdaar","आमदार"] },
+      { value:"MP",         labels:["mp","member of parliament","parliament member","khasdar","खासदार"] },
+      { value:"Corporator", labels:["corporator","corporation member","ward member","nagarasevak","नगरसेवक"] },
+      { value:"Mayor",      labels:["mayor","city mayor","mahapour","महापौर"] },
+      { value:"Sarpanch",   labels:["sarpanch","village head","gram panchayat head","सरपंच"] },
+      { value:"Councillor", labels:["councillor","councilor","council member","ward councillor"] }
     ], "Say: MLA, MP, Corporator, Mayor, Sarpanch, or Councillor");
   }
 
@@ -694,13 +742,17 @@
           if (radio.onchange) radio.onchange.call(radio);
           flashRadio(radio);
         }
-      });
+      }, null, radioName);
     });
     rg.parentElement.insertBefore(btn, rg.nextSibling);
   }
 
   /* ---- Inject mic after a <select> ---- */
-  function injectSelectMic(selectId, options, hint) {
+  /* srLangOverride (optional) — forces a specific BCP-47 recognition
+     language for this mic regardless of the active guide language.
+     Used for p-gender so "male"/"female"/"purush"/"mahila" are always
+     recognised via en-IN even when the guide is in Hindi or Marathi. */
+  function injectSelectMic(selectId, options, hint, srLangOverride) {
     var sel = document.getElementById(selectId);
     if (!sel) return;
     if (document.querySelector(".vs-mic-btn[data-group=\"" + selectId + "\"]")) return;
@@ -711,9 +763,108 @@
         sel.value = matched.value;
         sel.dispatchEvent(new Event("change", { bubbles:true }));
         flashSuccess(sel);
-      });
+      }, srLangOverride);
     });
     /* If inside form-row-two grid, insert after the grid row */
+    var fg      = sel.closest(".form-group");
+    var gridRow = fg && fg.closest(".form-row-two");
+    if (gridRow) {
+      gridRow.parentNode.insertBefore(btn, gridRow.nextElementSibling || null);
+    } else if (fg) {
+      fg.appendChild(btn);
+    } else {
+      sel.parentElement.appendChild(btn);
+    }
+  }
+
+  /* ---- Inject mic for a dynamically-populated <select> ----
+     spokenGroups: array of { spoken: [words...] } — may be empty [].
+     At click time, reads the live <option> elements and builds labels
+     purely from the option text (split into individual words).
+     When spokenGroups is non-empty, additional spoken synonyms are
+     merged in for any option whose text matches a group's words.
+     This handles dropdowns populated from the DB at runtime.    */
+  function injectDynamicSelectMic(selectId, spokenGroups, hint) {
+    var sel = document.getElementById(selectId);
+    if (!sel) return;
+    if (document.querySelector(".vs-mic-btn[data-group=\"" + selectId + "\"]")) return;
+    var btn = makeMicBtn(hint, selectId);
+    btn.addEventListener("click", function() {
+      /* Build options list from live DOM at click time */
+      var liveOptions = [];
+      for (var i = 0; i < sel.options.length; i++) {
+        var opt = sel.options[i];
+        if (!opt.value) continue; /* skip placeholder */
+        var optText    = opt.text.trim();
+        var optTextLow = optText.toLowerCase();
+        var optVal     = opt.value;
+        /* Always include the full option text (both cases) and each word */
+        var labels = [optTextLow, optText];
+        optTextLow.split(/\s+/).forEach(function(w) {
+          if (w.length >= 3 && labels.indexOf(w) === -1) labels.push(w);
+        });
+        /* Merge any matching spoken-group synonyms */
+        if (spokenGroups && spokenGroups.length > 0) {
+          spokenGroups.forEach(function(grp) {
+            grp.spoken.forEach(function(word) {
+              var wl = word.toLowerCase();
+              if (optTextLow.indexOf(wl) !== -1 || wl.indexOf(optTextLow) !== -1) {
+                grp.spoken.forEach(function(s) {
+                  if (labels.indexOf(s) === -1) labels.push(s);
+                });
+              }
+            });
+          });
+        }
+        liveOptions.push({ value: optVal, labels: labels });
+      }
+
+      if (liveOptions.length === 0) {
+        /* Dropdown not yet populated — wait 2 s and retry once */
+        setVsStatus(btn, "Loading options\u2026");
+        setTimeout(function() {
+          /* Re-read the DOM after the delay */
+          var retryOptions = [];
+          for (var ri = 0; ri < sel.options.length; ri++) {
+            var ropt = sel.options[ri];
+            if (!ropt.value) continue;
+            var rText    = ropt.text.trim();
+            var rTextLow = rText.toLowerCase();
+            var rLabels  = [rTextLow, rText];
+            rTextLow.split(/\s+/).forEach(function(w) {
+              if (w.length >= 3 && rLabels.indexOf(w) === -1) rLabels.push(w);
+            });
+            retryOptions.push({ value: ropt.value, labels: rLabels });
+          }
+          if (retryOptions.length === 0) {
+            btn.classList.remove("vs-active");
+            setVsStatus(btn, "Options not loaded. Refresh and try again.");
+            setTimeout(function() { setVsStatus(btn, ""); }, 4000);
+            return;
+          }
+          /* Options now available — announce them and start recognition */
+          var names = retryOptions.map(function(o) { return o.labels[1] || o.labels[0]; }).join(", ");
+          setVsStatus(btn, "Say: " + names);
+          runSelectionRecog(btn, retryOptions, function(matched) {
+            if (!matched) return;
+            sel.value = matched.value;
+            sel.dispatchEvent(new Event("change", { bubbles: true }));
+            flashSuccess(sel);
+          });
+        }, 2000);
+        return;
+      }
+
+      /* Announce available options before listening */
+      var optNames = liveOptions.map(function(o) { return o.labels[1] || o.labels[0]; }).join(", ");
+      setVsStatus(btn, "Say: " + optNames);
+      runSelectionRecog(btn, liveOptions, function(matched) {
+        if (!matched) return;
+        sel.value = matched.value;
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        flashSuccess(sel);
+      });
+    });
     var fg      = sel.closest(".form-group");
     var gridRow = fg && fg.closest(".form-row-two");
     if (gridRow) {
@@ -926,15 +1077,80 @@
 
   /* Called after language is confirmed — runs the actual registration guide */
   function beginGuide(fields) {
+    /* If starting politician step 2, refresh jurisdiction options from live dropdown */
+    if (fields === P2) {
+      refreshJurisdictionOptions();
+    }
     guideFields = fields;
     guideIndex  = 0;
     phoneBuf    = "";
     promptNext();
   }
 
+  /* Reads live <option> elements from p-jurisdiction and rebuilds
+     the P2 jurisdiction field options so voice matches DB values.
+     Only the actual dropdown text is used — no hardcoded names.
+     Spoken variants are derived purely from the option text itself
+     by splitting words and adding common transliterations.
+     Returns true if options were successfully loaded, false otherwise. */
+  function refreshJurisdictionOptions() {
+    var sel = document.getElementById("p-jurisdiction");
+    if (!sel || sel.options.length <= 1) return false; /* not yet populated */
+    var liveOpts = [];
+    for (var i = 0; i < sel.options.length; i++) {
+      var opt = sel.options[i];
+      if (!opt.value) continue; /* skip placeholder */
+      var text    = opt.text.trim();
+      var textLow = text.toLowerCase();
+      /* labels[0] = lowercase full text (for matching)
+         labels[1] = original-case full text (for display/TTS)
+         Additional individual words allow partial speech to match
+         e.g. saying "municipal" matches "Municipal Corporation"   */
+      var labels = [textLow, text];
+      textLow.split(/\s+/).forEach(function(w) {
+        if (w.length >= 3 && labels.indexOf(w) === -1) labels.push(w);
+      });
+      liveOpts.push({ value: opt.value, labels: labels });
+    }
+    if (liveOpts.length === 0) return false;
+
+    /* Update the P2 field definition with live options */
+    P2[0].options = liveOpts;
+
+    /* Build a spoken list of option names for the options-announcement step */
+    var optionNames = liveOpts.map(function(o) { return o.labels[1] || o.labels[0]; });
+    var spokenList  = optionNames.join(", ");
+
+    /* The field prompt is the QUESTION — spoken first by promptNext().
+       A separate options-announcement is spoken by listenField() before
+       recognition starts, so the user hears:
+         1. "Please select your Jurisdiction Type."
+         2. "Available options are: District, Municipal, Village. Please say one."
+       This matches the behaviour of all other dropdown fields.            */
+    P2[0].prompt         = "Please select your Jurisdiction Type.";
+    P2[0].optionsPrompt  = "Available options are: " + spokenList + ". Please say one.";
+
+    /* Update the PROMPTS table so getPrompt() returns the question in all
+       three languages. The options-announcement is always in English because
+       the option names themselves come from the DB in English.             */
+    PROMPTS["p-jurisdiction"].english = "Please select your Jurisdiction Type.";
+    PROMPTS["p-jurisdiction"].hindi   = "कृपया अपना क्षेत्राधिकार प्रकार चुनें।";
+    PROMPTS["p-jurisdiction"].marathi = "कृपया आपला अधिकारक्षेत्र प्रकार निवडा.";
+
+    /* Store the options announcement on the field object so listenField()
+       can speak it right before starting recognition.                     */
+    P2[0].optionsAnnouncement = "Available options are: " + spokenList + ". Please say one.";
+
+    return true;
+  }
+
   function stopGuide() {
     guideActive = false;
     clearTimer();
+    if (cDobWaitCleanup) {
+      cDobWaitCleanup();
+      cDobWaitCleanup = null;
+    }
     killRecog();
     cancelSpeech();
     removeGuideBar();
@@ -1009,6 +1225,60 @@
     if (guideTimer) { clearTimeout(guideTimer); guideTimer = null; }
   }
 
+  function clearCitizenDobWaitListeners() {
+    if (cDobWaitCleanup) {
+      cDobWaitCleanup();
+      cDobWaitCleanup = null;
+    }
+  }
+
+  /* Same rules as login.js validateStep for citizen step 2 DOB */
+  function isValidCitizenDobValue(val) {
+    if (!val || typeof val !== "string") return false;
+    var v = val.trim();
+    if (!v) return false;
+    var dobDate = new Date(v);
+    if (isNaN(dobDate.getTime())) return false;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dobDate.setHours(0, 0, 0, 0);
+    if (dobDate >= today) return false;
+    return true;
+  }
+
+  /* Citizen registration step 2 — block until DOB is chosen in the picker */
+  function listenCitizenDob(field) {
+    if (!guideActive) return;
+    clearCitizenDobWaitListeners();
+    var inp = document.getElementById("c-dob");
+    if (!inp) { advance(); return; }
+
+    function commitIfValid() {
+      if (!guideActive) return;
+      if (!isValidCitizenDobValue(inp.value)) return;
+      clearCitizenDobWaitListeners();
+      clearTimer();
+      flashSuccess(inp);
+      updateBar(ui("ui-gotDob"), "success");
+      setTimeout(advance, 900);
+    }
+
+    function onDobInput() {
+      commitIfValid();
+    }
+
+    inp.addEventListener("change", onDobInput);
+    inp.addEventListener("input", onDobInput);
+    cDobWaitCleanup = function() {
+      inp.removeEventListener("change", onDobInput);
+      inp.removeEventListener("input", onDobInput);
+    };
+
+    updateBar(getPrompt(field), "info");
+    startTimer(field);
+    commitIfValid();
+  }
+
   /* ================================================================
      LISTEN FOR A FIELD
   ================================================================ */
@@ -1016,7 +1286,12 @@
   function listenField(field) {
     if (!guideActive) return;
 
-    /* Skip fields (date picker etc.) — auto-advance after 3.5s */
+    if (field.type === "dob") {
+      listenCitizenDob(field);
+      return;
+    }
+
+    /* Skip fields — auto-advance after 3.5s (none in current flow; kept for compatibility) */
     if (field.type === "skip") {
       updateBar(field.prompt, "info");
       startTimer(field);
@@ -1041,9 +1316,61 @@
 
     /* Radio / Select / Text */
     killRecog();
+
+    /* For jurisdiction: always re-read live dropdown options right now.
+       The API load is async — options may not have been ready when
+       beginGuide() called refreshJurisdictionOptions() earlier.
+       If the dropdown is still empty, wait up to 5 s then retry.     */
+    if (field.id === "p-jurisdiction") {
+      var loaded = refreshJurisdictionOptions();
+      if (!loaded) {
+        /* Dropdown not populated yet — tell user and retry in 2 s */
+        var waitMsg = {
+          english: "Jurisdiction options are still loading. Please wait a moment.",
+          hindi:   "क्षेत्राधिकार विकल्प अभी लोड हो रहे हैं। कृपया एक पल प्रतीक्षा करें।",
+          marathi: "अधिकारक्षेत्र पर्याय अजून लोड होत आहेत. कृपया थोडी प्रतीक्षा करा."
+        }[activeLang] || "Jurisdiction options are still loading. Please wait a moment.";
+        updateBar(waitMsg, "info");
+        tts(waitMsg, function() {
+          if (!guideActive) return;
+          /* Try once more after 2 s */
+          setTimeout(function() {
+            if (!guideActive) return;
+            refreshJurisdictionOptions();
+            listenField(field);
+          }, 2000);
+        });
+        return;
+      }
+
+      /* Options loaded — speak the options announcement THEN start recognition.
+         The question prompt was already spoken by promptNext().
+         Now say: "Available options are: District, Municipal, Village. Please say one."
+         Two-step flow:
+           Step 1 (promptNext): "Please select your Jurisdiction Type."
+           Step 2 (here):       "Available options are: X, Y, Z. Please say one."
+         Use a flag so the announcement block is skipped on re-entry.   */
+      if (!field._skipAnnouncement && field.optionsAnnouncement) {
+        var announcement = field.optionsAnnouncement;
+        updateBar(announcement, "listening");
+        tts(announcement, function() {
+          if (!guideActive) return;
+          field._skipAnnouncement = true;
+          listenField(field);
+        });
+        return;
+      }
+      /* Reset flag so next time the guide reaches this field the
+         announcement is spoken again.                               */
+      field._skipAnnouncement = false;
+    }
+
     var isSel = (field.type === "radio" || field.type === "select");
     var recog = new SR();
-    recog.lang            = LANG_CONFIG[activeLang].srLang;
+    /* Use field-level srLangOverride if set (e.g. p-gender uses en-IN
+       so spoken words like "male"/"female"/"purush"/"mahila" are all
+       recognised regardless of the active guide language).            */
+    recog.lang            = field.srLangOverride || LANG_CONFIG[activeLang].srLang;
     recog.continuous      = false;
     recog.interimResults  = false;
     recog.maxAlternatives = isSel ? 5 : 3;
@@ -1286,7 +1613,9 @@
   ================================================================ */
 
   function handleSelection(field, transcripts, type) {
-    var matched = matchOption(field.options, transcripts);
+    var matched = matchCitizenYesNoField(field)
+      ? matchBinaryYesNo(field.options, transcripts)
+      : matchOption(field.options, transcripts);
     if (!matched) {
       var names = field.options.map(function(o) { return o.labels[0]; }).join(", ");
       tts(ui("ui-notRecognised") + names, function() {
@@ -1295,6 +1624,8 @@
       });
       return;
     }
+
+    var applied = false;
 
     if (type === "radio") {
       var radio = document.querySelector(
@@ -1305,14 +1636,27 @@
         radio.dispatchEvent(new Event("change", { bubbles: true }));
         if (radio.onchange) radio.onchange.call(radio);
         flashRadio(radio);
+        applied = true;
       }
     } else {
       var sel = document.getElementById(field.id);
       if (sel) {
         sel.value = matched.value;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
-        flashSuccess(sel);
+        if (sel.value === matched.value) {
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+          flashSuccess(sel);
+          applied = true;
+        }
       }
+    }
+
+    if (!applied) {
+      var namesFail = field.options.map(function(o) { return o.labels[0]; }).join(", ");
+      tts(ui("ui-notRecognised") + namesFail, function() {
+        updateBar(ui("ui-notRecognisedBar") + namesFail, "warn");
+        if (guideActive) listenField(field);
+      });
+      return;
     }
 
     updateBar(ui("ui-selected") + matched.labels[0] + "\"", "success");
@@ -1323,7 +1667,7 @@
      STANDALONE SELECTION MIC RECOGNITION
   ================================================================ */
 
-  function runSelectionRecog(btn, options, onMatch) {
+  function runSelectionRecog(btn, options, onMatch, srLangOverride, radioName) {
     if (btn.classList.contains("vs-active")) {
       stopBtnRecog(btn);
       return;
@@ -1336,7 +1680,10 @@
     setVsStatus(btn, "Listening\u2026");
 
     var recog = new SR();
-    recog.lang            = LANG_CONFIG[activeLang].srLang;
+    /* Use srLangOverride when provided (e.g. p-gender always uses en-IN
+       so short words like "male"/"female"/"purush"/"mahila" are reliably
+       recognised regardless of the active guide language).              */
+    recog.lang            = srLangOverride || LANG_CONFIG[activeLang].srLang;
     recog.continuous      = false;
     recog.interimResults  = false;
     recog.maxAlternatives = 5;
@@ -1366,7 +1713,9 @@
       for (var i = 0; i < ev.results[0].length; i++) {
         alts.push(ev.results[0][i].transcript.trim());
       }
-      var matched = matchOption(options, alts);
+      var matched = matchCitizenYesNoRadio(radioName)
+        ? matchBinaryYesNo(options, alts)
+        : matchOption(options, alts);
       if (matched) {
         setVsStatus(btn, "\u2705 " + matched.labels[0]);
         onMatch(matched);
@@ -1517,10 +1866,9 @@
     var t = text.trim();
     /* Age — spoken words → digits */
     if (id === "p-age") return spokenToDigits(t);
-    /* Ward number — spoken words → digits, preserve alphanumeric codes */
+    /* Ward number — spoken words → digits, preserve alphanumeric codes with proper spacing */
     if (id === "p-wardNumber") {
-      var digits = spokenToDigits(t);
-      return digits.length > 0 ? t.toUpperCase().replace(/[^\dA-Z]/g, "") : t.toUpperCase();
+      return formatWardNumber(t);
     }
     t = t.charAt(0).toUpperCase() + t.slice(1);
     t = t.replace(/\.$/, "");
@@ -1602,6 +1950,86 @@
      OPTION MATCHING — 4-pass priority
   ================================================================ */
 
+  /* Citizen Step 1 — ward / voter Yes–No (avoid "note"/"nothing" → false "no") */
+  function matchCitizenYesNoField(field) {
+    return field && field.type === "radio" &&
+      (field.name === "wardConfirm" || field.name === "isVoter");
+  }
+
+  function matchCitizenYesNoRadio(radioName) {
+    return radioName === "wardConfirm" || radioName === "isVoter";
+  }
+
+  function isWordEnd(str, pos) {
+    if (pos >= str.length) return true;
+    var ch = str.charAt(pos);
+    return !/[a-z0-9]/.test(ch);
+  }
+
+  function spokenStartsWithLabel(spoken, lbl) {
+    if (spoken.indexOf(lbl) !== 0) return false;
+    return isWordEnd(spoken, lbl.length);
+  }
+
+  function labelStartsWithSpoken(spoken, lbl) {
+    if (lbl.indexOf(spoken) !== 0) return false;
+    return isWordEnd(lbl, spoken.length);
+  }
+
+  function hasWholeWord(utterance, word) {
+    if (!word) return false;
+    var escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("(^|[\\s,])" + escaped + "($|[\\s,.!?;:])", "i").test(utterance);
+  }
+
+  function labelMatchesUtterance(labels, spoken) {
+    var sl = spoken.toLowerCase().trim();
+    for (var l = 0; l < labels.length; l++) {
+      var lbl = labels[l].toLowerCase();
+      if (sl === lbl) return true;
+      if (spokenStartsWithLabel(sl, lbl) || labelStartsWithSpoken(sl, lbl)) return true;
+      if (lbl.length >= 4 && hasWholeWord(sl, lbl)) return true;
+    }
+    return false;
+  }
+
+  function utteranceLeadsYes(spoken) {
+    return /^\s*(yes|yeah|yep|yea|yah|ya|yup|haan|ha|ho|हाँ|हां|हो|जी)\b/i.test(spoken);
+  }
+
+  function utteranceLeadsNo(spoken) {
+    return /^\s*(no|nope|nah|nahi|na|not|dont|don't|नहीं|ना|नाही)\b/i.test(spoken);
+  }
+
+  function matchBinaryYesNo(options, transcripts) {
+    var yesOpt = null;
+    var noOpt  = null;
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].value === "yes") yesOpt = options[i];
+      if (options[i].value === "no")  noOpt  = options[i];
+    }
+    if (!yesOpt || !noOpt) return null;
+
+    var spoken = transcripts.map(function(t) { return t.toLowerCase().trim(); });
+
+    for (var s = 0; s < spoken.length; s++) {
+      var t = spoken[s];
+      var yesHit = labelMatchesUtterance(yesOpt.labels, t) || utteranceLeadsYes(t) ||
+        hasWholeWord(t, "yes") || hasWholeWord(t, "yeah") || hasWholeWord(t, "yep");
+      var noHit  = labelMatchesUtterance(noOpt.labels, t) || utteranceLeadsNo(t) ||
+        (hasWholeWord(t, "no") && !hasWholeWord(t, "yes"));
+
+      if (yesHit && !noHit) return yesOpt;
+      if (noHit && !yesHit) return noOpt;
+      if (yesHit && noHit) {
+        if (utteranceLeadsNo(t)) return noOpt;
+        if (utteranceLeadsYes(t)) return yesOpt;
+        return null;
+      }
+    }
+    return null;
+  }
+
   function matchOption(options, transcripts) {
     var spoken = transcripts.map(function(t) { return t.toLowerCase().trim(); });
 
@@ -1611,12 +2039,14 @@
         for (var l = 0; l < options[o].labels.length; l++)
           if (spoken[s] === options[o].labels[l].toLowerCase()) return options[o];
 
-    /* Pass 2 — starts-with */
+    /* Pass 2 — starts-with (word boundary for short tokens so "note" ≠ "no") */
     for (var s = 0; s < spoken.length; s++)
       for (var o = 0; o < options.length; o++)
         for (var l = 0; l < options[o].labels.length; l++) {
           var lbl = options[o].labels[l].toLowerCase();
-          if (spoken[s].indexOf(lbl) === 0 || lbl.indexOf(spoken[s]) === 0) return options[o];
+          if (spokenStartsWithLabel(spoken[s], lbl) || labelStartsWithSpoken(spoken[s], lbl)) {
+            return options[o];
+          }
         }
 
     /* Pass 3 — spoken contains label (label >= 4 chars) */
@@ -1824,6 +2254,107 @@
     return t.replace(/\D/g, "");
   }
 
+  /* ================================================================
+     WARD NUMBER FORMATTER
+     Converts spoken ward number input (English / Hindi / Marathi)
+     into the correct format: digits followed by a space and uppercase
+     letter suffix when present.
+     Examples:
+       "21 a"       → "21 A"
+       "21a"        → "21 A"
+       "21A"        → "21 A"
+       "twenty one a" → "21 A"
+       "11 b"       → "11 B"
+       "5 c"        → "5 C"
+       "101"        → "101"
+     Rules:
+       1. Convert spoken digit words to numerals (all three languages).
+       2. Separate a trailing letter suffix with a single space.
+       3. Uppercase the letter suffix.
+       4. Strip any characters that are not digits, spaces, or A-Z.
+  ================================================================ */
+  function formatWardNumber(raw) {
+    var t = raw.trim();
+
+    /* Step 1 — Normalise Devanagari letter suffixes spoken in Hindi/Marathi.
+       Speech recognisers may return Devanagari for letters like A, B, C
+       when the user speaks in Hindi or Marathi.
+       Map common Devanagari letter names → their Latin equivalents.
+       Replace each with a space-padded Latin letter so it survives
+       the digit-conversion step below.                               */
+    var DEVA_LETTERS = [
+      ["एय", "A"], ["ऐ",  "A"], ["ए",  "A"],
+      ["बी",  "B"], ["बि",  "B"],
+      ["सी",  "C"], ["सि",  "C"],
+      ["डी",  "D"], ["डि",  "D"],
+      ["ई",  "E"], ["इ",   "E"],
+      ["एफ", "F"],
+      ["जी",  "G"], ["जि",  "G"],
+      ["एच", "H"],
+      ["आई", "I"],
+      ["जे",  "J"],
+      ["के",  "K"], ["कि",  "K"],
+      ["एल", "L"],
+      ["एम", "M"],
+      ["एन", "N"],
+      ["ओ",  "O"],
+      ["पी",  "P"], ["पि",  "P"],
+      ["क्यू","Q"],
+      ["आर", "R"],
+      ["एस", "S"],
+      ["टी",  "T"], ["टि",  "T"],
+      ["यू",  "U"],
+      ["वी",  "V"], ["वि",  "V"],
+      ["डब्ल्यू","W"],
+      ["एक्स","X"],
+      ["वाय","Y"],
+      ["जेड","Z"]
+    ];
+    for (var d = 0; d < DEVA_LETTERS.length; d++) {
+      var deva  = DEVA_LETTERS[d][0];
+      var latin = DEVA_LETTERS[d][1];
+      var esc   = deva.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      t = t.replace(new RegExp(esc, "g"), " " + latin + " ");
+    }
+
+    /* Step 2 — Uppercase everything so Latin letters are consistent */
+    t = t.toUpperCase();
+
+    /* Step 3 — Collapse multiple spaces */
+    t = t.replace(/\s+/g, " ").trim();
+
+    /* Step 4 — Separate the string into a numeric part and an optional
+       trailing letter suffix BEFORE converting spoken digit words.
+       This preserves the letter suffix through the digit conversion.
+       Pattern: capture leading non-letter content and trailing letter. */
+
+    /* First, convert spoken digit words to numerals in the numeric portion.
+       We only apply spokenToDigits to the part before any trailing letter,
+       so the letter suffix is never touched by the digit stripper.        */
+    var trailMatch = t.match(/^(.*?)\s*([A-Z])$/);
+    if (trailMatch) {
+      /* Has a trailing letter suffix */
+      var numPart    = trailMatch[1].trim();  /* e.g. "TWENTY ONE" or "21" */
+      var letterPart = trailMatch[2];         /* e.g. "A" */
+      /* Convert spoken digit words in the numeric part only */
+      var digits = spokenToDigits(numPart);
+      if (digits.length > 0) {
+        return digits + " " + letterPart;
+      }
+      /* numPart had no recognisable digits — return as-is uppercased */
+      return numPart + " " + letterPart;
+    }
+
+    /* No trailing letter — convert the whole thing to digits */
+    var digitsOnly = spokenToDigits(t);
+    if (digitsOnly.length > 0) {
+      return digitsOnly;
+    }
+
+    /* Fallback — strip non-alphanumeric, uppercase */
+    return t.replace(/[^\dA-Z ]/g, "").trim();
+  }
+
   function cleanText(text, id) {
     var t = text.trim();
 
@@ -1839,10 +2370,7 @@
 
     /* Ward number — may contain digits spoken as words */
     if (id === "p-wardNumber") {
-      var digits = spokenToDigits(t);
-      /* If the whole input resolved to digits, return uppercase of original
-         (preserves alphanumeric ward codes like "23A") */
-      return digits.length > 0 ? t.toUpperCase().replace(/[^\dA-Z]/g, "") : t.toUpperCase();
+      return formatWardNumber(t);
     }
 
     /* Default — capitalise first letter, strip trailing period */
@@ -1968,7 +2496,7 @@
     if (!el) return;
     var target = el.closest(".form-group") || el.parentElement;
     if (target) target.classList.add("vg-field-active");
-    if (field.type === "text" || field.type === "phone" || field.type === "email") {
+    if (field.type === "text" || field.type === "phone" || field.type === "email" || field.type === "dob") {
       el.focus();
     }
   }
