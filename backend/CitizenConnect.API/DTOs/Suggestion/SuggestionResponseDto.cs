@@ -19,7 +19,15 @@ namespace CitizenConnect.Application.DTOs.Suggestion
         { get; set; }
             = string.Empty;
 
+        public string CategoryName
+        { get; set; }
+            = string.Empty;
+
         public string ExpectedBenefit
+        { get; set; }
+            = string.Empty;
+
+        public string BenefitScopeDisplay
         { get; set; }
             = string.Empty;
 
