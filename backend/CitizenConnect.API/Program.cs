@@ -30,7 +30,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+<<<<<<< HEAD
 
+=======
+builder.Services.AddScoped<ICitizenService, CitizenService>();
+builder.Services.AddScoped<ISuggestionService,SuggestionService>();
+>>>>>>> 0cfb14e (Added backend API changes for suggesions)
 // ==============================
 // CORS - Allow frontend origins
 // ==============================

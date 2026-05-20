@@ -38,6 +38,26 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<ComplaintStatusHistory> ComplaintStatusHistories => Set<ComplaintStatusHistory>();
 
 
+        public DbSet<Suggestion>
+    Suggestions
+        { get; set; }
+
+        public DbSet<SuggestionCategory>
+            SuggestionCategories
+        { get; set; }
+
+        public DbSet<SuggestionAttachment>
+            SuggestionAttachments
+        { get; set; }
+
+        public DbSet<SuggestionVote>
+            SuggestionVotes
+        { get; set; }
+
+        public DbSet<SuggestionStatusHistory>
+            SuggestionStatusHistories
+        { get; set; }
+
         // ==============================
         // MODEL CONFIGURATION
         // ==============================
@@ -226,6 +246,25 @@ namespace CitizenConnect.Infrastructure.Data
     .WithMany(u => u.ComplaintStatusHistories)
     .HasForeignKey(h => h.ChangedByUserId)
     .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<SuggestionVote>()
+    .HasOne(x => x.Citizen)
+    .WithMany()
+    .HasForeignKey(x => x.CitizenId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SuggestionVote>()
+    .HasOne(x => x.Citizen)
+    .WithMany()
+    .HasForeignKey(x => x.CitizenId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SuggestionStatusHistory>()
+                .HasOne(x => x.ChangedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.ChangedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
         }
