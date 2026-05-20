@@ -3,15 +3,11 @@
    ============================================================ */
 "use strict";
 
-const CITIZEN_API_BASE   = "http://localhost:5079/api/citizen";
-const COMPLAINT_API_BASE = "http://localhost:5079/api/Complaint";
+const CITIZEN_API_BASE     = "http://localhost:5079/api/citizen";
+const COMPLAINT_API_BASE   = "http://localhost:5079/api/Complaint";
+const SUGGESTION_API_BASE  = "http://localhost:5079/api/suggestions";
 
 const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
-
-const SUGGESTIONS = [
-  { id: "SUG-001", title: "Install CCTV cameras near Ward Park", category: "Public Safety & Security", desc: "The ward park has no surveillance. Installing CCTV cameras will deter anti-social activities and improve safety for families.", benefit: "Improved safety for children and families visiting the park.", date: "25 Apr 2026", status: "review", scope: "Ward" },
-  { id: "SUG-002", title: "Set up a community recycling bin", category: "Environment & Greenery", desc: "Place colour-coded recycling bins at 3 key locations in the ward to encourage waste segregation at source.", benefit: "Reduces landfill waste and promotes environmental awareness.", date: "10 Apr 2026", status: "accepted", scope: "Ward" },
-];
 
 // ---- Init ----
 document.addEventListener("DOMContentLoaded", function () {
@@ -19,10 +15,11 @@ document.addEventListener("DOMContentLoaded", function () {
   setDate();
   setupCharCounters();
   loadComplaintCategories();
+  loadSuggestionCategories();
   loadCitizenProfile().then(function () {
-    return loadCitizenComplaints();
+    loadCitizenComplaints();
+    loadCitizenSuggestions();
   });
-  renderSuggestions(SUGGESTIONS);
 });
 
 function requireCitizenSession() {
@@ -433,8 +430,87 @@ function resetComplaintForm() {
   loadComplaintCategories();
 }
 
+// ---- Load Suggestion Categories ----
+async function loadSuggestionCategories() {
+  const select = document.getElementById("suggestionCategory");
+  if (!select) return;
+
+  const placeholder = '<option value="">— Select Category —</option>';
+
+  try {
+    const response = await fetch(SUGGESTION_API_BASE + "/categories");
+    if (!response.ok) throw new Error("Categories request failed");
+
+    const categories = await response.json();
+    if (!Array.isArray(categories) || categories.length === 0) {
+      select.innerHTML = placeholder +
+        '<option value="" disabled>— No categories available —</option>';
+      return;
+    }
+
+    let html = placeholder;
+    categories.forEach(function (cat) {
+      const id = cat.suggestionCategoryId;
+      const name = cat.categoryName;
+      if (id == null || !name) return;
+      html += '<option value="' + escAttr(String(id)) + '">' + escHtml(name) + "</option>";
+    });
+    select.innerHTML = html;
+  } catch (_) {
+    select.innerHTML = placeholder +
+      '<option value="" disabled>— Could not load categories —</option>';
+  }
+}
+
+// ---- Load Citizen Suggestions ----
+async function loadCitizenSuggestions() {
+  const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
+  if (!citizenId) {
+    renderSuggestions([]);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      SUGGESTION_API_BASE + "/my/" + encodeURIComponent(citizenId)
+    );
+    if (!response.ok) throw new Error("Failed to load suggestions");
+
+    const data = await response.json();
+    const items = data.success && Array.isArray(data.data)
+      ? data.data.map(mapApiSuggestionToCard)
+      : [];
+    renderSuggestions(items);
+  } catch (_) {
+    renderSuggestions([]);
+  }
+}
+
+function mapApiSuggestionToCard(s) {
+  return {
+    id: s.suggestionNumber || ("SUG-" + s.suggestionId),
+    title: s.title || "",
+    category: s.categoryName || "",
+    desc: s.description || "",
+    benefit: s.expectedBenefit || "",
+    date: formatDate(new Date(s.createdDate)),
+    status: normalizeSuggestionStatus(s.status),
+    scope: s.benefitScopeDisplay || ""
+  };
+}
+
+function normalizeSuggestionStatus(status) {
+  if (status == null) return "pending";
+  const s = String(status).toLowerCase().replace(/\s+/g, "");
+  if (s === "underreview" || s === "1" || s === "2") return "review";
+  if (s === "approved" || s === "3") return "accepted";
+  if (s === "implemented" || s === "5") return "implemented";
+  if (s === "rejected" || s === "4") return "rejected";
+  return "pending";
+}
+
 // ---- Submit Suggestion ----
-function submitSuggestion(e) {
+async function submitSuggestion(e) {
   e.preventDefault();
   const errEl = document.getElementById("suggestionError");
   errEl.classList.add("hidden");
@@ -451,24 +527,86 @@ function submitSuggestion(e) {
     return;
   }
 
-  const newId = "SUG-00" + (SUGGESTIONS.length + 1);
-  SUGGESTIONS.unshift({ id: newId, title: title, category: cat, desc: desc, benefit: benefit, date: formatDate(new Date()), status: "review", scope: scope });
-  renderSuggestions(SUGGESTIONS);
+  const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
+  const wardId = citizenProfile.wardId;
+  if (!citizenId || !wardId) {
+    errEl.textContent = "Unable to verify your profile. Please log in again.";
+    errEl.classList.remove("hidden");
+    return;
+  }
 
-  document.getElementById("suggestionForm").reset();
+  const form = document.getElementById("suggestionForm");
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+  }
+
+  try {
+    const response = await fetch(SUGGESTION_API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        citizenId: parseInt(citizenId, 10),
+        wardId: parseInt(wardId, 10),
+        suggestionCategoryId: parseInt(cat, 10),
+        title: title,
+        description: desc,
+        expectedBenefit: benefit,
+        benefitScope: parseInt(scope, 10),
+        isAnonymous: false
+      })
+    });
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      throw new Error("Server returned an unexpected response.");
+    }
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Suggestion submission failed. Please try again.");
+    }
+
+    resetSuggestionForm();
+    await loadCitizenSuggestions();
+
+    const suggNumber = (result.data && result.data.suggestionNumber) || "";
+    showToast("", "Suggestion submitted successfully! ID: " + suggNumber);
+    showPanel("mysuggestions", document.querySelector("[onclick*=mysuggestions]"));
+  } catch (err) {
+    errEl.textContent = err.message || "Unable to submit suggestion. Please try again.";
+    errEl.classList.remove("hidden");
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Suggestion";
+    }
+  }
+}
+
+function resetSuggestionForm() {
+  const form = document.getElementById("suggestionForm");
+  if (form) form.reset();
   document.getElementById("suggestionTitleCount").textContent = "0";
   document.getElementById("suggestionDescCount").textContent = "0";
   document.getElementById("suggestionBenefitCount").textContent = "0";
-  document.getElementById("suggestionFileName").classList.add("hidden");
-
-  showToast("", "Suggestion submitted successfully! ID: " + newId);
-  showPanel("mysuggestions", document.querySelector("[onclick*=mysuggestions]"));
+  const fileNameEl = document.getElementById("suggestionFileName");
+  if (fileNameEl) fileNameEl.classList.add("hidden");
+  const errEl = document.getElementById("suggestionError");
+  if (errEl) errEl.classList.add("hidden");
+  loadSuggestionCategories();
 }
 
 // ---- Reset form ----
 function resetForm(formId, errId) {
   if (formId === "complaintForm") {
     resetComplaintForm();
+    return;
+  }
+  if (formId === "suggestionForm") {
+    resetSuggestionForm();
     return;
   }
   document.getElementById(formId).reset();

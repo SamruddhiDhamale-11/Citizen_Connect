@@ -167,6 +167,16 @@ namespace CitizenConnect.Application.Services
              * ===============================================
              */
 
+            var categoryName =
+                await _context
+                .SuggestionCategories
+                .Where(c =>
+                    c.SuggestionCategoryId ==
+                    suggestion.SuggestionCategoryId)
+                .Select(c => c.CategoryName)
+                .FirstOrDefaultAsync()
+                ?? string.Empty;
+
             return new SuggestionResponseDto
             {
                 SuggestionId =
@@ -181,8 +191,14 @@ namespace CitizenConnect.Application.Services
                 Description =
                     suggestion.Description,
 
+                CategoryName =
+                    categoryName,
+
                 ExpectedBenefit =
                     suggestion.ExpectedBenefit,
+
+                BenefitScopeDisplay =
+                    suggestion.BenefitScope.ToString(),
 
                 Status =
                     suggestion.Status,
@@ -207,6 +223,7 @@ namespace CitizenConnect.Application.Services
             var suggestions =
                 await _context
                 .Suggestions
+                .Include(x => x.SuggestionCategory)
                 .Where(x =>
 
                     x.CitizenId ==
@@ -232,8 +249,14 @@ namespace CitizenConnect.Application.Services
                         Description =
                             x.Description,
 
+                        CategoryName =
+                            x.SuggestionCategory.CategoryName,
+
                         ExpectedBenefit =
                             x.ExpectedBenefit,
+
+                        BenefitScopeDisplay =
+                            x.BenefitScope.ToString(),
 
                         Status =
                             x.Status,
@@ -246,6 +269,29 @@ namespace CitizenConnect.Application.Services
                 .ToListAsync();
 
             return suggestions;
+        }
+
+
+        /**
+         * =====================================================
+         * GET SUGGESTION CATEGORIES
+         * =====================================================
+         */
+
+        public async Task<List<object>>
+            GetSuggestionCategoriesAsync()
+        {
+            return await _context
+                .SuggestionCategories
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.CategoryName)
+                .Select(c => new
+                {
+                    c.SuggestionCategoryId,
+                    c.CategoryName
+                })
+                .Cast<object>()
+                .ToListAsync();
         }
     }
 }

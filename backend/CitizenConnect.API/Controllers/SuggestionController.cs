@@ -22,6 +22,36 @@ namespace CitizenConnect.API.Controllers
 
         /**
          * =====================================================
+         * GET SUGGESTION CATEGORIES
+         * =====================================================
+         */
+
+        [HttpGet("categories")]
+        public async Task<IActionResult>
+            GetSuggestionCategories()
+        {
+            try
+            {
+                var result =
+                    await _suggestionService
+                    .GetSuggestionCategoriesAsync();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+
+                    message = ex.Message
+                });
+            }
+        }
+
+
+        /**
+         * =====================================================
          * CREATE SUGGESTION
          * =====================================================
          */
