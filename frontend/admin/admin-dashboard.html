@@ -59,6 +59,10 @@
           <span class="nav-icon">&#x1F4CB;</span>
           <span class="nav-label">Complaints Management</span>
         </a>
+        <a href="#" class="nav-item" onclick="showPanel('suggestions-management', this)">
+          <span class="nav-icon">&#x1F4A1;</span>
+          <span class="nav-label">Suggestions Management</span>
+        </a>
         <a href="#" class="nav-item" onclick="showPanel('announcements', this)">
           <span class="nav-icon">&#x1F4E2;</span>
           <span class="nav-label">Announcements</span>
@@ -459,10 +463,18 @@
             <p class="page-subtitle">Review, assign, and resolve citizen complaints</p>
           </div>
         </div>
-        <div class="placeholder-panel">
-          <div class="placeholder-icon">&#x1F4CB;</div>
-          <div class="placeholder-title">Complaints Management</div>
-          <div class="placeholder-desc">This module is under development. Full complaint lifecycle management will be available here.</div>
+        <div class="filter-bar">
+          <select class="filter-select" id="adminComplaintStatusFilter" onchange="filterAdminComplaints(this.value)">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="inprogress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <input type="text" class="filter-search" id="adminComplaintSearch" placeholder="Search complaints..." oninput="searchAdminComplaints(this.value)" />
+        </div>
+        <div class="items-list" id="adminComplaintsList">
+          <!-- Populated by JS -->
         </div>
       </div>
 

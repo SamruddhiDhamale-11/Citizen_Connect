@@ -18,6 +18,12 @@
 
         public string Priority { get; set; } = string.Empty;
 
+        public string CitizenName { get; set; } = string.Empty;
+
+        public string ImageUrl { get; set; } = string.Empty;
+
+        public List<string> Images { get; set; } = new List<string>();
+
         public DateTime CreatedAt { get; set; }
     }
 }

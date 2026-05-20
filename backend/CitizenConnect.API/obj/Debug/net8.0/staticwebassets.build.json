@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "XK4MOJ+JMY7CGvnBf2mh5VfvJSFVjRfGJuiOib86pvA=",
+  "Hash": "yno4MpQzGVb9BMdc3YleoBwipsq56zMy2A3KywDXAJ8=",
   "Source": "CitizenConnect.API",
   "BasePath": "_content/CitizenConnect.API",
   "Mode": "Default",
@@ -16,6 +16,44 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\wwwroot\\uploads\\complaints\\3aa2d5f2-d2f4-4667-a085-6c725805f8ab.jpg",
+      "SourceId": "CitizenConnect.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\wwwroot\\",
+      "BasePath": "_content/CitizenConnect.API",
+      "RelativePath": "uploads/complaints/3aa2d5f2-d2f4-4667-a085-6c725805f8ab.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\complaints\\3aa2d5f2-d2f4-4667-a085-6c725805f8ab.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\wwwroot\\uploads\\complaints\\8465ef2d-fe23-4c45-91c9-933cf6c6f5e2.jpg",
+      "SourceId": "CitizenConnect.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\wwwroot\\",
+      "BasePath": "_content/CitizenConnect.API",
+      "RelativePath": "uploads/complaints/8465ef2d-fe23-4c45-91c9-933cf6c6f5e2.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\complaints\\8465ef2d-fe23-4c45-91c9-933cf6c6f5e2.jpg"
+    },
     {
       "Identity": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\wwwroot\\uploads\\complaints\\ee86921f-83c7-4e88-b374-ce270b2fe649.jpg",
       "SourceId": "CitizenConnect.API",

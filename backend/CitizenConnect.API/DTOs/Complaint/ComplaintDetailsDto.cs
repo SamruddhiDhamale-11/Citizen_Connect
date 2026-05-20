@@ -20,6 +20,8 @@
 
         public bool IsAnonymous { get; set; }
 
+        public string CitizenName { get; set; } = string.Empty;
+
         public DateTime CreatedAt { get; set; }
 
         public List<string> Images { get; set; }

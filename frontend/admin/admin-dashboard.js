@@ -14,6 +14,11 @@
 var LS_KEY = 'adminAreaOverviewData';
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var ADMIN_API_BASE = 'http://localhost:5079/api/admin';
+var COMPLAINT_API_BASE = 'http://localhost:5079/api/Complaint';
+var API_ORIGIN = 'http://localhost:5079';
+var adminComplaints = [];
+var activeComplaintId = null;
 
 /* ============================================================
    GLOBAL STATE
@@ -279,6 +284,9 @@ function showPanel(panelId, navEl) {
   var target = document.getElementById('panel-' + panelId);
   if (target) target.classList.add('active');
   if (navEl) navEl.classList.add('active');
+  if (panelId === 'complaints-management') {
+    loadAdminComplaints();
+  }
   closeSidebar();
   return false;
 }
@@ -1155,12 +1163,299 @@ function clearSectionForm() {
 }
 
 /* ============================================================
+   COMPLAINTS MANAGEMENT
+   ============================================================ */
+function requireAdminSession() {
+  var userId = localStorage.getItem('userId');
+  var role = localStorage.getItem('role');
+  if (!userId || role !== 'Admin') {
+    window.location.href = '../login/login.html';
+    return false;
+  }
+  return true;
+}
+
+async function loadAdminComplaints() {
+  var list = document.getElementById('adminComplaintsList');
+  if (!list) return;
+
+  list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x23F3;</div><div>Loading complaints...</div></div>';
+
+  try {
+    var response = await fetch(ADMIN_API_BASE + '/complaints');
+    if (!response.ok) throw new Error('Failed to load complaints');
+    var data = await response.json();
+    adminComplaints = Array.isArray(data)
+      ? data.map(mapAdminComplaintToCard)
+      : [];
+    renderAdminComplaints(adminComplaints);
+    var statusFilter = document.getElementById('adminComplaintStatusFilter');
+    var searchInput = document.getElementById('adminComplaintSearch');
+    if (statusFilter && statusFilter.value !== 'all') {
+      filterAdminComplaints(statusFilter.value);
+    }
+    if (searchInput && searchInput.value.trim()) {
+      searchAdminComplaints(searchInput.value);
+    }
+  } catch (_) {
+    adminComplaints = [];
+    list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>Unable to load complaints. Please ensure the server is running.</div></div>';
+  }
+}
+
+function pickComplaintField(obj, camelKey, pascalKey) {
+  var val = obj[camelKey];
+  if (val === undefined || val === null) val = obj[pascalKey];
+  return val === undefined || val === null ? '' : val;
+}
+
+function mapAdminComplaintToCard(c) {
+  var rawImages = c.images || c.Images || [];
+  if (!Array.isArray(rawImages)) rawImages = [];
+  var imagePath = pickComplaintField(c, 'imageUrl', 'ImageUrl') || rawImages[0] || '';
+  var images = rawImages.length
+    ? rawImages.map(resolveComplaintImageUrl).filter(Boolean)
+    : (imagePath ? [resolveComplaintImageUrl(imagePath)] : []);
+
+  return {
+    complaintId: c.complaintId != null ? c.complaintId : c.ComplaintId,
+    id: pickComplaintField(c, 'complaintNumber', 'ComplaintNumber') || ('CMP-' + (c.complaintId || c.ComplaintId)),
+    title: pickComplaintField(c, 'title', 'Title'),
+    category: pickComplaintField(c, 'categoryName', 'CategoryName'),
+    desc: pickComplaintField(c, 'description', 'Description'),
+    location: pickComplaintField(c, 'address', 'Address'),
+    citizen: pickComplaintField(c, 'citizenName', 'CitizenName') || '—',
+    date: formatComplaintDate(c.createdAt || c.CreatedAt),
+    status: normalizeAdminComplaintStatus(c.status || c.Status),
+    priority: (pickComplaintField(c, 'priority', 'Priority') || 'medium').toLowerCase(),
+    imageUrl: images[0] || '',
+    images: images
+  };
+}
+
+function resolveComplaintImageUrl(path) {
+  if (!path) return '';
+  var p = String(path).trim();
+  if (p.indexOf('http://') === 0 || p.indexOf('https://') === 0) return p;
+  if (p.charAt(0) !== '/') p = '/' + p;
+  return API_ORIGIN + p;
+}
+
+function normalizeAdminComplaintStatus(status) {
+  if (!status) return 'pending';
+  var s = String(status).toLowerCase().replace(/\s+/g, '');
+  if (s === 'inprogress') return 'inprogress';
+  if (s === 'pending') return 'pending';
+  if (s === 'resolved') return 'resolved';
+  if (s === 'rejected') return 'rejected';
+  return s;
+}
+
+function adminStatusLabel(s) {
+  var map = { pending: 'Pending', inprogress: 'In Progress', resolved: 'Resolved', rejected: 'Rejected' };
+  return map[s] || s;
+}
+
+function formatComplaintDate(isoOrDate) {
+  if (!isoOrDate) return '—';
+  var d = new Date(isoOrDate);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function buildComplaintImagesHtml(complaint) {
+  var urls = complaint.images && complaint.images.length
+    ? complaint.images
+    : (complaint.imageUrl ? [complaint.imageUrl] : []);
+  if (!urls.length) {
+    return '<div class="modal-value">No image attached</div>';
+  }
+  return urls.map(function(url) {
+    return '<img class="complaint-detail-img" src="' + escHtml(url) + '" alt="Complaint attachment" />';
+  }).join('');
+}
+
+function renderAdminComplaints(data) {
+  var list = document.getElementById('adminComplaintsList');
+  if (!list) return;
+  if (!data.length) {
+    list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>No complaints found.</div></div>';
+    return;
+  }
+  list.innerHTML = data.map(function(c) {
+    return '<div class="item-card" data-complaint-id="' + c.complaintId + '" data-status="' + c.status + '" data-title="' + escHtml(c.title).toLowerCase() + '" data-citizen="' + escHtml(c.citizen).toLowerCase() + '" onclick="openAdminComplaintDetail(' + c.complaintId + ')">' +
+      '<div class="item-card-top">' +
+        '<div><div class="item-card-title">' + escHtml(c.title) + '</div>' +
+        '<div class="item-card-cat">' + escHtml(c.category) + ' &nbsp;&nbsp; ' + escHtml(c.id) + '</div></div>' +
+        '<span class="status-pill ' + c.status + '">' + adminStatusLabel(c.status) + '</span>' +
+      '</div>' +
+      '<div class="item-card-desc">' + escHtml(c.desc || '—') + '</div>' +
+      (c.imageUrl ? '<div class="item-card-thumb-wrap"><img class="complaint-card-thumb" src="' + escHtml(c.imageUrl) + '" alt="" /></div>' : '') +
+      '<div class="item-card-footer">' +
+        '<span class="item-card-date">' + escHtml(c.date) + '</span>' +
+        '<span class="item-card-date">' + escHtml(c.citizen) + '</span>' +
+        '<span class="item-card-date">' + escHtml(c.location || '—') + '</span>' +
+        '<span class="priority-pill ' + c.priority + '">' + escHtml(c.priority.toUpperCase()) + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function filterAdminComplaints(status) {
+  applyAdminComplaintFilters();
+}
+
+function searchAdminComplaints(query) {
+  applyAdminComplaintFilters();
+}
+
+function applyAdminComplaintFilters() {
+  var statusEl = document.getElementById('adminComplaintStatusFilter');
+  var searchEl = document.getElementById('adminComplaintSearch');
+  var status = statusEl ? statusEl.value : 'all';
+  var q = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  var cards = document.querySelectorAll('#adminComplaintsList .item-card');
+  cards.forEach(function(card) {
+    var statusMatch = status === 'all' || card.dataset.status === status;
+    var searchMatch = !q ||
+      (card.dataset.title || '').includes(q) ||
+      (card.dataset.citizen || '').includes(q);
+    card.style.display = statusMatch && searchMatch ? '' : 'none';
+  });
+}
+
+async function openAdminComplaintDetail(complaintId) {
+  var complaint = adminComplaints.find(function(c) { return c.complaintId === complaintId; });
+  if (!complaint) return;
+
+  activeComplaintId = complaintId;
+
+  try {
+    var detailRes = await fetch(COMPLAINT_API_BASE + '/' + encodeURIComponent(complaintId));
+    if (detailRes.ok) {
+      var detail = await detailRes.json();
+      complaint.desc = pickComplaintField(detail, 'description', 'Description') || complaint.desc;
+      complaint.location = pickComplaintField(detail, 'address', 'Address') || complaint.location;
+      complaint.citizen = pickComplaintField(detail, 'citizenName', 'CitizenName') || complaint.citizen;
+      var detailImages = detail.images || detail.Images || [];
+      if (Array.isArray(detailImages) && detailImages.length) {
+        complaint.images = detailImages.map(resolveComplaintImageUrl).filter(Boolean);
+        complaint.imageUrl = complaint.images[0] || complaint.imageUrl;
+      }
+    }
+  } catch (_) { /* use list data */ }
+
+  var imageHtml = buildComplaintImagesHtml(complaint);
+
+  var bodyHtml =
+    '<div class="modal-section-label">Complaint Number</div>' +
+    '<div class="modal-value">' + escHtml(complaint.id) + '</div>' +
+    '<div class="modal-section-label">Title</div>' +
+    '<div class="modal-value">' + escHtml(complaint.title) + '</div>' +
+    '<div class="modal-section-label">Category</div>' +
+    '<div class="modal-value">' + escHtml(complaint.category) + '</div>' +
+    '<div class="modal-section-label">Description</div>' +
+    '<div class="modal-value">' + escHtml(complaint.desc || '—') + '</div>' +
+    '<div class="modal-section-label">Citizen</div>' +
+    '<div class="modal-value">' + escHtml(complaint.citizen) + '</div>' +
+    '<div class="modal-section-label">Address</div>' +
+    '<div class="modal-value">' + escHtml(complaint.location || '—') + '</div>' +
+    '<div class="modal-section-label">Priority</div>' +
+    '<div class="modal-value">' + escHtml(complaint.priority.toUpperCase()) + '</div>' +
+    '<div class="modal-section-label">Status</div>' +
+    '<div class="modal-value"><span class="status-pill ' + complaint.status + '">' + adminStatusLabel(complaint.status) + '</span></div>' +
+    '<div class="modal-section-label">Filed On</div>' +
+    '<div class="modal-value">' + escHtml(complaint.date) + '</div>' +
+    '<div class="modal-section-label">Attachment</div>' +
+    imageHtml +
+    '<div class="complaint-status-form">' +
+      '<div class="modal-section-label">Update Status</div>' +
+      '<select id="adminStatusSelect">' +
+        '<option value="Pending"' + (complaint.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
+        '<option value="InProgress"' + (complaint.status === 'inprogress' ? ' selected' : '') + '>In Progress</option>' +
+        '<option value="Resolved"' + (complaint.status === 'resolved' ? ' selected' : '') + '>Resolved</option>' +
+        '<option value="Rejected"' + (complaint.status === 'rejected' ? ' selected' : '') + '>Rejected</option>' +
+      '</select>' +
+      '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
+      '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
+    '</div>' +
+    '<div class="modal-section-label">Status History</div>' +
+    '<div class="complaint-history-list" id="adminComplaintHistory"><div class="modal-value">Loading history...</div></div>';
+
+  document.getElementById('modalTitle').textContent = 'Complaint Details';
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  loadAdminComplaintHistory(complaintId);
+}
+
+async function loadAdminComplaintHistory(complaintId) {
+  var container = document.getElementById('adminComplaintHistory');
+  if (!container) return;
+
+  try {
+    var response = await fetch(ADMIN_API_BASE + '/complaint-history/' + encodeURIComponent(complaintId));
+    if (!response.ok) throw new Error('History unavailable');
+    var data = await response.json();
+    if (!Array.isArray(data) || !data.length) {
+      container.innerHTML = '<div class="modal-value">No status history yet.</div>';
+      return;
+    }
+    container.innerHTML = data.map(function(h) {
+      return '<div class="complaint-history-item">' +
+        '<strong>' + escHtml(h.oldStatus || '—') + ' → ' + escHtml(h.newStatus || '—') + '</strong><br>' +
+        escHtml(h.changedBy || 'System') + ' · ' + formatComplaintDate(h.changedAt) +
+        (h.remarks ? '<br><span>' + escHtml(h.remarks) + '</span>' : '') +
+      '</div>';
+    }).join('');
+  } catch (_) {
+    container.innerHTML = '<div class="modal-value">Unable to load history.</div>';
+  }
+}
+
+async function submitAdminStatusUpdate() {
+  if (!activeComplaintId) return;
+
+  var userId = localStorage.getItem('userId');
+  if (!userId) {
+    showToast('Please log in again to update status.', 'warning');
+    return;
+  }
+
+  var statusEl = document.getElementById('adminStatusSelect');
+  var remarksEl = document.getElementById('adminStatusRemarks');
+  var newStatus = statusEl ? statusEl.value : 'Pending';
+  var remarks = remarksEl ? remarksEl.value.trim() : '';
+
+  try {
+    var response = await fetch(ADMIN_API_BASE + '/update-status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        complaintId: activeComplaintId,
+        newStatus: newStatus,
+        changedByUserId: parseInt(userId, 10),
+        remarks: remarks || null
+      })
+    });
+
+    if (!response.ok) throw new Error('Update failed');
+    var msg = await response.text();
+    showToast(msg || 'Complaint status updated.', 'success');
+    closeModal();
+    await loadAdminComplaints();
+  } catch (_) {
+    showToast('Unable to update complaint status.', 'error');
+  }
+}
+
+/* ============================================================
    INIT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
+  if (!requireAdminSession()) return;
   setDate();
   recomputeAllSections();
   renderSectionCards();
   computeAreaProgress();
-  syncAreaSummary();                          // populate summary on load
+  syncAreaSummary();
 });

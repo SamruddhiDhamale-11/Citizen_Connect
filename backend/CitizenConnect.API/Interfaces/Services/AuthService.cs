@@ -51,18 +51,10 @@ namespace CitizenConnect.Application.Services
 
             // ==============================
             // CITIZEN / POLITICIAN — DB lookup
+            // Password optional: if omitted, allow when account exists.
+            // If provided, must match stored hash.
+            // DB users with Admin role must always provide password.
             // ==============================
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Password is required."
-                };
-            }
-
-            // EF Core translates this to a SQL WHERE with case-insensitive collation
-            // Trim is applied in-memory via ToLower for email; MobileNo is exact match
             var user = await _context.Users
                 .Include(x => x.Role)
                 .FirstOrDefaultAsync(x =>
@@ -78,14 +70,42 @@ namespace CitizenConnect.Application.Services
                 };
             }
 
-            // Password check
-            if (user.PasswordHash != password)
+            var roleName = user.Role?.RoleName ?? string.Empty;
+            var isAdminRole = roleName.Equals(
+                "Admin",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (isAdminRole)
             {
-                return new AuthResponseDto
+                if (string.IsNullOrWhiteSpace(password))
                 {
-                    Success = false,
-                    Message = "Invalid credentials. Please check your password."
-                };
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Password is required."
+                    };
+                }
+
+                if (user.PasswordHash != password)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid credentials. Please check your password."
+                    };
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(password) &&
+                    user.PasswordHash != password)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid credentials. Please check your password."
+                    };
+                }
             }
 
             user.LastLoginAt = DateTime.UtcNow;
@@ -96,8 +116,8 @@ namespace CitizenConnect.Application.Services
                 Success     = true,
                 Message     = "Login successful",
                 UserId      = user.UserId,
-                Role        = user.Role.RoleName,
-                RedirectUrl = GetRedirectUrl(user.Role.RoleName)
+                Role        = user.Role!.RoleName,
+                RedirectUrl = GetRedirectUrl(user.Role!.RoleName)
             };
         }
 

@@ -204,38 +204,58 @@ namespace CitizenConnect.Services
         public async Task<ComplaintDetailsDto?>
             GetComplaintDetailsAsync(int complaintId)
         {
-            return await _context.Complaints
+            var complaint = await _context.Complaints
+                .AsNoTracking()
                 .Include(c => c.ComplaintCategory)
+                .Include(c => c.Citizen)
+                    .ThenInclude(cit => cit.User)
                 .Include(c => c.ComplaintImages)
-                .Where(c => c.ComplaintId == complaintId)
-                .Select(c => new ComplaintDetailsDto
-                {
-                    ComplaintId = c.ComplaintId,
+                .FirstOrDefaultAsync(c => c.ComplaintId == complaintId);
 
-                    ComplaintNumber = c.ComplaintNumber,
+            if (complaint == null)
+            {
+                return null;
+            }
 
-                    CategoryName =
-                        c.ComplaintCategory.CategoryName,
+            return new ComplaintDetailsDto
+            {
+                ComplaintId = complaint.ComplaintId,
+                ComplaintNumber = complaint.ComplaintNumber,
+                CategoryName = complaint.ComplaintCategory?.CategoryName ?? string.Empty,
+                Title = complaint.Title,
+                Description = complaint.Description ?? string.Empty,
+                Address = complaint.Address ?? string.Empty,
+                Status = complaint.Status.ToString(),
+                Priority = complaint.Priority,
+                IsAnonymous = complaint.IsAnonymous,
+                CitizenName = complaint.IsAnonymous
+                    ? "Anonymous"
+                    : FormatCitizenDisplayName(complaint.Citizen?.User),
+                CreatedAt = complaint.CreatedAt,
+                Images = complaint.ComplaintImages
+                    .OrderBy(i => i.ComplaintImageId)
+                    .Select(i => i.ImagePath)
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .ToList()
+            };
+        }
 
-                    Title = c.Title,
+        private static string FormatCitizenDisplayName(User? user)
+        {
+            if (user == null)
+            {
+                return "—";
+            }
 
-                    Description = c.Description,
+            var parts = new[]
+            {
+                user.FirstName,
+                user.MiddleName,
+                user.LastName
+            }.Where(p => !string.IsNullOrWhiteSpace(p));
 
-                    Address = c.Address,
-
-                    Status = c.Status.ToString(),
-
-                    Priority = c.Priority,
-
-                    IsAnonymous = c.IsAnonymous,
-
-                    CreatedAt = c.CreatedAt,
-
-                    Images = c.ComplaintImages
-                        .Select(i => i.ImagePath)
-                        .ToList()
-                })
-                .FirstOrDefaultAsync();
+            var name = string.Join(" ", parts).Trim();
+            return string.IsNullOrEmpty(name) ? "—" : name;
         }
 
 

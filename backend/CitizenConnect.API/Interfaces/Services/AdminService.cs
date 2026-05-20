@@ -25,27 +25,63 @@ namespace CitizenConnect.Services
         public async Task<List<ComplaintResponseDto>>
             GetAllComplaintsAsync()
         {
-            return await _context.Complaints
+            var complaints = await _context.Complaints
+                .AsNoTracking()
                 .Include(c => c.ComplaintCategory)
-                .Select(c => new ComplaintResponseDto
-                {
-                    ComplaintId = c.ComplaintId,
-
-                    ComplaintNumber = c.ComplaintNumber,
-
-                    CategoryName =
-                        c.ComplaintCategory.CategoryName,
-
-                    Title = c.Title,
-
-                    Status = c.Status.ToString(),
-
-                    Priority = c.Priority,
-
-                    CreatedAt = c.CreatedAt
-                })
+                .Include(c => c.Citizen)
+                    .ThenInclude(cit => cit.User)
+                .Include(c => c.ComplaintImages)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
+
+            return complaints
+                .Select(MapToComplaintResponseDto)
+                .ToList();
+        }
+
+        private static ComplaintResponseDto MapToComplaintResponseDto(Complaint c)
+        {
+            var imagePaths = c.ComplaintImages
+                .OrderBy(i => i.ComplaintImageId)
+                .Select(i => i.ImagePath)
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .ToList();
+
+            return new ComplaintResponseDto
+            {
+                ComplaintId = c.ComplaintId,
+                ComplaintNumber = c.ComplaintNumber,
+                CategoryName = c.ComplaintCategory?.CategoryName ?? string.Empty,
+                Title = c.Title,
+                Description = c.Description ?? string.Empty,
+                Address = c.Address ?? string.Empty,
+                Status = c.Status.ToString(),
+                Priority = c.Priority,
+                CitizenName = c.IsAnonymous
+                    ? "Anonymous"
+                    : FormatCitizenName(c.Citizen?.User),
+                ImageUrl = imagePaths.FirstOrDefault() ?? string.Empty,
+                Images = imagePaths,
+                CreatedAt = c.CreatedAt
+            };
+        }
+
+        private static string FormatCitizenName(User? user)
+        {
+            if (user == null)
+            {
+                return "—";
+            }
+
+            var parts = new[]
+            {
+                user.FirstName,
+                user.MiddleName,
+                user.LastName
+            }.Where(p => !string.IsNullOrWhiteSpace(p));
+
+            var name = string.Join(" ", parts).Trim();
+            return string.IsNullOrEmpty(name) ? "—" : name;
         }
 
 

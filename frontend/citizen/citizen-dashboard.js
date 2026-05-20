@@ -77,9 +77,6 @@ function applyCitizenProfile(profile) {
   citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
   citizenProfile.wardDisplay = profile.wardDisplay || "";
 
-  const wardField = document.getElementById("complaintWard");
-  if (wardField) wardField.value = ward;
-
   setText("greetName", firstName);
   setText("userAvatar", initials);
   setText("userName", fullName);
@@ -433,8 +430,6 @@ function resetComplaintForm() {
   if (fileNameEl) fileNameEl.classList.add("hidden");
   const errEl = document.getElementById("complaintError");
   if (errEl) errEl.classList.add("hidden");
-  const wardField = document.getElementById("complaintWard");
-  if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
   loadComplaintCategories();
 }
 

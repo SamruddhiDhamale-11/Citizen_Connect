@@ -22,14 +22,35 @@ function onLoginRoleChange() {
   const role = document.getElementById('loginRole').value;
   const adminNotice = document.getElementById('adminNotice');
   const registerLink = document.getElementById('registerLink');
+  const pwdInput = document.getElementById('loginPassword');
+  const pwdReq = document.getElementById('loginPasswordReq');
 
   if (role === 'admin') {
     adminNotice.classList.remove('hidden');
     registerLink.classList.add('hidden');
+    if (pwdInput) {
+      pwdInput.setAttribute('required', 'required');
+      pwdInput.placeholder = 'Enter your password';
+    }
+    if (pwdReq) pwdReq.classList.remove('hidden');
   } else {
     adminNotice.classList.add('hidden');
     registerLink.classList.remove('hidden');
+    if (pwdInput) {
+      pwdInput.removeAttribute('required');
+      pwdInput.placeholder =
+        role === 'citizen' || role === 'politician'
+          ? 'Optional — email/mobile only, or with password'
+          : 'Enter your password';
+    }
+    if (pwdReq) pwdReq.classList.add('hidden');
   }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onLoginRoleChange);
+} else {
+  onLoginRoleChange();
 }
 
 // ================================================================
@@ -1053,8 +1074,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     return;
   }
 
-  // ---- Password required ----
-  if (!password) {
+  // ---- Password: mandatory for Admin only (Citizen / Politician may omit) ----
+  if (role === 'admin' && !String(password).trim()) {
     showError('loginError', 'Please enter your password.');
     return;
   }
