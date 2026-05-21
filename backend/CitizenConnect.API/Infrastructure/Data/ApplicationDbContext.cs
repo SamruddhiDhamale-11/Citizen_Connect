@@ -1,4 +1,5 @@
-﻿using CitizenConnect.Domain.Entities;
+﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CitizenConnect.Infrastructure.Data
@@ -62,6 +63,12 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<SuggestionStatusHistory>
             SuggestionStatusHistories
                 => Set<SuggestionStatusHistory>();
+
+        public DbSet<Locality> Localities
+    => Set<Locality>();
+
+        public DbSet<LocalityType> LocalityTypes
+            => Set<LocalityType>();
 
         // =========================================
         // NEW MODULES
@@ -366,6 +373,19 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasOne(x => x.AssignedOfficer)
                 .WithMany(x => x.Complaints)
                 .HasForeignKey(x => x.AssignedOfficerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Locality>()
+    .HasOne(x => x.Ward)
+    .WithMany(x => x.Localities)
+    .HasForeignKey(x => x.WardId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Locality>()
+                .HasOne(x => x.LocalityType)
+                .WithMany(x => x.Localities)
+                .HasForeignKey(x => x.LocalityTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

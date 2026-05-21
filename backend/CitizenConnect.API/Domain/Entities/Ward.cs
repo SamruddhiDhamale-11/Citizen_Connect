@@ -1,4 +1,5 @@
-﻿using CitizenConnect.Domain.Common;
+﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.Domain.Entities
 {
@@ -33,5 +34,9 @@ namespace CitizenConnect.Domain.Entities
 
         public ICollection<Complaint> Complaints { get; set; }
     = new List<Complaint>();
+
+        public ICollection<Locality> Localities
+        { get; set; }
+           = new List<Locality>();
     }
 }

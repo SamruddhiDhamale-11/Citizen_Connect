@@ -36,6 +36,7 @@ builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
 builder.Services.AddScoped<IDepartmentService,DepartmentService>();
 builder.Services.AddScoped<IOfficerService,OfficerService>();
+builder.Services.AddScoped<ILocalityService,LocalityService>();
 // ==============================
 // CORS - Allow frontend origins
 // ==============================
