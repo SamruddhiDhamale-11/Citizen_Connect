@@ -77,6 +77,12 @@ function applyCitizenProfile(profile) {
   citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
   citizenProfile.wardDisplay = profile.wardDisplay || "";
 
+<<<<<<< HEAD
+=======
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = ward;
+
+>>>>>>> frontend-work
   setText("greetName", firstName);
   setText("userAvatar", initials);
   setText("userName", fullName);
@@ -430,6 +436,11 @@ function resetComplaintForm() {
   if (fileNameEl) fileNameEl.classList.add("hidden");
   const errEl = document.getElementById("complaintError");
   if (errEl) errEl.classList.add("hidden");
+<<<<<<< HEAD
+=======
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
+>>>>>>> frontend-work
   loadComplaintCategories();
 }
 
