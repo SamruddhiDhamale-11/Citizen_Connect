@@ -28,15 +28,21 @@ namespace CitizenConnect.Services
         // =========================================
 
         public async Task<ComplaintResponseDto> CreateComplaintAsync(
-            CreateComplaintDto dto)
+     CreateComplaintDto dto)
         {
+            // =========================================
+            // FILE VALIDATION
+            // =========================================
+
             if (dto.Files != null && dto.Files.Any())
             {
-                var allowedTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                var allowedTypes =
+                    new HashSet<string>(
+                        StringComparer.OrdinalIgnoreCase)
                 {
-                    "image/jpeg",
-                    "image/jpg",
-                    "image/png"
+            "image/jpeg",
+            "image/jpg",
+            "image/png"
                 };
 
                 foreach (var file in dto.Files)
@@ -55,10 +61,44 @@ namespace CitizenConnect.Services
                 }
             }
 
-            // Generate Complaint Number
+            // =========================================
+            // FIND COMPLAINT CATEGORY
+            // =========================================
+
+            var category = await _context
+                .ComplaintCategories
+                .Include(x => x.Department)
+                .FirstOrDefaultAsync(x =>
+                    x.ComplaintCategoryId
+                    == dto.ComplaintCategoryId);
+
+            if (category == null)
+            {
+                throw new Exception(
+                    "Complaint category not found.");
+            }
+
+            // =========================================
+            // FIND AVAILABLE OFFICER
+            // =========================================
+
+            var officer = await _context.Officers
+                .FirstOrDefaultAsync(x =>
+                    x.DepartmentId
+                    == category.DepartmentId
+                    &&
+                    x.IsAvailable);
+
+            // =========================================
+            // GENERATE COMPLAINT NUMBER
+            // =========================================
+
             string complaintNumber =
                 $"CC-{DateTime.UtcNow:yyyyMMddHHmmss}";
 
+            // =========================================
+            // CREATE COMPLAINT
+            // =========================================
 
             var complaint = new Complaint
             {
@@ -68,7 +108,19 @@ namespace CitizenConnect.Services
 
                 WardId = dto.WardId,
 
-                ComplaintCategoryId = dto.ComplaintCategoryId,
+                ComplaintCategoryId =
+                    dto.ComplaintCategoryId,
+
+                DepartmentId =
+                    category.DepartmentId,
+
+                AssignedOfficerId =
+                    officer?.OfficerId,
+
+                AssignedAt =
+                    officer != null
+                        ? DateTime.UtcNow
+                        : null,
 
                 Title = dto.Title,
 
@@ -84,13 +136,16 @@ namespace CitizenConnect.Services
 
                 IsAnonymous = dto.IsAnonymous,
 
-                Status = ComplaintStatus.Pending
+                Status =
+                    officer != null
+                        ? ComplaintStatus.Assigned
+                        : ComplaintStatus.Pending
             };
 
-            await _context.Complaints.AddAsync(complaint);
+            await _context.Complaints
+                .AddAsync(complaint);
 
             await _context.SaveChangesAsync();
-
 
             // =========================================
             // FILE UPLOAD
@@ -103,7 +158,6 @@ namespace CitizenConnect.Services
                     "uploads",
                     "complaints");
 
-                // Create folder if not exists
                 if (!Directory.Exists(uploadPath))
                 {
                     Directory.CreateDirectory(uploadPath);
@@ -119,22 +173,28 @@ namespace CitizenConnect.Services
                         Path.Combine(uploadPath, fileName);
 
                     using (var stream =
-                           new FileStream(filePath, FileMode.Create))
+                           new FileStream(
+                               filePath,
+                               FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
                     }
 
-                    var complaintImage = new ComplaintImage
-                    {
-                        ComplaintId = complaint.ComplaintId,
+                    var complaintImage =
+                        new ComplaintImage
+                        {
+                            ComplaintId =
+                                complaint.ComplaintId,
 
-                        ImagePath =
-                            $"/uploads/complaints/{fileName}",
+                            ImagePath =
+                                $"/uploads/complaints/{fileName}",
 
-                        FileType = file.ContentType,
+                            FileType =
+                                file.ContentType,
 
-                        FileSize = file.Length
-                    };
+                            FileSize =
+                                file.Length
+                        };
 
                     await _context.ComplaintImages
                         .AddAsync(complaintImage);
@@ -143,23 +203,59 @@ namespace CitizenConnect.Services
                 await _context.SaveChangesAsync();
             }
 
+            // =========================================
+            // RETURN RESPONSE
+            // =========================================
 
             return new ComplaintResponseDto
             {
-                ComplaintId = complaint.ComplaintId,
+                ComplaintId =
+                    complaint.ComplaintId,
 
-                ComplaintNumber = complaint.ComplaintNumber,
+                ComplaintNumber =
+                    complaint.ComplaintNumber,
 
-                Title = complaint.Title,
+                CategoryName =
+                    category.CategoryName,
 
-                Priority = complaint.Priority,
+                Title =
+                    complaint.Title,
 
-                Status = complaint.Status.ToString(),
+                Description =
+                    complaint.Description,
 
-                CreatedAt = complaint.CreatedAt
+                Address =
+                    complaint.Address,
+
+                Status =
+                    complaint.Status.ToString(),
+
+                Priority =
+                    complaint.Priority,
+
+                CreatedAt =
+                    complaint.CreatedAt,
+
+                DepartmentName =
+                    category.Department
+                        .DepartmentName,
+
+                OfficerName =
+                    officer != null
+                        ? officer.FirstName
+                          + " "
+                          + officer.LastName
+                        : "Not Assigned",
+
+                OfficerDesignation =
+                    officer?.Designation
+                    ?? "",
+
+                OfficerMobileNumber =
+                    officer?.MobileNumber
+                    ?? ""
             };
         }
-
 
         // =========================================
         // GET CITIZEN COMPLAINTS
