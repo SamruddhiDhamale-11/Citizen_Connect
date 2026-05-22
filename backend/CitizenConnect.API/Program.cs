@@ -1,3 +1,4 @@
+using CitizenConnect.API.Interfaces.Services;
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
 using CitizenConnect.Infrastructure.Data;
@@ -31,11 +32,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICitizenService, CitizenService>();
-
-
-
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
+
+builder.Services.AddScoped<IDepartmentService,DepartmentService>();
+builder.Services.AddScoped<IOfficerService,OfficerService>();
+builder.Services.AddScoped<ILocalityService,LocalityService>();
 
 // ==============================
 // CORS - Allow frontend origins

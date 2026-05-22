@@ -25,5 +25,23 @@
         public List<string> Images { get; set; } = new List<string>();
 
         public DateTime CreatedAt { get; set; }
+
+        // add this fields for auto-assign complaint to department
+        public string DepartmentName { get; set; }
+            = string.Empty;
+
+        public string OfficerName { get; set; }
+            = string.Empty;
+
+        public string OfficerDesignation { get; set; }
+            = string.Empty;
+
+        public string OfficerMobileNumber { get; set; }
+            = string.Empty;
+
+        public int SLAHours { get; set; }
+
+        public DateTime? ExpectedResolutionTime
+        { get; set; }
     }
 }

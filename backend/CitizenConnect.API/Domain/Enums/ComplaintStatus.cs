@@ -4,10 +4,12 @@
     {
         Pending = 1,
 
-        InProgress = 2,
+        Assigned = 2,
 
-        Resolved = 3,
+        InProgress = 3,
 
-        Rejected = 4
+        Resolved = 4,
+
+        Rejected = 5
     }
 }

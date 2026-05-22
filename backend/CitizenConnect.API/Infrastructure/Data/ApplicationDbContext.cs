@@ -1,4 +1,5 @@
-﻿using CitizenConnect.Domain.Entities;
+﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CitizenConnect.Infrastructure.Data
@@ -11,9 +12,9 @@ namespace CitizenConnect.Infrastructure.Data
         {
         }
 
-        // ==============================
+        // =========================================
         // DB SETS
-        // ==============================
+        // =========================================
 
         public DbSet<User> Users => Set<User>();
 
@@ -25,250 +26,367 @@ namespace CitizenConnect.Infrastructure.Data
 
         public DbSet<Ward> Wards => Set<Ward>();
 
-        public DbSet<ResidenceType> ResidenceTypes => Set<ResidenceType>();
+        public DbSet<ResidenceType> ResidenceTypes
+            => Set<ResidenceType>();
 
-        public DbSet<JurisdictionType> JurisdictionTypes => Set<JurisdictionType>();
+        public DbSet<JurisdictionType> JurisdictionTypes
+            => Set<JurisdictionType>();
 
-        public DbSet<Complaint> Complaints => Set<Complaint>();
+        public DbSet<Complaint> Complaints
+            => Set<Complaint>();
 
-        public DbSet<ComplaintCategory> ComplaintCategories => Set<ComplaintCategory>();
+        public DbSet<ComplaintCategory> ComplaintCategories
+            => Set<ComplaintCategory>();
 
-        public DbSet<ComplaintImage> ComplaintImages => Set<ComplaintImage>();
+        public DbSet<ComplaintImage> ComplaintImages
+            => Set<ComplaintImage>();
 
-        public DbSet<ComplaintStatusHistory> ComplaintStatusHistories => Set<ComplaintStatusHistory>();
+        public DbSet<ComplaintStatusHistory>
+            ComplaintStatusHistories
+                => Set<ComplaintStatusHistory>();
 
-
-        public DbSet<Suggestion>
-    Suggestions
-        { get; set; }
+        public DbSet<Suggestion> Suggestions
+            => Set<Suggestion>();
 
         public DbSet<SuggestionCategory>
             SuggestionCategories
-        { get; set; }
+                => Set<SuggestionCategory>();
 
         public DbSet<SuggestionAttachment>
             SuggestionAttachments
-        { get; set; }
+                => Set<SuggestionAttachment>();
 
         public DbSet<SuggestionVote>
             SuggestionVotes
-        { get; set; }
+                => Set<SuggestionVote>();
 
         public DbSet<SuggestionStatusHistory>
             SuggestionStatusHistories
-        { get; set; }
+                => Set<SuggestionStatusHistory>();
 
-        // ==============================
+        public DbSet<Locality> Localities
+    => Set<Locality>();
+
+        public DbSet<LocalityType> LocalityTypes
+            => Set<LocalityType>();
+
+        // =========================================
+        // NEW MODULES
+        // =========================================
+
+        public DbSet<Department> Departments
+            => Set<Department>();
+
+        public DbSet<Officer> Officers
+            => Set<Officer>();
+
+        // =========================================
         // MODEL CONFIGURATION
-        // ==============================
+        // =========================================
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(
+            ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ==============================
-            // ROLE -> USERS
-            // ==============================
+            // =========================================
+            // USER -> ROLE
+            // =========================================
 
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Role)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
-            // USER -> CITIZEN (ONE TO ONE)
-            // ==============================
+            // =========================================
+            // CITIZEN -> USER
+            // =========================================
 
             modelBuilder.Entity<Citizen>()
-                .HasOne(c => c.User)
-                .WithOne(u => u.Citizen)
-                .HasForeignKey<Citizen>(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.User)
+                .WithOne(x => x.Citizen)
+                .HasForeignKey<Citizen>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
-            // USER -> POLITICIAN (ONE TO ONE)
-            // ==============================
+            // =========================================
+            // POLITICIAN -> USER
+            // =========================================
 
             modelBuilder.Entity<Politician>()
-                .HasOne(p => p.User)
-                .WithOne(u => u.Politician)
-                .HasForeignKey<Politician>(p => p.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.User)
+                .WithOne(x => x.Politician)
+                .HasForeignKey<Politician>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
+            // =========================================
             // CITIZEN -> WARD
-            // ==============================
+            // =========================================
 
             modelBuilder.Entity<Citizen>()
-                .HasOne(c => c.Ward)
-                .WithMany(w => w.Citizens)
-                .HasForeignKey(c => c.WardId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.Citizens)
+                .HasForeignKey(x => x.WardId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
+            // =========================================
             // CITIZEN -> RESIDENCE TYPE
-            // ==============================
+            // =========================================
 
             modelBuilder.Entity<Citizen>()
-                .HasOne(c => c.ResidenceType)
-                .WithMany(r => r.Citizens)
-                .HasForeignKey(c => c.ResidenceTypeId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.ResidenceType)
+                .WithMany(x => x.Citizens)
+                .HasForeignKey(x => x.ResidenceTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
+            // =========================================
             // POLITICIAN -> WARD
-            // ==============================
-            // WardId is optional — politicians identify their ward via
-            // WardNumber/WardName text fields; the ward dropdown was removed.
+            // =========================================
+
             modelBuilder.Entity<Politician>()
-                .HasOne(p => p.Ward)
-                .WithMany(w => w.Politicians)
-                .HasForeignKey(p => p.WardId)
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.Politicians)
+                .HasForeignKey(x => x.WardId)
                 .IsRequired(false)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
+            // =========================================
             // POLITICIAN -> JURISDICTION TYPE
-            // ==============================
+            // =========================================
 
             modelBuilder.Entity<Politician>()
-                .HasOne(p => p.JurisdictionType)
-                .WithMany(j => j.Politicians)
-                .HasForeignKey(p => p.JurisdictionTypeId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.JurisdictionType)
+                .WithMany(x => x.Politicians)
+                .HasForeignKey(x => x.JurisdictionTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
+            // =========================================
             // WARD -> JURISDICTION TYPE
-            // ==============================
+            // =========================================
 
             modelBuilder.Entity<Ward>()
-                .HasOne(w => w.JurisdictionType)
-                .WithMany(j => j.Wards)
-                .HasForeignKey(w => w.JurisdictionTypeId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.JurisdictionType)
+                .WithMany(x => x.Wards)
+                .HasForeignKey(x => x.JurisdictionTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // ==============================
-            // UNIQUE CONSTRAINTS
-            // ==============================
-
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.MobileNo)
-                .IsUnique();
-
-
-            // ==============================
-            // COLUMN CONFIGURATIONS
-            // ==============================
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.FirstName)
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.LastName)
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.MobileNo)
-                .HasMaxLength(15);
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.Email)
-                .HasMaxLength(150);
-
-            modelBuilder.Entity<Ward>()
-                .Property(w => w.Latitude)
-                .HasColumnType("decimal(18,6)");
-
-            modelBuilder.Entity<Ward>()
-                .Property(w => w.Longitude)
-                .HasColumnType("decimal(18,6)");
+            // =========================================
+            // COMPLAINT -> CITIZEN
+            // =========================================
 
             modelBuilder.Entity<Complaint>()
-    .HasOne(c => c.Citizen)
-    .WithMany(c => c.Complaints)
-    .HasForeignKey(c => c.CitizenId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Citizen)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.CitizenId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            modelBuilder.Entity<Complaint>()
-    .HasOne(c => c.Ward)
-    .WithMany(w => w.Complaints)
-    .HasForeignKey(c => c.WardId)
-    .OnDelete(DeleteBehavior.NoAction);
+            // =========================================
+            // COMPLAINT -> WARD
+            // =========================================
 
             modelBuilder.Entity<Complaint>()
-    .HasOne(c => c.ComplaintCategory)
-    .WithMany(cc => cc.Complaints)
-    .HasForeignKey(c => c.ComplaintCategoryId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.WardId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // COMPLAINT -> CATEGORY
+            // =========================================
+
+            modelBuilder.Entity<Complaint>()
+                .HasOne(x => x.ComplaintCategory)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.ComplaintCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // COMPLAINT IMAGE -> COMPLAINT
+            // =========================================
 
             modelBuilder.Entity<ComplaintImage>()
-    .HasOne(ci => ci.Complaint)
-    .WithMany(c => c.ComplaintImages)
-    .HasForeignKey(ci => ci.ComplaintId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Complaint)
+                .WithMany(x => x.ComplaintImages)
+                .HasForeignKey(x => x.ComplaintId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            modelBuilder.Entity<Complaint>()
-    .Property(c => c.Latitude)
-    .HasColumnType("decimal(18,6)");
-
-            modelBuilder.Entity<Complaint>()
-                .Property(c => c.Longitude)
-                .HasColumnType("decimal(18,6)");
-
-
-            modelBuilder.Entity<Complaint>()
-    .HasIndex(c => c.ComplaintNumber)
-    .IsUnique();
-
+            // =========================================
+            // COMPLAINT STATUS HISTORY
+            // =========================================
 
             modelBuilder.Entity<ComplaintStatusHistory>()
-    .HasOne(h => h.Complaint)
-    .WithMany(c => c.ComplaintStatusHistories)
-    .HasForeignKey(h => h.ComplaintId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Complaint)
+                .WithMany(x => x.ComplaintStatusHistories)
+                .HasForeignKey(x => x.ComplaintId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ComplaintStatusHistory>()
-    .HasOne(h => h.ChangedByUser)
-    .WithMany(u => u.ComplaintStatusHistories)
-    .HasForeignKey(h => h.ChangedByUserId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.ChangedByUser)
+                .WithMany(x => x.ComplaintStatusHistories)
+                .HasForeignKey(x => x.ChangedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            modelBuilder.Entity<SuggestionVote>()
-    .HasOne(x => x.Citizen)
-    .WithMany()
-    .HasForeignKey(x => x.CitizenId)
-    .OnDelete(DeleteBehavior.NoAction);
+            // =========================================
+            // SUGGESTION VOTE
+            // =========================================
 
             modelBuilder.Entity<SuggestionVote>()
-    .HasOne(x => x.Citizen)
-    .WithMany()
-    .HasForeignKey(x => x.CitizenId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.Citizen)
+                .WithMany()
+                .HasForeignKey(x => x.CitizenId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // SUGGESTION STATUS HISTORY
+            // =========================================
 
             modelBuilder.Entity<SuggestionStatusHistory>()
                 .HasOne(x => x.ChangedByUser)
                 .WithMany()
                 .HasForeignKey(x => x.ChangedByUserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // UNIQUE CONSTRAINTS
+            // =========================================
+
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.MobileNo)
+                .IsUnique();
+
+            modelBuilder.Entity<Department>()
+                .HasIndex(x => x.DepartmentName)
+                .IsUnique();
+
+            // =========================================
+            // COLUMN CONFIGURATIONS
+            // =========================================
+
+            modelBuilder.Entity<User>()
+                .Property(x => x.FirstName)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<User>()
+                .Property(x => x.LastName)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<User>()
+                .Property(x => x.MobileNo)
+                .HasMaxLength(15);
+
+            modelBuilder.Entity<User>()
+                .Property(x => x.Email)
+                .HasMaxLength(150);
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.Latitude)
+                .HasColumnType("decimal(18,6)");
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(18,6)");
+
+            modelBuilder.Entity<Complaint>()
+                .Property(x => x.Latitude)
+                .HasColumnType("decimal(18,6)");
+
+            modelBuilder.Entity<Complaint>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(18,6)");
+
+            modelBuilder.Entity<Complaint>()
+                .HasIndex(x => x.ComplaintNumber)
+                .IsUnique();
+
+            // =========================================
+            // DEPARTMENT CONFIGURATION
+            // =========================================
+
+            modelBuilder.Entity<Department>()
+                .Property(x => x.DepartmentName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            // =========================================
+            // COMPLAINT CATEGORY -> DEPARTMENT
+            // =========================================
+
+            modelBuilder.Entity<ComplaintCategory>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.ComplaintCategories)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // OFFICER CONFIGURATION
+            // =========================================
+
+            modelBuilder.Entity<Officer>()
+                .Property(x => x.FirstName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Officer>()
+                .Property(x => x.LastName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Officer>()
+                .Property(x => x.Email)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            modelBuilder.Entity<Officer>()
+                .Property(x => x.MobileNumber)
+                .IsRequired()
+                .HasMaxLength(15);
+
+            // =========================================
+            // OFFICER -> DEPARTMENT
+            // =========================================
+
+            modelBuilder.Entity<Officer>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.Officers)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // COMPLAINT -> DEPARTMENT
+            // =========================================
+
+            modelBuilder.Entity<Complaint>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================================
+            // COMPLAINT -> ASSIGNED OFFICER
+            // =========================================
+
+            modelBuilder.Entity<Complaint>()
+                .HasOne(x => x.AssignedOfficer)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.AssignedOfficerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
+            modelBuilder.Entity<Locality>()
+    .HasOne(x => x.Ward)
+    .WithMany(x => x.Localities)
+    .HasForeignKey(x => x.WardId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Locality>()
+                .HasOne(x => x.LocalityType)
+                .WithMany(x => x.Localities)
+                .HasForeignKey(x => x.LocalityTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

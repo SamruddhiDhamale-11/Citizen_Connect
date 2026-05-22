@@ -4,6 +4,7 @@ using CitizenConnect.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CitizenConnect.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260520130641_AddDepartmentAndOfficerModule")]
+    partial class AddDepartmentAndOfficerModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,57 +24,6 @@ namespace CitizenConnect.API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CitizenConnect.API.Domain.Entities.Locality", b =>
-                {
-                    b.Property<int>("LocalityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocalityId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Landmark")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("LocalityName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("LocalityTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Pincode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WardId")
-                        .HasColumnType("int");
-
-                    b.HasKey("LocalityId");
-
-                    b.HasIndex("LocalityTypeId");
-
-                    b.HasIndex("WardId");
-
-                    b.ToTable("Localities");
-                });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Citizen", b =>
                 {
@@ -93,9 +45,6 @@ namespace CitizenConnect.API.Migrations
                     b.Property<bool>("IsVoterRegistered")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LocalityId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ResidenceTypeId")
                         .HasColumnType("int");
 
@@ -109,8 +58,6 @@ namespace CitizenConnect.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CitizenId");
-
-                    b.HasIndex("LocalityId");
 
                     b.HasIndex("ResidenceTypeId");
 
@@ -169,9 +116,6 @@ namespace CitizenConnect.API.Migrations
                     b.Property<decimal>("Latitude")
                         .HasColumnType("decimal(18,6)");
 
-                    b.Property<int?>("LocalityId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Longitude")
                         .HasColumnType("decimal(18,6)");
 
@@ -210,8 +154,6 @@ namespace CitizenConnect.API.Migrations
                         .IsUnique();
 
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("LocalityId");
 
                     b.HasIndex("WardId");
 
@@ -359,35 +301,6 @@ namespace CitizenConnect.API.Migrations
                     b.HasKey("JurisdictionTypeId");
 
                     b.ToTable("JurisdictionTypes");
-                });
-
-            modelBuilder.Entity("CitizenConnect.Domain.Entities.LocalityType", b =>
-                {
-                    b.Property<int>("LocalityTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocalityTypeId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("LocalityTypeId");
-
-                    b.ToTable("LocalityTypes");
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Officer", b =>
@@ -939,7 +852,7 @@ namespace CitizenConnect.API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -961,31 +874,8 @@ namespace CitizenConnect.API.Migrations
                     b.ToTable("ComplaintCategories");
                 });
 
-            modelBuilder.Entity("CitizenConnect.API.Domain.Entities.Locality", b =>
-                {
-                    b.HasOne("CitizenConnect.Domain.Entities.LocalityType", "LocalityType")
-                        .WithMany("Localities")
-                        .HasForeignKey("LocalityTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CitizenConnect.Domain.Entities.Ward", "Ward")
-                        .WithMany("Localities")
-                        .HasForeignKey("WardId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("LocalityType");
-
-                    b.Navigation("Ward");
-                });
-
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Citizen", b =>
                 {
-                    b.HasOne("CitizenConnect.API.Domain.Entities.Locality", null)
-                        .WithMany("Citizens")
-                        .HasForeignKey("LocalityId");
-
                     b.HasOne("CitizenConnect.Domain.Entities.ResidenceType", "ResidenceType")
                         .WithMany("Citizens")
                         .HasForeignKey("ResidenceTypeId")
@@ -1034,10 +924,6 @@ namespace CitizenConnect.API.Migrations
                         .WithMany("Complaints")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CitizenConnect.API.Domain.Entities.Locality", null)
-                        .WithMany("Complaints")
-                        .HasForeignKey("LocalityId");
 
                     b.HasOne("CitizenConnect.Domain.Entities.Ward", "Ward")
                         .WithMany("Complaints")
@@ -1226,17 +1112,9 @@ namespace CitizenConnect.API.Migrations
                     b.HasOne("CitizenConnect.Domain.Entities.Department", "Department")
                         .WithMany("ComplaintCategories")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Department");
-                });
-
-            modelBuilder.Entity("CitizenConnect.API.Domain.Entities.Locality", b =>
-                {
-                    b.Navigation("Citizens");
-
-                    b.Navigation("Complaints");
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Citizen", b =>
@@ -1265,11 +1143,6 @@ namespace CitizenConnect.API.Migrations
                     b.Navigation("Politicians");
 
                     b.Navigation("Wards");
-                });
-
-            modelBuilder.Entity("CitizenConnect.Domain.Entities.LocalityType", b =>
-                {
-                    b.Navigation("Localities");
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Officer", b =>
@@ -1315,8 +1188,6 @@ namespace CitizenConnect.API.Migrations
                     b.Navigation("Citizens");
 
                     b.Navigation("Complaints");
-
-                    b.Navigation("Localities");
 
                     b.Navigation("Politicians");
                 });

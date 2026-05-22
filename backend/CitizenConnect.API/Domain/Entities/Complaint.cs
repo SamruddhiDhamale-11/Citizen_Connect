@@ -43,6 +43,18 @@ namespace CitizenConnect.Domain.Entities
 
         public Ward Ward { get; set; } = null!;
 
+        // NEW FIELDS
+
+        public int? DepartmentId { get; set; }
+
+        public int? AssignedOfficerId { get; set; }
+
+        public DateTime? AssignedAt { get; set; }
+
+
+        public Department? Department { get; set; }
+
+        public Officer? AssignedOfficer { get; set; }
         public ComplaintCategory ComplaintCategory { get; set; } = null!;
 
         public ICollection<ComplaintImage> ComplaintImages { get; set; }
