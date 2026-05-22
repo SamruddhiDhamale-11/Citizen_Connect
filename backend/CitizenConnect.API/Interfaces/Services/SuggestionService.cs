@@ -4,6 +4,7 @@ using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Domain.Entities;
 using CitizenConnect.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CitizenConnect.Application.Services
 {
@@ -247,5 +248,110 @@ namespace CitizenConnect.Application.Services
 
             return suggestions;
         }
+        /**
+ * =====================================================
+ * GET SUGGESTION CATEGORIES
+ * =====================================================
+ */
+
+public async Task<List<object>>
+    GetSuggestionCategoriesAsync()
+{
+    return await _context
+        .SuggestionCategories
+        .Where(x => x.IsActive)
+        .OrderBy(x => x.CategoryName)
+        .Select(x => new
+        {
+            suggestionCategoryId =
+                x.SuggestionCategoryId,
+
+            categoryName =
+                x.CategoryName
+        })
+        .Cast<object>()
+        .ToListAsync();
+}
+
+public async Task<List<object>> GetAllSuggestionsAsync()
+{
+    return await _context.Suggestions
+
+        .Join(
+            _context.SuggestionCategories,
+
+            s => s.SuggestionCategoryId,
+
+            c => c.SuggestionCategoryId,
+
+            (s, c) => new
+            {
+                s,
+                c
+            }
+        )
+
+        .Join(
+            _context.Citizens,
+
+            sc => sc.s.CitizenId,
+
+            ct => ct.CitizenId,
+
+            (sc, ct) => new
+            {
+                sc.s,
+                sc.c,
+                ct
+            }
+        )
+
+        .Join(
+            _context.Users,
+
+            x => x.ct.UserId,
+
+            u => u.UserId,
+
+            (x, u) => new
+            {
+                suggestionId =
+                    x.s.SuggestionId,
+
+                suggestionNumber =
+                    x.s.SuggestionNumber,
+
+                title =
+                    x.s.Title,
+
+                description =
+                    x.s.Description,
+
+                status =
+                    x.s.Status.ToString(),
+
+                createdAt =
+                    x.s.CreatedAt,
+
+                citizenId =
+                    x.s.CitizenId,
+
+                citizenName =
+                    u.FirstName + " " + u.LastName,
+
+                wardId =
+                    x.s.WardId,
+
+                categoryName =
+                    x.c.CategoryName,
+
+                totalVotes =
+                    x.s.TotalVotes
+            }
+        )
+
+        .ToListAsync<object>();
+}
+
     }
 }

@@ -5346,11 +5346,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
+      "projectUniqueName": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - succesfully submitting compaints and suggestions in db\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
       "projectName": "CitizenConnect.API",
-      "projectPath": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
+      "projectPath": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - succesfully submitting compaints and suggestions in db\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
       "packagesPath": "C:\\Users\\Samruddhi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - chnages currently doing\\backend\\CitizenConnect.API\\obj\\",
+      "outputPath": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - succesfully submitting compaints and suggestions in db\\backend\\CitizenConnect.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Samruddhi\\AppData\\Roaming\\NuGet\\NuGet.Config",

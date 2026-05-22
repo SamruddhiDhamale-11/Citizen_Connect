@@ -1,4 +1,5 @@
 ﻿using CitizenConnect.Application.DTOs.Suggestion;
+using CitizenConnect.API.DTOs.Suggestion;
 using CitizenConnect.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,34 @@ namespace CitizenConnect.API.Controllers
         {
             _suggestionService =
                 suggestionService;
+        }
+
+        /**
+         * =====================================================
+         * GET SUGGESTION CATEGORIES
+         * =====================================================
+         */
+
+        [HttpGet("categories")]
+        public async Task<IActionResult>
+            GetCategories()
+        {
+            try
+            {
+                var result =
+                    await _suggestionService
+                    .GetSuggestionCategoriesAsync();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
 
 
@@ -98,5 +127,34 @@ namespace CitizenConnect.API.Controllers
                 });
             }
         }
+
+        [HttpGet("admin")]
+public async Task<IActionResult> GetAllSuggestions()
+{
+    try
+    {
+        var result = await _suggestionService.GetAllSuggestionsAsync();
+
+        return Ok(new
+        {
+            success = true,
+            data = result
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
+}
+
+
+
+
+
+
     }
 }
