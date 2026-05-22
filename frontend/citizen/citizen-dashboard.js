@@ -5,6 +5,7 @@
 
 const CITIZEN_API_BASE   = "http://localhost:5079/api/citizen";
 const COMPLAINT_API_BASE = "http://localhost:5079/api/Complaint";
+
 const SUGGESTION_API_BASE = "http://localhost:5079/api/suggestions";
 
 const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
@@ -16,11 +17,18 @@ document.addEventListener("DOMContentLoaded", function () {
   setDate();
   setupCharCounters();
   loadComplaintCategories();
+
   loadSuggestionCategories();
   loadCitizenProfile().then(function () {
     return loadCitizenComplaints();
   });
   loadCitizenSuggestions();
+
+  loadCitizenProfile().then(function () {
+    return loadCitizenComplaints();
+  });
+  renderSuggestions(SUGGESTIONS);
+
 });
 
 function requireCitizenSession() {
@@ -74,6 +82,9 @@ function applyCitizenProfile(profile) {
   citizenProfile.citizenId = profile.citizenId != null ? profile.citizenId : null;
   citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
   citizenProfile.wardDisplay = profile.wardDisplay || "";
+
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = ward;
 
   setText("greetName", firstName);
   setText("userAvatar", initials);
@@ -155,6 +166,7 @@ async function loadCitizenComplaints() {
     updateComplaintStats([]);
   }
 }
+
 
 async function loadCitizenSuggestions() {
   const citizenId =
@@ -355,6 +367,7 @@ async function loadSuggestionCategories() {
   }
 }
 
+
 function escAttr(str) {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -468,6 +481,110 @@ async function submitComplaint(e) {
   const wardId = citizenProfile.wardId;
   if (!citizenId || !wardId) {
     errEl.textContent = "Unable to verify your profile. Please log in again.";
+    errEl.classList.remove("hidden");
+    return;
+  }
+
+  const fileInput = document.getElementById("complaintFile");
+  if (fileInput && fileInput.files && fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    const allowed = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowed.includes(file.type)) {
+      errEl.textContent = "Attachment must be JPG or PNG format only (max 5 MB).";
+      errEl.classList.remove("hidden");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      errEl.textContent = "Attachment must not exceed 5 MB.";
+      errEl.classList.remove("hidden");
+      return;
+    }
+  }
+
+  const form = document.getElementById("complaintForm");
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+  }
+
+  const fd = new FormData();
+  fd.append("CitizenId", citizenId);
+  fd.append("WardId", wardId);
+  fd.append("ComplaintCategoryId", cat);
+  fd.append("Title", title);
+  fd.append("Description", desc);
+  fd.append("Address", location);
+  fd.append("Latitude", "0");
+  fd.append("Longitude", "0");
+  fd.append("Priority", priority);
+  fd.append("IsAnonymous", document.getElementById("complaintAnon").checked ? "true" : "false");
+  if (fileInput && fileInput.files && fileInput.files.length > 0) {
+    fd.append("Files", fileInput.files[0]);
+  }
+
+  try {
+    const response = await fetch(COMPLAINT_API_BASE + "/create", {
+      method: "POST",
+      body: fd
+    });
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      throw new Error("Server returned an unexpected response.");
+    }
+
+    if (!response.ok) {
+      throw new Error(result.message || "Complaint submission failed. Please try again.");
+    }
+
+    resetComplaintForm();
+    await loadCitizenComplaints();
+
+    const complaintNumber = result.complaintNumber || result.ComplaintNumber || "";
+    showToast("", "Complaint submitted successfully! ID: " + complaintNumber);
+    showPanel("mycomplaints", document.querySelector("[onclick*=mycomplaints]"));
+  } catch (err) {
+    errEl.textContent = err.message || "Unable to submit complaint. Please try again.";
+    errEl.classList.remove("hidden");
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Complaint";
+    }
+  }
+}
+
+function resetComplaintForm() {
+  const form = document.getElementById("complaintForm");
+  if (form) form.reset();
+  document.getElementById("complaintTitleCount").textContent = "0";
+  document.getElementById("complaintDescCount").textContent = "0";
+  const fileNameEl = document.getElementById("complaintFileName");
+  if (fileNameEl) fileNameEl.classList.add("hidden");
+  const errEl = document.getElementById("complaintError");
+  if (errEl) errEl.classList.add("hidden");
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
+  loadComplaintCategories();
+}
+
+// ---- Submit Suggestion ----
+function submitSuggestion(e) {
+  e.preventDefault();
+  const errEl = document.getElementById("suggestionError");
+  errEl.classList.add("hidden");
+
+  const cat     = document.getElementById("suggestionCategory").value;
+  const scope   = document.getElementById("suggestionScope").value;
+  const title   = document.getElementById("suggestionTitle").value.trim();
+  const desc    = document.getElementById("suggestionDesc").value.trim();
+  const benefit = document.getElementById("suggestionBenefit").value.trim();
+
+  if (!cat || !scope || !title || !desc || !benefit) {
+    errEl.textContent = "Please fill all required fields before submitting.";
     errEl.classList.remove("hidden");
     return;
   }
