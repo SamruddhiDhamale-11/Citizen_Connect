@@ -17,8 +17,11 @@ var DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Satur
 var ADMIN_API_BASE = 'http://localhost:5079/api/admin';
 var COMPLAINT_API_BASE = 'http://localhost:5079/api/Complaint';
 var API_ORIGIN = 'http://localhost:5079';
-var adminComplaints = [];
+let adminComplaints = [];
+let adminSuggestions = [];
 var activeComplaintId = null;
+var activeSuggestionId = null;
+var SUGGESTION_API_BASE = ADMIN_API_BASE + '/suggestions';
 
 /* ============================================================
    GLOBAL STATE
@@ -1203,6 +1206,211 @@ async function loadAdminComplaints() {
   }
 }
 
+let allSuggestions = [];
+
+async function loadAdminSuggestions() {
+    try {
+
+        const response = await fetch(
+            "http://localhost:5079/api/suggestions/admin"
+        );
+
+        const result = await response.json();
+
+        console.log(result);
+
+        allSuggestions = result.data || [];
+
+        renderAdminSuggestions(allSuggestions);
+
+    } catch (error) {
+
+        console.error(
+            "Error loading suggestions:",
+            error
+        );
+    }
+}
+
+function getSuggestionStatusText(status) {
+
+    switch(status) {
+
+        case 1:
+            return "Pending";
+
+        case 2:
+            return "Approved";
+
+        case 3:
+            return "Rejected";
+
+        case 4:
+            return "Completed";
+
+        default:
+            return "Unknown";
+    }
+}
+
+function renderAdminSuggestions(data) {
+
+  var list = document.getElementById('adminSuggestionsList');
+
+  if (!list) return;
+
+  if (!data.length) {
+
+    list.innerHTML =
+      '<div class="item-empty">' +
+        '<div class="item-empty-icon">&#x1F4A1;</div>' +
+        '<div>No suggestions found.</div>' +
+      '</div>';
+
+    return;
+  }
+
+  list.innerHTML = data.map(function(s) {
+
+    let statusClass = '';
+
+    const status = String(s.status).toLowerCase();
+
+    if (status === '1' || status === 'pending')
+      statusClass = 'pending';
+
+    else if (status === '2' || status === 'approved')
+      statusClass = 'resolved';
+
+    else if (status === '3' || status === 'rejected')
+      statusClass = 'rejected';
+
+    return (
+
+      '<div class="item-card" ' +
+        'data-suggestion-id="' + s.suggestionId + '" ' +
+        'onclick="openAdminSuggestionDetail(' + s.suggestionId + ')">' +
+
+          '<div class="item-card-top">' +
+
+            '<div>' +
+
+              '<div class="item-card-title">' +
+                escHtml(s.title || 'No Title') +
+              '</div>' +
+
+              '<div class="item-card-cat">' +
+                escHtml(s.categoryName || 'General') +
+                ' &nbsp;&nbsp; ' +
+                escHtml(
+                  s.suggestionNumber ||
+                  ('SUG-' + s.suggestionId)
+                ) +
+              '</div>' +
+
+            '</div>' +
+
+            '<span class="status-pill ' + statusClass + '">' +
+              escHtml(getSuggestionStatusText(s.status)) +
+            '</span>' +
+
+          '</div>' +
+
+          '<div class="item-card-desc">' +
+            escHtml(s.description || '—') +
+          '</div>' +
+
+          '<div class="item-card-footer">' +
+
+            '<span class="item-card-date">' +
+              escHtml(
+                formatComplaintDate(
+                  s.createdAt || s.createdDate
+                )
+              ) +
+            '</span>' +
+
+            '<span class="item-card-date">' +
+              escHtml(s.citizenName || '—') +
+            '</span>' +
+
+            '<span class="item-card-date">' +
+              escHtml(s.address || '—') +
+            '</span>' +
+
+            '<span class="item-card-date">' +
+              'Votes: ' + escHtml(String(s.totalVotes || 0)) +
+            '</span>' +
+
+          '</div>' +
+
+      '</div>'
+
+    );
+
+  }).join('');
+}
+
+function viewSuggestion(id) {
+    alert("View Suggestion ID: " + id);
+}
+
+async function updateSuggestionStatus(id, status) {
+    try {
+        const response = await fetch(`http://localhost:5079/api/suggestions/${id}/status`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                status: status,
+                remarks: "",
+                changedByUserId: 1
+            })
+        }); 
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Status updated successfully");
+
+            // reload list
+            loadAdminSuggestions();
+        } else {
+            alert("Failed to update");
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Error updating suggestion");
+    }
+}
+
+function filterAdminSuggestions(status) {
+
+    if (status === "all") {
+        renderAdminSuggestions(allSuggestions);
+        return;
+    }
+
+    const filtered = allSuggestions.filter(function(s) {
+
+        return getSuggestionStatusText(s.status)
+            .toLowerCase() === status.toLowerCase();
+    });
+
+    renderAdminSuggestions(filtered);
+}
+
+function searchAdminSuggestions(text) {
+    const filtered = allSuggestions.filter(s =>
+        (s.title && s.title.toLowerCase().includes(text.toLowerCase())) ||
+        (s.description && s.description.toLowerCase().includes(text.toLowerCase()))
+    );
+
+    renderAdminSuggestions(filtered);
+}
+
 function pickComplaintField(obj, camelKey, pascalKey) {
   var val = obj[camelKey];
   if (val === undefined || val === null) val = obj[pascalKey];
@@ -1231,6 +1439,32 @@ function mapAdminComplaintToCard(c) {
     imageUrl: images[0] || '',
     images: images
   };
+}
+
+function mapAdminSuggestionToCard(s) {
+  return {
+    suggestionId: s.suggestionId || s.SuggestionId,
+    id: s.suggestionNumber || s.SuggestionNumber || ('SUG-' + (s.suggestionId || s.SuggestionId)),
+    title: s.title || s.Title || '',
+    category: (s.categoryName || s.CategoryName || '—'),
+    desc: s.description || s.Description || '',
+    citizen: s.citizenName || s.CitizenName || '—',
+    date: formatComplaintDate(s.createdAt || s.CreatedAt),
+    status: normalizeSuggestionStatus(s.status || s.Status),
+    votes: s.totalVotes || s.TotalVotes || 0
+  };
+}
+
+function normalizeSuggestionStatus(status) {
+  if (!status) return 'pending';
+
+  var s = String(status).toLowerCase().replace(/\s+/g, '');
+
+  if (s === 'pending') return 'pending';
+  if (s === 'approved') return 'approved';
+  if (s === 'rejected') return 'rejected';
+
+  return s;
 }
 
 function resolveComplaintImageUrl(path) {
@@ -1388,6 +1622,145 @@ async function openAdminComplaintDetail(complaintId) {
   loadAdminComplaintHistory(complaintId);
 }
 
+async function openAdminSuggestionDetail(suggestionId) {
+
+  console.log("FUNCTION CALLED");
+  console.log("ID =", suggestionId);
+  console.log("DATA =", allSuggestions);
+
+  var suggestion = allSuggestions.find(function(s) {
+    return String(s.suggestionId) === String(suggestionId);
+  });
+
+  if (!suggestion) {
+    console.log("Suggestion not found");
+    return;
+  }
+
+  var statusClass = '';
+
+  const status = String(suggestion.status).toLowerCase();
+
+  if (status === '1' || status === 'pending')
+    statusClass = 'pending';
+
+  else if (status === '2' || status === 'approved')
+    statusClass = 'resolved';
+
+  else if (status === '3' || status === 'rejected')
+    statusClass = 'rejected';
+
+  var bodyHtml =
+
+  '<div class="modal-section-label">Suggestion Number</div>' +
+  '<div class="modal-value">' +
+    escHtml(suggestion.suggestionNumber || '—') +
+  '</div>' +
+
+  '<div class="modal-section-label">Title</div>' +
+  '<div class="modal-value">' +
+    escHtml(suggestion.title || '—') +
+  '</div>' +
+
+  '<div class="modal-section-label">Category</div>' +
+  '<div class="modal-value">' +
+    escHtml(suggestion.categoryName || 'General') +
+  '</div>' +
+
+  '<div class="modal-section-label">Description</div>' +
+  '<div class="modal-value">' +
+    escHtml(suggestion.description || '—') +
+  '</div>' +
+
+  '<div class="modal-section-label">Citizen</div>' +
+  '<div class="modal-value">' +
+    escHtml(suggestion.citizenName || '—') +
+  '</div>' +
+
+  '<div class="modal-section-label">Address</div>' +
+  '<div class="modal-value">' +
+    escHtml(suggestion.address || '—') +
+  '</div>' +
+
+  '<div class="modal-section-label">Votes</div>' +
+  '<div class="modal-value">' +
+    escHtml(String(suggestion.totalVotes || 0)) +
+  '</div>' +
+
+  '<div class="modal-section-label">Status</div>' +
+  '<div class="modal-value">' +
+    '<span class="status-pill ' + statusClass + '">' +
+      escHtml(getSuggestionStatusText(suggestion.status)) +
+    '</span>' +
+  '</div>' +
+
+  '<div class="modal-section-label">Filed On</div>' +
+  '<div class="modal-value">' +
+    escHtml(formatComplaintDate(suggestion.createdAt)) +
+  '</div>' +
+
+  '<div class="modal-section-label">Attachment</div>' +
+
+  (
+    suggestion.imageUrl
+      ? '<img class="complaint-detail-img" src="' +
+          escHtml(suggestion.imageUrl) +
+        '" alt="Suggestion attachment" />'
+      : '<div class="modal-value">No image attached</div>'
+  ) +
+
+  '<div class="complaint-status-form">' +
+
+    '<div class="modal-section-label">Update Status</div>' +
+
+    '<select id="adminSuggestionStatusSelect">' +
+
+      '<option value="Pending"' +
+        ((status === '1' || status === 'pending')
+          ? ' selected'
+          : '') +
+      '>Pending</option>' +
+
+      '<option value="Approved"' +
+        ((status === '2' || status === 'approved')
+          ? ' selected'
+          : '') +
+      '>Approved</option>' +
+
+      '<option value="Rejected"' +
+        ((status === '3' || status === 'rejected')
+          ? ' selected'
+          : '') +
+      '>Rejected</option>' +
+
+    '</select>' +
+
+    '<textarea id="adminSuggestionRemarks" placeholder="Remarks (optional)"></textarea>' +
+
+    '<button type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
+      suggestion.suggestionId +
+    ')">' +
+      'Update Status' +
+    '</button>' +
+
+  '</div>' +
+
+  '<div class="modal-section-label">Status History</div>' +
+
+  '<div class="complaint-history-list" id="adminSuggestionHistory">' +
+    '<div class="modal-value">Loading history...</div>' +
+  '</div>';
+
+  document.getElementById('modalTitle').textContent =
+    'Suggestion Details';
+
+  document.getElementById('modalBody').innerHTML =
+    bodyHtml;
+
+  document.getElementById('modalOverlay')
+    .classList.remove('hidden');
+}
+
 async function loadAdminComplaintHistory(complaintId) {
   var container = document.getElementById('adminComplaintHistory');
   if (!container) return;
@@ -1459,3 +1832,7 @@ document.addEventListener('DOMContentLoaded', function() {
   computeAreaProgress();
   syncAreaSummary();
 });
+
+window.onload = function () {
+    loadAdminSuggestions();
+};

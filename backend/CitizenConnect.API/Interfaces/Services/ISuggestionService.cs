@@ -13,5 +13,11 @@ namespace CitizenConnect.Application.Interfaces.Services
         Task<List<SuggestionResponseDto>>
             GetCitizenSuggestionsAsync(
                 int citizenId);
+
+        Task<List<object>>
+            GetSuggestionCategoriesAsync();
+
+        Task<List<object>>
+            GetAllSuggestionsAsync();
     }
 }

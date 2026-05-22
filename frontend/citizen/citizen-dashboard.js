@@ -5,13 +5,10 @@
 
 const CITIZEN_API_BASE   = "http://localhost:5079/api/citizen";
 const COMPLAINT_API_BASE = "http://localhost:5079/api/Complaint";
+const SUGGESTION_API_BASE = "http://localhost:5079/api/suggestions";
 
 const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
 
-const SUGGESTIONS = [
-  { id: "SUG-001", title: "Install CCTV cameras near Ward Park", category: "Public Safety & Security", desc: "The ward park has no surveillance. Installing CCTV cameras will deter anti-social activities and improve safety for families.", benefit: "Improved safety for children and families visiting the park.", date: "25 Apr 2026", status: "review", scope: "Ward" },
-  { id: "SUG-002", title: "Set up a community recycling bin", category: "Environment & Greenery", desc: "Place colour-coded recycling bins at 3 key locations in the ward to encourage waste segregation at source.", benefit: "Reduces landfill waste and promotes environmental awareness.", date: "10 Apr 2026", status: "accepted", scope: "Ward" },
-];
 
 // ---- Init ----
 document.addEventListener("DOMContentLoaded", function () {
@@ -19,10 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
   setDate();
   setupCharCounters();
   loadComplaintCategories();
+  loadSuggestionCategories();
   loadCitizenProfile().then(function () {
     return loadCitizenComplaints();
   });
-  renderSuggestions(SUGGESTIONS);
+  loadCitizenSuggestions();
 });
 
 function requireCitizenSession() {
@@ -164,6 +162,71 @@ async function loadCitizenComplaints() {
   }
 }
 
+async function loadCitizenSuggestions() {
+  const citizenId =
+    localStorage.getItem("citizenId") ||
+    citizenProfile.citizenId;
+
+  if (!citizenId) {
+    renderSuggestions([]);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      SUGGESTION_API_BASE + "/my/" + citizenId
+    );
+
+    if (!response.ok) throw new Error("Failed to load suggestions");
+
+    const data = await response.json();
+
+    // backend returns: { success: true, data: [...] }
+    const list = data.data || [];
+
+    // map API → UI format
+    const mapped = list.map(function (s) {
+      return {
+        id: s.suggestionNumber,
+        title: s.title,
+        category: s.categoryName || "",   // if not returned, ok
+        desc: s.description,
+        benefit: s.expectedBenefit,
+        date: formatDate(new Date(s.createdDate)),
+        status: normalizeSuggestionStatus(s.status),
+        scope: s.scope || "Ward"
+      };
+    });
+
+    renderSuggestions(mapped);
+
+  } catch (err) {
+    console.error(err);
+    renderSuggestions([]);
+  }
+}
+
+function normalizeSuggestionStatus(status) {
+  if (status === null || status === undefined) return "review";
+
+  // if backend sends number (enum)
+  if (typeof status === "number") {
+    if (status === 0) return "review";
+    if (status === 1) return "accepted";
+    if (status === 2) return "rejected";
+    return "review";
+  }
+
+  // if backend sends string
+  const s = String(status).toLowerCase();
+
+  if (s === "pending") return "review";
+  if (s === "approved") return "accepted";
+  if (s === "rejected") return "rejected";
+
+  return s;
+}
+
 function mapApiComplaintToCard(c) {
   return {
     id: c.complaintNumber || ("CMP-" + c.complaintId),
@@ -235,6 +298,66 @@ async function loadComplaintCategories() {
   } catch (_) {
     select.innerHTML = placeholder +
       '<option value="" disabled>— Could not load categories —</option>';
+  }
+}
+
+async function loadSuggestionCategories() {
+  const select = document.getElementById("suggestionCategory");
+
+  if (!select) return;
+
+  const placeholder =
+    '<option value="">— Select Category —</option>';
+
+  try {
+
+    const response = await fetch(
+      SUGGESTION_API_BASE + "/categories"
+    );
+
+    if (!response.ok)
+      throw new Error("Failed to load categories");
+
+    const categories = await response.json();
+
+    if (!Array.isArray(categories) || categories.length === 0) {
+
+      select.innerHTML =
+        placeholder +
+        '<option disabled>No categories found</option>';
+
+      return;
+    }
+
+    let html = placeholder;
+
+    categories.forEach(function (cat) {
+
+      const id =
+        cat.suggestionCategoryId;
+
+      const name =
+        cat.categoryName;
+
+      if (id == null || !name) return;
+
+      html +=
+        '<option value="' +
+        escAttr(String(id)) +
+        '">' +
+        escHtml(name) +
+        '</option>';
+    });
+
+    select.innerHTML = html;
+
+  } catch (err) {
+
+    select.innerHTML =
+      placeholder +
+      '<option disabled>Could not load categories</option>';
+
+    console.error(err);
   }
 }
 
@@ -444,36 +567,210 @@ function resetComplaintForm() {
   loadComplaintCategories();
 }
 
+function resetSuggestionForm() {
+
+  const form =
+    document.getElementById("suggestionForm");
+
+  if (form)
+    form.reset();
+
+  document.getElementById(
+    "suggestionTitleCount"
+  ).textContent = "0";
+
+  document.getElementById(
+    "suggestionDescCount"
+  ).textContent = "0";
+
+  document.getElementById(
+    "suggestionBenefitCount"
+  ).textContent = "0";
+
+  const fileNameEl =
+    document.getElementById(
+      "suggestionFileName"
+    );
+
+  if (fileNameEl)
+    fileNameEl.classList.add("hidden");
+
+  const errEl =
+    document.getElementById(
+      "suggestionError"
+    );
+
+  if (errEl)
+    errEl.classList.add("hidden");
+
+  loadSuggestionCategories();
+}
+
 // ---- Submit Suggestion ----
-function submitSuggestion(e) {
+// function submitSuggestion(e) {
+//   e.preventDefault();
+//   const errEl = document.getElementById("suggestionError");
+//   errEl.classList.add("hidden");
+
+//   const cat     = document.getElementById("suggestionCategory").value;
+//   const scope   = document.getElementById("suggestionScope").value;
+//   const title   = document.getElementById("suggestionTitle").value.trim();
+//   const desc    = document.getElementById("suggestionDesc").value.trim();
+//   const benefit = document.getElementById("suggestionBenefit").value.trim();
+
+//   if (!cat || !scope || !title || !desc || !benefit) {
+//     errEl.textContent = "Please fill all required fields before submitting.";
+//     errEl.classList.remove("hidden");
+//     return;
+//   }
+
+//   const newId = "SUG-00" + (SUGGESTIONS.length + 1);
+//   SUGGESTIONS.unshift({ id: newId, title: title, category: cat, desc: desc, benefit: benefit, date: formatDate(new Date()), status: "review", scope: scope });
+//   renderSuggestions(SUGGESTIONS);
+
+//   document.getElementById("suggestionForm").reset();
+//   document.getElementById("suggestionTitleCount").textContent = "0";
+//   document.getElementById("suggestionDescCount").textContent = "0";
+//   document.getElementById("suggestionBenefitCount").textContent = "0";
+//   document.getElementById("suggestionFileName").classList.add("hidden");
+
+//   showToast("", "Suggestion submitted successfully! ID: " + newId);
+//   showPanel("mysuggestions", document.querySelector("[onclick*=mysuggestions]"));
+// }
+
+// ---- Submit Suggestion ----
+async function submitSuggestion(e) {
   e.preventDefault();
+
   const errEl = document.getElementById("suggestionError");
   errEl.classList.add("hidden");
 
-  const cat     = document.getElementById("suggestionCategory").value;
-  const scope   = document.getElementById("suggestionScope").value;
-  const title   = document.getElementById("suggestionTitle").value.trim();
-  const desc    = document.getElementById("suggestionDesc").value.trim();
-  const benefit = document.getElementById("suggestionBenefit").value.trim();
+  const categoryId =
+    document.getElementById("suggestionCategory").value;
 
-  if (!cat || !scope || !title || !desc || !benefit) {
-    errEl.textContent = "Please fill all required fields before submitting.";
+  const scope =
+    document.getElementById("suggestionScope").value;
+
+  const title =
+    document.getElementById("suggestionTitle").value.trim();
+
+  const desc =
+    document.getElementById("suggestionDesc").value.trim();
+
+  const benefit =
+    document.getElementById("suggestionBenefit").value.trim();
+
+  // Validation
+  if (!categoryId || !scope || !title || !desc || !benefit) {
+    errEl.textContent =
+      "Please fill all required fields.";
+
     errEl.classList.remove("hidden");
     return;
   }
 
-  const newId = "SUG-00" + (SUGGESTIONS.length + 1);
-  SUGGESTIONS.unshift({ id: newId, title: title, category: cat, desc: desc, benefit: benefit, date: formatDate(new Date()), status: "review", scope: scope });
-  renderSuggestions(SUGGESTIONS);
+  const citizenId =
+    localStorage.getItem("citizenId") ||
+    citizenProfile.citizenId;
 
-  document.getElementById("suggestionForm").reset();
-  document.getElementById("suggestionTitleCount").textContent = "0";
-  document.getElementById("suggestionDescCount").textContent = "0";
-  document.getElementById("suggestionBenefitCount").textContent = "0";
-  document.getElementById("suggestionFileName").classList.add("hidden");
+  const wardId =
+    citizenProfile.wardId;
 
-  showToast("", "Suggestion submitted successfully! ID: " + newId);
-  showPanel("mysuggestions", document.querySelector("[onclick*=mysuggestions]"));
+  if (!citizenId || !wardId) {
+    errEl.textContent =
+      "Citizen profile not found. Please login again.";
+
+    errEl.classList.remove("hidden");
+    return;
+  }
+
+  // Convert scope string to enum number
+  let benefitScope = 0;
+
+  if (scope === "street") {
+    benefitScope = 0;
+  }
+  else if (scope === "ward") {
+    benefitScope = 1;
+  }
+  else if (scope === "city") {
+    benefitScope = 2;
+  }
+
+  // Create request object
+  const requestBody = {
+    citizenId: parseInt(citizenId),
+    wardId: parseInt(wardId),
+    suggestionCategoryId: parseInt(categoryId),
+    title: title,
+    description: desc,
+    expectedBenefit: benefit,
+    benefitScope: benefitScope,
+    isAnonymous: false
+  };
+
+  try {
+
+    const response = await fetch(
+      "http://localhost:5079/api/suggestions",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(requestBody)
+      });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message ||
+        "Suggestion submission failed."
+      );
+    }
+
+    // Success
+    document.getElementById("suggestionForm").reset();
+
+    document.getElementById(
+      "suggestionTitleCount"
+    ).textContent = "0";
+
+    document.getElementById(
+      "suggestionDescCount"
+    ).textContent = "0";
+
+    document.getElementById(
+      "suggestionBenefitCount"
+    ).textContent = "0";
+
+    document.getElementById(
+      "suggestionFileName"
+    ).classList.add("hidden");
+
+    showToast(
+      "✅",
+      "Suggestion submitted successfully!"
+    );
+
+    showPanel(
+      "mysuggestions",
+      document.querySelector(
+        "[onclick*=mysuggestions]"
+      )
+    );
+
+  } catch (err) {
+
+    errEl.textContent =
+      err.message ||
+      "Unable to submit suggestion.";
+
+    errEl.classList.remove("hidden");
+  }
 }
 
 // ---- Reset form ----

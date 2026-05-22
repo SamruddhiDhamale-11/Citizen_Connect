@@ -477,6 +477,42 @@
           <!-- Populated by JS -->
         </div>
       </div>
+      
+      <!-- ============================================================
+     PANEL: SUGGESTIONS MANAGEMENT
+============================================================ -->
+<div class="panel" id="panel-suggestions-management">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Suggestions Management</h1>
+      <p class="page-subtitle">Review and manage citizen suggestions</p>
+    </div>
+  </div>
+
+  <!-- FILTER BAR (same like complaints) -->
+  <div class="filter-bar">
+    <select class="filter-select" id="adminSuggestionStatusFilter" onchange="filterAdminSuggestions(this.value)">
+      <option value="all">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+
+    <input type="text"
+           class="filter-search"
+           id="adminSuggestionSearch"
+           placeholder="Search suggestions..."
+           oninput="searchAdminSuggestions(this.value)" />
+  </div>
+
+  <!-- LIST CONTAINER (IMPORTANT) -->
+  <div class="items-list" id="adminSuggestionsList">
+    <!-- Populated by JS -->
+  </div>
+
+</div>
+
 
       <!-- ============================================================
            PANEL: ANNOUNCEMENTS
