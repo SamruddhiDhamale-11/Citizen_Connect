@@ -17,9 +17,6 @@ namespace CitizenConnect.Domain.Entities
         public SuggestionStatus NewStatus
         { get; set; }
 
-        public int ChangedByUserId
-        { get; set; }
-
         public string? Remarks
         { get; set; }
 
@@ -37,7 +34,5 @@ namespace CitizenConnect.Domain.Entities
         public Suggestion Suggestion
         { get; set; } = null!;
 
-        public User ChangedByUser
-        { get; set; } = null!;
     }
 }

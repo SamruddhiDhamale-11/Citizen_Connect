@@ -129,8 +129,6 @@ namespace CitizenConnect.Services
 
                 NewStatus = dto.NewStatus,
 
-                ChangedByUserId = dto.ChangedByUserId,
-
                 Remarks = dto.Remarks,
 
                 ChangedAt = DateTime.UtcNow
@@ -149,24 +147,26 @@ namespace CitizenConnect.Services
         // GET COMPLAINT HISTORY
         // =========================================
 
-        public async Task<List<ComplaintStatusHistoryDto>>
-            GetComplaintHistoryAsync(int complaintId)
+      public async Task<List<ComplaintStatusHistoryDto>>
+    GetComplaintHistoryAsync(int complaintId)
+{
+    return await _context.ComplaintStatusHistories
+
+        .Where(h => h.ComplaintId == complaintId)
+
+        .Select(h => new ComplaintStatusHistoryDto
         {
-            return await _context.ComplaintStatusHistories
-                .Include(h => h.ChangedByUser)
-                .Where(h => h.ComplaintId == complaintId)
-                .Select(h => new ComplaintStatusHistoryDto
-                {
-                    OldStatus = h.OldStatus.ToString(),
+            OldStatus =
+                h.OldStatus.ToString(),
 
-                    NewStatus = h.NewStatus.ToString(),
+            NewStatus =
+                h.NewStatus.ToString(),
 
-                    ChangedBy =
-                        h.ChangedByUser.FirstName
-                        + " "
-                        + h.ChangedByUser.LastName,
+            ChangedBy = "Admin",
 
-                    Remarks = h.Remarks,
+            Remarks =
+                h.Remarks,
+
 
                     ChangedAt = h.ChangedAt
                 })
@@ -254,5 +254,14 @@ UpdateSuggestionStatusAsync(
 
             return true;
         }
+
+            ChangedAt =
+                h.ChangedAt
+        })
+
+        .OrderByDescending(h => h.ChangedAt)
+
+        .ToListAsync();
+}
     }
 }

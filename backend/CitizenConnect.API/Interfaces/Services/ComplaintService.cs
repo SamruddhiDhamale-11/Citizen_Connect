@@ -14,13 +14,19 @@ namespace CitizenConnect.Services
 
         private readonly IWebHostEnvironment _environment;
 
-        public ComplaintService(
-            ApplicationDbContext context,
-            IWebHostEnvironment environment)
-        {
-            _context = context;
-            _environment = environment;
-        }
+       private readonly ICloudinaryService _cloudinaryService;
+
+       public ComplaintService(
+    ApplicationDbContext context,
+    IWebHostEnvironment environment,
+    ICloudinaryService cloudinaryService)
+{
+    _context = context;
+
+    _environment = environment;
+
+    _cloudinaryService = cloudinaryService;
+}
 
 
         // =========================================
@@ -151,57 +157,36 @@ namespace CitizenConnect.Services
             // FILE UPLOAD
             // =========================================
 
-            if (dto.Files != null && dto.Files.Any())
+           if (dto.Files != null && dto.Files.Any())
+{
+    foreach (var file in dto.Files)
+    {
+        var imageUrl =
+            await _cloudinaryService
+                .UploadImageAsync(file);
+
+        var complaintImage =
+            new ComplaintImage
             {
-                string uploadPath = Path.Combine(
-                    _environment.WebRootPath,
-                    "uploads",
-                    "complaints");
+                ComplaintId =
+                    complaint.ComplaintId,
 
-                if (!Directory.Exists(uploadPath))
-                {
-                    Directory.CreateDirectory(uploadPath);
-                }
+                ImagePath =
+                    imageUrl,
 
-                foreach (var file in dto.Files)
-                {
-                    string fileName =
-                        Guid.NewGuid().ToString()
-                        + Path.GetExtension(file.FileName);
+                FileType =
+                    file.ContentType,
 
-                    string filePath =
-                        Path.Combine(uploadPath, fileName);
+                FileSize =
+                    file.Length
+            };
 
-                    using (var stream =
-                           new FileStream(
-                               filePath,
-                               FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
+        await _context.ComplaintImages
+            .AddAsync(complaintImage);
+    }
 
-                    var complaintImage =
-                        new ComplaintImage
-                        {
-                            ComplaintId =
-                                complaint.ComplaintId,
-
-                            ImagePath =
-                                $"/uploads/complaints/{fileName}",
-
-                            FileType =
-                                file.ContentType,
-
-                            FileSize =
-                                file.Length
-                        };
-
-                    await _context.ComplaintImages
-                        .AddAsync(complaintImage);
-                }
-
-                await _context.SaveChangesAsync();
-            }
+    await _context.SaveChangesAsync();
+}
 
             // =========================================
             // RETURN RESPONSE

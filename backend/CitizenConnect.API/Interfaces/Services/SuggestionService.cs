@@ -132,27 +132,24 @@ namespace CitizenConnect.Application.Services
              * ===============================================
              */
 
-            var statusHistory =
-                new SuggestionStatusHistory
-                {
-                    SuggestionId =
-                        suggestion.SuggestionId,
+           var statusHistory =
+    new SuggestionStatusHistory
+    {
+        SuggestionId =
+            suggestion.SuggestionId,
 
-                    OldStatus =
-                        SuggestionStatus.Pending,
+        OldStatus =
+            SuggestionStatus.Pending,
 
-                    NewStatus =
-                        SuggestionStatus.Pending,
+        NewStatus =
+            SuggestionStatus.Pending,
 
-                    ChangedByUserId =
-                        citizenId,
+        Remarks =
+            "Suggestion created.",
 
-                    Remarks =
-                        "Suggestion created.",
-
-                    ChangedAt =
-                        DateTime.UtcNow
-                };
+        ChangedAt =
+            DateTime.UtcNow
+    };
 
             await _context
                 .SuggestionStatusHistories

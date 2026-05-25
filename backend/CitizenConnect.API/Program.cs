@@ -5,14 +5,18 @@ using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
+using CitizenConnect.API.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+    
 // ==============================
 // CONTROLLERS
 // ==============================
 builder.Services.AddControllers();
-
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 // ==============================
 // SWAGGER / OPENAPI
 // ==============================

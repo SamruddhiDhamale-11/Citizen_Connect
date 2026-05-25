@@ -224,9 +224,6 @@ namespace CitizenConnect.API.Migrations
                     b.Property<DateTime>("ChangedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ChangedByUserId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ComplaintId")
                         .HasColumnType("int");
 
@@ -249,8 +246,6 @@ namespace CitizenConnect.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("ComplaintStatusHistoryId");
-
-                    b.HasIndex("ChangedByUserId");
 
                     b.HasIndex("ComplaintId");
 
@@ -594,11 +589,6 @@ namespace CitizenConnect.API.Migrations
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusHistory", b =>
                 {
-                    b.HasOne("CitizenConnect.Domain.Entities.User", "ChangedByUser")
-                        .WithMany("ComplaintStatusHistories")
-                        .HasForeignKey("ChangedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
 
                     b.HasOne("CitizenConnect.Domain.Entities.Complaint", "Complaint")
                         .WithMany("ComplaintStatusHistories")
@@ -606,7 +596,7 @@ namespace CitizenConnect.API.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ChangedByUser");
+                
 
                     b.Navigation("Complaint");
                 });
@@ -669,7 +659,7 @@ namespace CitizenConnect.API.Migrations
                 {
                     b.Navigation("ComplaintImages");
 
-                    b.Navigation("ComplaintStatusHistories");
+         
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintCategory", b =>
@@ -698,7 +688,7 @@ namespace CitizenConnect.API.Migrations
                 {
                     b.Navigation("Citizen");
 
-                    b.Navigation("ComplaintStatusHistories");
+              
 
                     b.Navigation("Politician");
                 });

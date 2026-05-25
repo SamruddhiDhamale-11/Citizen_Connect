@@ -75,10 +75,15 @@ function applyCitizenProfile(profile) {
   citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
   citizenProfile.wardDisplay = profile.wardDisplay || "";
 
+<<<<<<< HEAD
 
   const wardField = document.getElementById("complaintWard");
   if (wardField) wardField.value = ward;
 
+=======
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = ward;
+>>>>>>> 272743db86a5f0886ab190db2978c284fbff7a96
   setText("greetName", firstName);
   setText("userAvatar", initials);
   setText("userName", fullName);
@@ -558,6 +563,11 @@ function resetComplaintForm() {
   const errEl = document.getElementById("complaintError");
   if (errEl) errEl.classList.add("hidden");
 
+
+  const wardField = document.getElementById("complaintWard");
+  if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
+
+
   const wardField = document.getElementById("complaintWard");
   if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
 
@@ -848,7 +858,7 @@ function filterItems(type, status) {
 }
 
 // ---- Search ----
-function searchItems(type, query) {
+function searchItems(type, query) { 
   const listId = type === "complaint" ? "complaintsList" : "suggestionsList";
   const cards = document.querySelectorAll("#" + listId + " .item-card");
   const q = query.toLowerCase();
@@ -860,9 +870,9 @@ function searchItems(type, query) {
 
 // ---- Helpers ----
 function statusLabel(s) {
-  const map = { pending: "Pending", inprogress: "In Progress", resolved: "Resolved", review: "Under Review", accepted: "Accepted", implemented: "Implemented", rejected: "Not Accepted" };
+  const map = { pending: "Pending", inprogress: "In Progress", resolved: "Resolved", review: "Under Review", accepted: "Accepted", implemented: "Implemented", rejected: "Rejected" };
   return map[s] || s;
-}
+} 
 
 function escHtml(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
