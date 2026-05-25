@@ -8,6 +8,5 @@ namespace CitizenConnect.API.DTOs.Suggestion
 
     public string? Remarks { get; set; }
 
-    public int ChangedByUserId { get; set; }
 }
 }

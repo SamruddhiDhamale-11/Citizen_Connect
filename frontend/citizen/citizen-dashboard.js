@@ -75,12 +75,8 @@ function applyCitizenProfile(profile) {
   citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
   citizenProfile.wardDisplay = profile.wardDisplay || "";
 
-<<<<<<< HEAD
-=======
   const wardField = document.getElementById("complaintWard");
   if (wardField) wardField.value = ward;
-
->>>>>>> frontend-work
   setText("greetName", firstName);
   setText("userAvatar", initials);
   setText("userName", fullName);
@@ -559,11 +555,8 @@ function resetComplaintForm() {
   if (fileNameEl) fileNameEl.classList.add("hidden");
   const errEl = document.getElementById("complaintError");
   if (errEl) errEl.classList.add("hidden");
-<<<<<<< HEAD
-=======
   const wardField = document.getElementById("complaintWard");
   if (wardField) wardField.value = citizenProfile.wardDisplay || "—";
->>>>>>> frontend-work
   loadComplaintCategories();
 }
 
@@ -851,7 +844,7 @@ function filterItems(type, status) {
 }
 
 // ---- Search ----
-function searchItems(type, query) {
+function searchItems(type, query) { 
   const listId = type === "complaint" ? "complaintsList" : "suggestionsList";
   const cards = document.querySelectorAll("#" + listId + " .item-card");
   const q = query.toLowerCase();
@@ -863,9 +856,9 @@ function searchItems(type, query) {
 
 // ---- Helpers ----
 function statusLabel(s) {
-  const map = { pending: "Pending", inprogress: "In Progress", resolved: "Resolved", review: "Under Review", accepted: "Accepted", implemented: "Implemented", rejected: "Not Accepted" };
+  const map = { pending: "Pending", inprogress: "In Progress", resolved: "Resolved", review: "Under Review", accepted: "Accepted", implemented: "Implemented", rejected: "Rejected" };
   return map[s] || s;
-}
+} 
 
 function escHtml(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");

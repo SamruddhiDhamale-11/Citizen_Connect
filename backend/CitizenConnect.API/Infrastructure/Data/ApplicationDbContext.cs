@@ -220,12 +220,6 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.ComplaintId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<ComplaintStatusHistory>()
-                .HasOne(x => x.ChangedByUser)
-                .WithMany(x => x.ComplaintStatusHistories)
-                .HasForeignKey(x => x.ChangedByUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // =========================================
             // SUGGESTION VOTE
             // =========================================
@@ -240,11 +234,6 @@ namespace CitizenConnect.Infrastructure.Data
             // SUGGESTION STATUS HISTORY
             // =========================================
 
-            modelBuilder.Entity<SuggestionStatusHistory>()
-                .HasOne(x => x.ChangedByUser)
-                .WithMany()
-                .HasForeignKey(x => x.ChangedByUserId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             // =========================================
             // UNIQUE CONSTRAINTS

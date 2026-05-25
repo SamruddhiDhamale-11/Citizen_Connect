@@ -13,8 +13,6 @@ namespace CitizenConnect.Domain.Entities
 
         public ComplaintStatus NewStatus { get; set; }
 
-        public int ChangedByUserId { get; set; }
-
         public string? Remarks { get; set; }
 
         public DateTime ChangedAt { get; set; }
@@ -24,7 +22,5 @@ namespace CitizenConnect.Domain.Entities
         // Navigation Properties
 
         public Complaint Complaint { get; set; } = null!;
-
-        public User ChangedByUser { get; set; } = null!;
     }
 }

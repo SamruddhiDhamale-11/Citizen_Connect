@@ -39,9 +39,9 @@ namespace CitizenConnect.Controllers
         // =========================================
 
         [HttpPut("update-status")]
-        public async Task<IActionResult>
-            UpdateComplaintStatus(
-                UpdateComplaintStatusDto dto)
+public async Task<IActionResult>
+    UpdateComplaintStatus(
+        [FromBody] UpdateComplaintStatusDto dto)
         {
             var result =
                 await _adminService

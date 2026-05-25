@@ -179,7 +179,18 @@ var SECTION_FORMS = {
 /* ============================================================
    LOCALSTORAGE HELPERS
    ============================================================ */
-function lsLoad() {
+function mapComplaintStatus(status) {
+  var map = {
+    1: "Pending",
+    2: "Assigned",
+    3: "InProgress",
+    4: "Resolved",
+    5: "Rejected"
+  };
+  return map[status] || status;
+}
+
+   function lsLoad() {
   try {
     var raw = localStorage.getItem(LS_KEY);
     return raw ? JSON.parse(raw) : {};
@@ -1477,16 +1488,44 @@ function resolveComplaintImageUrl(path) {
 
 function normalizeAdminComplaintStatus(status) {
   if (!status) return 'pending';
-  var s = String(status).toLowerCase().replace(/\s+/g, '');
-  if (s === 'inprogress') return 'inprogress';
-  if (s === 'pending') return 'pending';
-  if (s === 'resolved') return 'resolved';
-  if (s === 'rejected') return 'rejected';
+
+  var s = String(status)
+    .toLowerCase()
+    .replace(/\s+/g, '');
+
+  if (s === 'pending')
+    return 'pending';
+
+  if (s === 'assigned')
+    return 'assigned';
+
+  if (s === 'inprogress')
+    return 'inprogress';
+
+  if (s === 'resolved')
+    return 'resolved';
+
+  if (s === 'rejected')
+    return 'rejected';
+
   return s;
 }
 
 function adminStatusLabel(s) {
-  var map = { pending: 'Pending', inprogress: 'In Progress', resolved: 'Resolved', rejected: 'Rejected' };
+
+  var map = {
+
+    pending: 'Pending',
+
+    assigned: 'Assigned',
+
+    inprogress: 'In Progress',
+
+    resolved: 'Resolved',
+
+    rejected: 'Rejected'
+  };
+
   return map[s] || s;
 }
 
@@ -1558,6 +1597,7 @@ function applyAdminComplaintFilters() {
   });
 }
 
+//popup model
 async function openAdminComplaintDetail(complaintId) {
   var complaint = adminComplaints.find(function(c) { return c.complaintId === complaintId; });
   if (!complaint) return;
@@ -1605,11 +1645,28 @@ async function openAdminComplaintDetail(complaintId) {
     '<div class="complaint-status-form">' +
       '<div class="modal-section-label">Update Status</div>' +
       '<select id="adminStatusSelect">' +
-        '<option value="Pending"' + (complaint.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
-        '<option value="InProgress"' + (complaint.status === 'inprogress' ? ' selected' : '') + '>In Progress</option>' +
-        '<option value="Resolved"' + (complaint.status === 'resolved' ? ' selected' : '') + '>Resolved</option>' +
-        '<option value="Rejected"' + (complaint.status === 'rejected' ? ' selected' : '') + '>Rejected</option>' +
-      '</select>' +
+
+  '<option value="Pending"' +
+    (complaint.status === 'pending' ? ' selected' : '') +
+  '>Pending</option>' +
+
+  '<option value="Assigned"' +
+    (complaint.status === 'assigned' ? ' selected' : '') +
+  '>Assigned</option>' +
+
+  '<option value="InProgress"' +
+    (complaint.status === 'inprogress' ? ' selected' : '') +
+  '>In Progress</option>' +
+
+  '<option value="Resolved"' +
+    (complaint.status === 'resolved' ? ' selected' : '') +
+  '>Resolved</option>' +
+
+  '<option value="Rejected"' +
+    (complaint.status === 'rejected' ? ' selected' : '') +
+  '>Rejected</option>' +
+
+'</select>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
       '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
     '</div>' +
@@ -1762,62 +1819,163 @@ async function openAdminSuggestionDetail(suggestionId) {
 }
 
 async function loadAdminComplaintHistory(complaintId) {
-  var container = document.getElementById('adminComplaintHistory');
+
+  var container =
+    document.getElementById('adminComplaintHistory');
+
   if (!container) return;
 
   try {
-    var response = await fetch(ADMIN_API_BASE + '/complaint-history/' + encodeURIComponent(complaintId));
-    if (!response.ok) throw new Error('History unavailable');
-    var data = await response.json();
-    if (!Array.isArray(data) || !data.length) {
-      container.innerHTML = '<div class="modal-value">No status history yet.</div>';
+
+    var response = await fetch(
+      ADMIN_API_BASE +
+      '/complaint-history/' +
+      encodeURIComponent(complaintId)
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to load history');
+    }
+
+    var history = await response.json();
+
+    if (!Array.isArray(history) || !history.length) {
+
+      container.innerHTML =
+        '<div class="modal-value">No history found.</div>';
+
       return;
     }
-    container.innerHTML = data.map(function(h) {
-      return '<div class="complaint-history-item">' +
-        '<strong>' + escHtml(h.oldStatus || '—') + ' → ' + escHtml(h.newStatus || '—') + '</strong><br>' +
-        escHtml(h.changedBy || 'System') + ' · ' + formatComplaintDate(h.changedAt) +
-        (h.remarks ? '<br><span>' + escHtml(h.remarks) + '</span>' : '') +
-      '</div>';
+
+    container.innerHTML = history.map(function(h) {
+
+      return (
+
+        '<div class="history-item">' +
+
+          '<div class="history-status">' +
+
+            escHtml(h.oldStatus || '—') +
+
+            ' → ' +
+
+            escHtml(h.newStatus || '—') +
+
+          '</div>' +
+
+          '<div class="history-meta">' +
+
+            escHtml(h.changedBy || 'Admin') +
+
+            ' · ' +
+
+            escHtml(
+              new Date(h.changedAt).toLocaleDateString(
+                'en-GB',
+                {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric'
+                }
+              )
+            ) +
+
+          '</div>' +
+
+          (
+
+            h.remarks
+
+            ? '<div class="history-remarks">' +
+                escHtml(h.remarks) +
+              '</div>'
+
+            : ''
+
+          ) +
+
+        '</div>'
+
+      );
+
     }).join('');
-  } catch (_) {
-    container.innerHTML = '<div class="modal-value">Unable to load history.</div>';
+
+  }
+  catch (err) {
+
+    console.error(err);
+
+    container.innerHTML =
+      '<div class="modal-value">' +
+        'Failed to load history.' +
+      '</div>';
   }
 }
 
 async function submitAdminStatusUpdate() {
-  if (!activeComplaintId) return;
 
-  var userId = localStorage.getItem('userId');
-  if (!userId) {
-    showToast('Please log in again to update status.', 'warning');
+  if (!activeComplaintId) {
+    alert('Complaint not selected');
     return;
   }
 
-  var statusEl = document.getElementById('adminStatusSelect');
-  var remarksEl = document.getElementById('adminStatusRemarks');
-  var newStatus = statusEl ? statusEl.value : 'Pending';
-  var remarks = remarksEl ? remarksEl.value.trim() : '';
+  var status =
+    document.getElementById('adminStatusSelect').value;
+    var statusMap = {
+  Pending: 1,
+  Assigned: 2,
+  InProgress: 3,
+  Resolved: 4,
+  Rejected: 5
+};
+
+status = statusMap[status];
+
+  var remarks =
+    document.getElementById('adminStatusRemarks').value;
 
   try {
-    var response = await fetch(ADMIN_API_BASE + '/update-status', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        complaintId: activeComplaintId,
-        newStatus: newStatus,
-        changedByUserId: parseInt(userId, 10),
-        remarks: remarks || null
-      })
-    });
 
-    if (!response.ok) throw new Error('Update failed');
-    var msg = await response.text();
-    showToast(msg || 'Complaint status updated.', 'success');
+    var response = await fetch(
+      ADMIN_API_BASE + '/update-status',
+      {
+        method: 'PUT',
+
+        headers: {
+          'Content-Type': 'application/json'
+        },
+
+       body: JSON.stringify({
+
+  complaintId: activeComplaintId,
+
+  newStatus: status,
+
+  remarks: remarks
+})
+      }
+    );
+
+    var result = await response.text();
+
+    if (!response.ok) {
+      throw new Error(
+        result || 'Failed to update status'
+      );
+    }
+
+    alert('Complaint status updated successfully');
+
     closeModal();
-    await loadAdminComplaints();
-  } catch (_) {
-    showToast('Unable to update complaint status.', 'error');
+
+    loadAdminComplaints();
+
+  }
+  catch (err) {
+
+    console.error(err);
+
+    alert('Failed to update complaint status');
   }
 }
 
