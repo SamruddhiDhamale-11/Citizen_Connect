@@ -173,5 +173,86 @@ namespace CitizenConnect.Services
                 .OrderByDescending(h => h.ChangedAt)
                 .ToListAsync();
         }
+
+
+
+        public async Task<bool>
+UpdateSuggestionStatusAsync(
+    int suggestionId,
+    UpdateSuggestionStatusDto request)
+        {
+            var suggestion =
+                await _context.Suggestions
+                .FirstOrDefaultAsync(x =>
+
+                    x.SuggestionId ==
+                    suggestionId);
+
+            if (suggestion == null)
+            {
+                throw new Exception(
+                    "Suggestion not found.");
+            }
+
+            /**
+             * =====================================
+             * STORE OLD STATUS
+             * =====================================
+             */
+
+            var oldStatus =
+                suggestion.Status;
+
+            /**
+             * =====================================
+             * UPDATE STATUS
+             * =====================================
+             */
+
+            suggestion.Status =
+                request.Status;
+
+            suggestion.AdminRemarks =
+                request.Remarks;
+
+            suggestion.ReviewedAt =
+                DateTime.UtcNow;
+
+            /**
+             * =====================================
+             * SAVE HISTORY
+             * =====================================
+             */
+
+            var history =
+                new SuggestionStatusHistory
+                {
+                    SuggestionId =
+                        suggestion.SuggestionId,
+
+                    OldStatus =
+                        oldStatus,
+
+                    NewStatus =
+                        request.Status,
+
+                    Remarks =
+                        request.Remarks,
+
+                    ChangedByUserId =
+                        request.ChangedByUserId,
+
+                    ChangedAt =
+                        DateTime.UtcNow
+                };
+
+            _context
+                .SuggestionStatusHistories
+                .Add(history);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

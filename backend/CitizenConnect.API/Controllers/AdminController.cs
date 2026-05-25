@@ -66,5 +66,34 @@ namespace CitizenConnect.Controllers
 
             return Ok(result);
         }
+
+
+        //chage the suggession Status.
+
+
+
+        [HttpPut(
+    "suggestions/{suggestionId}/status")]
+        public async Task<IActionResult>
+UpdateSuggestionStatus(
+    int suggestionId,
+
+    [FromBody]
+    UpdateSuggestionStatusDto request)
+        {
+            var result =
+                await _adminService
+                .UpdateSuggestionStatusAsync(
+                    suggestionId,
+                    request);
+
+            return Ok(new
+            {
+                success = result,
+
+                message =
+                    "Suggestion status updated successfully."
+            });
+        }
     }
 }

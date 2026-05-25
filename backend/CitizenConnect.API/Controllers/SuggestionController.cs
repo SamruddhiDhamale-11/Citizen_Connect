@@ -1,5 +1,4 @@
 ﻿using CitizenConnect.Application.DTOs.Suggestion;
-using CitizenConnect.API.DTOs.Suggestion;
 using CitizenConnect.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -150,11 +149,5 @@ public async Task<IActionResult> GetAllSuggestions()
         });
     }
 }
-
-
-
-
-
-
     }
 }

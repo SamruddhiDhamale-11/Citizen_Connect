@@ -548,22 +548,314 @@
         </div>
       </div>
 
-      <!-- ============================================================
-           PANEL: STAFF MANAGEMENT
-           ============================================================ -->
-      <div class="panel" id="panel-staff-management">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Staff Management</h1>
-            <p class="page-subtitle">Manage staff accounts, roles, and assignments</p>
-          </div>
-        </div>
-        <div class="placeholder-panel">
-          <div class="placeholder-icon">&#x1F477;</div>
-          <div class="placeholder-title">Staff Management</div>
-          <div class="placeholder-desc">This module is under development. Staff onboarding, role assignment, and performance tracking will be available here.</div>
-        </div>
+      
+<!-- ============================================================
+     PANEL: STAFF MANAGEMENT
+     ============================================================ -->
+<div class="panel" id="panel-staff-management">
+
+  <div class="page-header">
+
+    <div>
+      <h1 class="page-title">
+        Staff Management
+      </h1>
+
+      <p class="page-subtitle">
+        Manage officers, departments and assignments
+      </p>
+    </div>
+
+    <div class="area-action-buttons">
+
+      <button class="btn-action btn-outline-red"
+              onclick="loadOfficers()">
+
+        &#x21BB; Refresh
+
+      </button>
+
+      <button class="btn-action btn-primary"
+              onclick="openOfficerModal()">
+
+        + Add Officer
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- =====================================================
+       FILTER TOOLBAR
+       ===================================================== -->
+
+  <div class="staff-toolbar">
+
+    <div class="staff-search">
+
+      <input type="text"
+             id="officerSearch"
+             placeholder="Search officer..."
+             onkeyup="searchOfficers()" />
+
+    </div>
+
+    <div class="staff-filters">
+
+      <select id="departmentFilter"
+              onchange="filterOfficers()">
+
+        <option value="all">
+          All Departments
+        </option>
+
+      </select>
+
+      <select id="statusFilter"
+              onchange="filterOfficers()">
+
+        <option value="all">
+          All Status
+        </option>
+
+        <option value="true">
+          Active
+        </option>
+
+        <option value="false">
+          Inactive
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+  <!-- =====================================================
+       OFFICERS TABLE
+       ===================================================== -->
+
+  <div class="staff-table-wrapper">
+
+    <table class="staff-table">
+
+      <thead>
+
+        <tr>
+
+          <th>Officer</th>
+
+          <th>Email</th>
+
+          <th>Mobile</th>
+
+          <th>Department</th>
+
+          <th>Designation</th>
+
+          <th>Status</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody id="officerTableBody">
+
+        <!-- Dynamic Officer Data -->
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+<!-- ============================================================
+     OFFICER MODAL
+     ============================================================ -->
+<div class="modal-overlay hidden"
+     id="officerModalOverlay">
+
+  <div class="modal-card officer-modal-card">
+
+    <!-- HEADER -->
+
+    <div class="modal-header">
+
+      <div class="modal-title"
+           id="officerModalTitle">
+
+        Add Officer
+
       </div>
+
+      <button class="modal-close"
+              onclick="closeOfficerModal()">
+
+        &#10005;
+
+      </button>
+
+    </div>
+
+    <!-- BODY -->
+
+    <div class="modal-body">
+
+      <div class="officer-form-grid">
+
+        <!-- FIRST NAME -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            First Name
+          </label>
+
+          <input type="text"
+                 id="officerFirstName"
+                 class="sd-input"
+                 placeholder="Enter first name" />
+
+        </div>
+
+        <!-- LAST NAME -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Last Name
+          </label>
+
+          <input type="text"
+                 id="officerLastName"
+                 class="sd-input"
+                 placeholder="Enter last name" />
+
+        </div>
+
+        <!-- EMAIL -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Email
+          </label>
+
+          <input type="email"
+                 id="officerEmail"
+                 class="sd-input"
+                 placeholder="Enter email address" />
+
+        </div>
+
+        <!-- MOBILE -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Mobile Number
+          </label>
+
+          <input type="text"
+                 id="officerMobile"
+                 class="sd-input"
+                 placeholder="Enter mobile number" />
+
+        </div>
+
+        <!-- DESIGNATION -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Designation
+          </label>
+
+          <input type="text"
+                 id="officerDesignation"
+                 class="sd-input"
+                 placeholder="Enter designation" />
+
+        </div>
+
+        <!-- DEPARTMENT -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Department
+          </label>
+
+          <select id="officerDepartment"
+                  class="sd-select">
+
+            <option value="">
+              Select Department
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- STATUS -->
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Availability Status
+          </label>
+
+          <select id="officerAvailability"
+                  class="sd-select">
+
+            <option value="true">
+              Available
+            </option>
+
+            <option value="false">
+              Unavailable
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+
+    <div class="modal-footer">
+
+      <button class="btn-action btn-ghost"
+              onclick="closeOfficerModal()">
+
+        Cancel
+
+      </button>
+
+      <button class="btn-action btn-primary"
+              id="saveOfficerBtn"
+              onclick="saveOfficer()">
+
+        Save Officer
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 
       <!-- ============================================================
            PANEL: REPORTS & ANALYTICS

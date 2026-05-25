@@ -14,5 +14,8 @@ namespace CitizenConnect.Interfaces.Services
             int complaintId);
 
         Task<List<object>> GetComplaintCategoriesAsync();
+
+        
+
     }
 }

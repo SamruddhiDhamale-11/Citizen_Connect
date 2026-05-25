@@ -27,5 +27,11 @@ namespace CitizenConnect.Interfaces.Services
 
         Task<List<ComplaintStatusHistoryDto>>
             GetComplaintHistoryAsync(int complaintId);
+
+
+        Task<bool>
+UpdateSuggestionStatusAsync(
+    int suggestionId,
+    UpdateSuggestionStatusDto request);
     }
 }
