@@ -75,15 +75,13 @@ function applyCitizenProfile(profile) {
   citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
   citizenProfile.wardDisplay = profile.wardDisplay || "";
 
-<<<<<<< HEAD
 
   const wardField = document.getElementById("complaintWard");
   if (wardField) wardField.value = ward;
 
-=======
   const wardField = document.getElementById("complaintWard");
   if (wardField) wardField.value = ward;
->>>>>>> 272743db86a5f0886ab190db2978c284fbff7a96
+
   setText("greetName", firstName);
   setText("userAvatar", initials);
   setText("userName", fullName);
