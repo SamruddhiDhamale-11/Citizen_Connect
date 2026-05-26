@@ -38,6 +38,9 @@ builder.Services.AddScoped<ICitizenService, CitizenService>();
 
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
+builder.Services
+    .AddScoped<ICloudinaryService,
+               CloudinaryService>();
 
 // ==============================
 // CORS - Allow frontend origins
