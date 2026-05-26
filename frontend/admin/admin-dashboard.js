@@ -23,23 +23,6 @@ var activeComplaintId = null;
 var activeSuggestionId = null;
 var SUGGESTION_API_BASE = ADMIN_API_BASE + '/suggestions';
 
-
-
-
-/* ============================================================
-   OFFICER MANAGEMENT STATE
-   ============================================================ */
-
-let officers = [];
-
-let selectedOfficerId = null;
-
-const OFFICER_API_BASE =
-  'http://localhost:5079/api/officers';
-
-const DEPARTMENT_API_BASE =
-  'http://localhost:5079/api/departments';
-
 /* ============================================================
    GLOBAL STATE
    ============================================================ */
@@ -196,18 +179,7 @@ var SECTION_FORMS = {
 /* ============================================================
    LOCALSTORAGE HELPERS
    ============================================================ */
-function mapComplaintStatus(status) {
-  var map = {
-    1: "Pending",
-    2: "Assigned",
-    3: "InProgress",
-    4: "Resolved",
-    5: "Rejected"
-  };
-  return map[status] || status;
-}
-
-   function lsLoad() {
+function lsLoad() {
   try {
     var raw = localStorage.getItem(LS_KEY);
     return raw ? JSON.parse(raw) : {};
@@ -1505,44 +1477,16 @@ function resolveComplaintImageUrl(path) {
 
 function normalizeAdminComplaintStatus(status) {
   if (!status) return 'pending';
-
-  var s = String(status)
-    .toLowerCase()
-    .replace(/\s+/g, '');
-
-  if (s === 'pending')
-    return 'pending';
-
-  if (s === 'assigned')
-    return 'assigned';
-
-  if (s === 'inprogress')
-    return 'inprogress';
-
-  if (s === 'resolved')
-    return 'resolved';
-
-  if (s === 'rejected')
-    return 'rejected';
-
+  var s = String(status).toLowerCase().replace(/\s+/g, '');
+  if (s === 'inprogress') return 'inprogress';
+  if (s === 'pending') return 'pending';
+  if (s === 'resolved') return 'resolved';
+  if (s === 'rejected') return 'rejected';
   return s;
 }
 
 function adminStatusLabel(s) {
-
-  var map = {
-
-    pending: 'Pending',
-
-    assigned: 'Assigned',
-
-    inprogress: 'In Progress',
-
-    resolved: 'Resolved',
-
-    rejected: 'Rejected'
-  };
-
+  var map = { pending: 'Pending', inprogress: 'In Progress', resolved: 'Resolved', rejected: 'Rejected' };
   return map[s] || s;
 }
 
@@ -1614,7 +1558,6 @@ function applyAdminComplaintFilters() {
   });
 }
 
-//popup model
 async function openAdminComplaintDetail(complaintId) {
   var complaint = adminComplaints.find(function(c) { return c.complaintId === complaintId; });
   if (!complaint) return;
@@ -1662,28 +1605,11 @@ async function openAdminComplaintDetail(complaintId) {
     '<div class="complaint-status-form">' +
       '<div class="modal-section-label">Update Status</div>' +
       '<select id="adminStatusSelect">' +
-
-  '<option value="Pending"' +
-    (complaint.status === 'pending' ? ' selected' : '') +
-  '>Pending</option>' +
-
-  '<option value="Assigned"' +
-    (complaint.status === 'assigned' ? ' selected' : '') +
-  '>Assigned</option>' +
-
-  '<option value="InProgress"' +
-    (complaint.status === 'inprogress' ? ' selected' : '') +
-  '>In Progress</option>' +
-
-  '<option value="Resolved"' +
-    (complaint.status === 'resolved' ? ' selected' : '') +
-  '>Resolved</option>' +
-
-  '<option value="Rejected"' +
-    (complaint.status === 'rejected' ? ' selected' : '') +
-  '>Rejected</option>' +
-
-'</select>' +
+        '<option value="Pending"' + (complaint.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
+        '<option value="InProgress"' + (complaint.status === 'inprogress' ? ' selected' : '') + '>In Progress</option>' +
+        '<option value="Resolved"' + (complaint.status === 'resolved' ? ' selected' : '') + '>Resolved</option>' +
+        '<option value="Rejected"' + (complaint.status === 'rejected' ? ' selected' : '') + '>Rejected</option>' +
+      '</select>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
       '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
     '</div>' +
@@ -1836,163 +1762,62 @@ async function openAdminSuggestionDetail(suggestionId) {
 }
 
 async function loadAdminComplaintHistory(complaintId) {
-
-  var container =
-    document.getElementById('adminComplaintHistory');
-
+  var container = document.getElementById('adminComplaintHistory');
   if (!container) return;
 
   try {
-
-    var response = await fetch(
-      ADMIN_API_BASE +
-      '/complaint-history/' +
-      encodeURIComponent(complaintId)
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to load history');
-    }
-
-    var history = await response.json();
-
-    if (!Array.isArray(history) || !history.length) {
-
-      container.innerHTML =
-        '<div class="modal-value">No history found.</div>';
-
+    var response = await fetch(ADMIN_API_BASE + '/complaint-history/' + encodeURIComponent(complaintId));
+    if (!response.ok) throw new Error('History unavailable');
+    var data = await response.json();
+    if (!Array.isArray(data) || !data.length) {
+      container.innerHTML = '<div class="modal-value">No status history yet.</div>';
       return;
     }
-
-    container.innerHTML = history.map(function(h) {
-
-      return (
-
-        '<div class="history-item">' +
-
-          '<div class="history-status">' +
-
-            escHtml(h.oldStatus || '—') +
-
-            ' → ' +
-
-            escHtml(h.newStatus || '—') +
-
-          '</div>' +
-
-          '<div class="history-meta">' +
-
-            escHtml(h.changedBy || 'Admin') +
-
-            ' · ' +
-
-            escHtml(
-              new Date(h.changedAt).toLocaleDateString(
-                'en-GB',
-                {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric'
-                }
-              )
-            ) +
-
-          '</div>' +
-
-          (
-
-            h.remarks
-
-            ? '<div class="history-remarks">' +
-                escHtml(h.remarks) +
-              '</div>'
-
-            : ''
-
-          ) +
-
-        '</div>'
-
-      );
-
-    }).join('');
-
-  }
-  catch (err) {
-
-    console.error(err);
-
-    container.innerHTML =
-      '<div class="modal-value">' +
-        'Failed to load history.' +
+    container.innerHTML = data.map(function(h) {
+      return '<div class="complaint-history-item">' +
+        '<strong>' + escHtml(h.oldStatus || '—') + ' → ' + escHtml(h.newStatus || '—') + '</strong><br>' +
+        escHtml(h.changedBy || 'System') + ' · ' + formatComplaintDate(h.changedAt) +
+        (h.remarks ? '<br><span>' + escHtml(h.remarks) + '</span>' : '') +
       '</div>';
+    }).join('');
+  } catch (_) {
+    container.innerHTML = '<div class="modal-value">Unable to load history.</div>';
   }
 }
 
 async function submitAdminStatusUpdate() {
+  if (!activeComplaintId) return;
 
-  if (!activeComplaintId) {
-    alert('Complaint not selected');
+  var userId = localStorage.getItem('userId');
+  if (!userId) {
+    showToast('Please log in again to update status.', 'warning');
     return;
   }
 
-  var status =
-    document.getElementById('adminStatusSelect').value;
-    var statusMap = {
-  Pending: 1,
-  Assigned: 2,
-  InProgress: 3,
-  Resolved: 4,
-  Rejected: 5
-};
-
-status = statusMap[status];
-
-  var remarks =
-    document.getElementById('adminStatusRemarks').value;
+  var statusEl = document.getElementById('adminStatusSelect');
+  var remarksEl = document.getElementById('adminStatusRemarks');
+  var newStatus = statusEl ? statusEl.value : 'Pending';
+  var remarks = remarksEl ? remarksEl.value.trim() : '';
 
   try {
+    var response = await fetch(ADMIN_API_BASE + '/update-status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        complaintId: activeComplaintId,
+        newStatus: newStatus,
+        changedByUserId: parseInt(userId, 10),
+        remarks: remarks || null
+      })
+    });
 
-    var response = await fetch(
-      ADMIN_API_BASE + '/update-status',
-      {
-        method: 'PUT',
-
-        headers: {
-          'Content-Type': 'application/json'
-        },
-
-       body: JSON.stringify({
-
-  complaintId: activeComplaintId,
-
-  newStatus: status,
-
-  remarks: remarks
-})
-      }
-    );
-
-    var result = await response.text();
-
-    if (!response.ok) {
-      throw new Error(
-        result || 'Failed to update status'
-      );
-    }
-
-    alert('Complaint status updated successfully');
-
+    if (!response.ok) throw new Error('Update failed');
+    var msg = await response.text();
+    showToast(msg || 'Complaint status updated.', 'success');
     closeModal();
-
-    loadAdminComplaints();
-
-  }
-  catch (err) {
-
-    console.error(err);
-
-    alert('Failed to update complaint status');
+    await loadAdminComplaints();
+  } catch (_) {
+    showToast('Unable to update complaint status.', 'error');
   }
 }
 
@@ -2011,605 +1836,3 @@ document.addEventListener('DOMContentLoaded', function() {
 window.onload = function () {
     loadAdminSuggestions();
 };
-
-
-
-/* ============================================================
-   OPEN OFFICER MODAL
-   ============================================================ */
-
-function openOfficerModal() {
-
-  selectedOfficerId = null;
-
-  document.getElementById(
-    'officerModalTitle'
-  ).textContent = 'Add Officer';
-
-  document.getElementById(
-    'saveOfficerBtn'
-  ).textContent = 'Save Officer';
-
-  clearOfficerForm();
-
-  document.getElementById(
-    'officerModalOverlay'
-  ).classList.remove('hidden');
-}
-
-/* ============================================================
-   CLOSE OFFICER MODAL
-   ============================================================ */
-
-function closeOfficerModal() {
-
-  document.getElementById(
-    'officerModalOverlay'
-  ).classList.add('hidden');
-}
-
-/* ============================================================
-   CLEAR FORM
-   ============================================================ */
-
-function clearOfficerForm() {
-
-  document.getElementById(
-    'officerFirstName'
-  ).value = '';
-
-  document.getElementById(
-    'officerLastName'
-  ).value = '';
-
-  document.getElementById(
-    'officerEmail'
-  ).value = '';
-
-  document.getElementById(
-    'officerMobile'
-  ).value = '';
-
-  document.getElementById(
-    'officerDesignation'
-  ).value = '';
-
-  document.getElementById(
-    'officerDepartment'
-  ).value = '';
-
-  document.getElementById(
-    'officerAvailability'
-  ).value = 'true';
-}
-
-/* ============================================================
-   EDIT OFFICER
-   ============================================================ */
-
-async function editOfficer(id) {
-
-  try {
-
-    const response =
-      await fetch(
-        `${OFFICER_API_BASE}/${id}`
-      );
-
-    if (!response.ok) {
-
-      throw new Error(
-        'Failed to load officer.'
-      );
-    }
-
-    const officer =
-      await response.json();
-
-    selectedOfficerId = id;
-
-    document.getElementById(
-      'officerModalTitle'
-    ).textContent = 'Edit Officer';
-
-    document.getElementById(
-      'saveOfficerBtn'
-    ).textContent = 'Update Officer';
-
-    /* Populate Form */
-
-    const fullName =
-      officer.fullName.split(' ');
-
-    document.getElementById(
-      'officerFirstName'
-    ).value = fullName[0] || '';
-
-    document.getElementById(
-      'officerLastName'
-    ).value =
-      fullName.slice(1).join(' ') || '';
-
-    document.getElementById(
-      'officerEmail'
-    ).value =
-      officer.email || '';
-
-    document.getElementById(
-      'officerMobile'
-    ).value =
-      officer.mobileNumber || '';
-
-    document.getElementById(
-      'officerDesignation'
-    ).value =
-      officer.designation || '';
-
-    document.getElementById(
-      'officerDepartment'
-    ).value =
-      officer.departmentId || '';
-
-    document.getElementById(
-      'officerAvailability'
-    ).value =
-      String(officer.isAvailable);
-
-    document.getElementById(
-      'officerModalOverlay'
-    ).classList.remove('hidden');
-
-  }
-  catch(error) {
-
-    console.error(error);
-
-    showToast(
-      'Unable to load officer.',
-      'error'
-    );
-  }
-}
-
-/* ============================================================
-   LOAD OFFICERS
-   ============================================================ */
-
-async function loadOfficers() {
-
-  try {
-
-    const response =
-      await fetch(OFFICER_API_BASE);
-
-    if (!response.ok) {
-
-      throw new Error(
-        'Failed to load officers.'
-      );
-    }
-
-    officers =
-      await response.json();
-
-    renderOfficerTable(officers);
-
-  }
-  catch(error) {
-
-    console.error(error);
-
-    showToast(
-      'Unable to load officers.',
-      'error'
-    );
-  }
-}
-
-/* ============================================================
-   LOAD OFFICERS
-   ============================================================ */
-
-async function loadOfficers() {
-
-  try {
-
-    const response =
-      await fetch(OFFICER_API_BASE);
-
-    if (!response.ok) {
-
-      throw new Error(
-        'Failed to load officers.'
-      );
-    }
-
-    officers =
-      await response.json();
-
-    renderOfficerTable(officers);
-
-  }
-  catch(error) {
-
-    console.error(error);
-
-    showToast(
-      'Unable to load officers.',
-      'error'
-    );
-  }
-}
-
-/* ============================================================
-   RENDER OFFICER TABLE
-   ============================================================ */
-
-function renderOfficerTable(data) {
-
-  // ADD COMPLETE STEP 5.2 CODE HERE
-
-}
-
-
-/* ============================================================
-   SAVE OFFICER
-   ============================================================ */
-
-async function saveOfficer() {
-
-  try {
-
-    /* =====================================================
-       GET FORM VALUES
-       ===================================================== */
-
-    const firstName =
-      document.getElementById(
-        'officerFirstName'
-      ).value.trim();
-
-    const lastName =
-      document.getElementById(
-        'officerLastName'
-      ).value.trim();
-
-    const email =
-      document.getElementById(
-        'officerEmail'
-      ).value.trim();
-
-    const mobileNumber =
-      document.getElementById(
-        'officerMobile'
-      ).value.trim();
-
-    const designation =
-      document.getElementById(
-        'officerDesignation'
-      ).value.trim();
-
-    const departmentId =
-      document.getElementById(
-        'officerDepartment'
-      ).value;
-
-    const isAvailable =
-      document.getElementById(
-        'officerAvailability'
-      ).value === 'true';
-
-    /* =====================================================
-       VALIDATION
-       ===================================================== */
-
-    if (!firstName) {
-
-      showToast(
-        'First name is required.',
-        'warning'
-      );
-
-      return;
-    }
-
-    if (!lastName) {
-
-      showToast(
-        'Last name is required.',
-        'warning'
-      );
-
-      return;
-    }
-
-    if (!email) {
-
-      showToast(
-        'Email is required.',
-        'warning'
-      );
-
-      return;
-    }
-
-    if (!mobileNumber) {
-
-      showToast(
-        'Mobile number is required.',
-        'warning'
-      );
-
-      return;
-    }
-
-    if (!designation) {
-
-      showToast(
-        'Designation is required.',
-        'warning'
-      );
-
-      return;
-    }
-
-    if (!departmentId) {
-
-      showToast(
-        'Department is required.',
-        'warning'
-      );
-
-      return;
-    }
-
-    /* =====================================================
-       REQUEST BODY
-       ===================================================== */
-
-    const payload = {
-
-      firstName,
-      lastName,
-      email,
-      mobileNumber,
-      designation,
-
-      departmentId:
-        Number(departmentId),
-
-      isAvailable
-    };
-
-    /* =====================================================
-       CREATE OR UPDATE
-       ===================================================== */
-
-    let response;
-
-    /* UPDATE */
-
-    if (selectedOfficerId) {
-
-      response =
-        await fetch(
-          `${OFFICER_API_BASE}/${selectedOfficerId}`,
-          {
-            method: 'PUT',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body:
-              JSON.stringify(payload)
-          }
-        );
-    }
-
-    /* CREATE */
-
-    else {
-
-      response =
-        await fetch(
-          OFFICER_API_BASE,
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body:
-              JSON.stringify(payload)
-          }
-        );
-    }
-
-    /* =====================================================
-       RESPONSE CHECK
-       ===================================================== */
-
-    if (!response.ok) {
-
-      throw new Error(
-        'Failed to save officer.'
-      );
-    }
-
-    /* =====================================================
-       SUCCESS
-       ===================================================== */
-
-    showToast(
-      selectedOfficerId
-        ? 'Officer updated successfully.'
-        : 'Officer created successfully.',
-      'success'
-    );
-
-    closeOfficerModal();
-
-    loadOfficers();
-
-  }
-  catch(error) {
-
-    console.error(error);
-
-    showToast(
-      error.message ||
-      'Unable to save officer.',
-      'error'
-    );
-  }
-}
-
-/* ============================================================
-   SEARCH OFFICERS
-   ============================================================ */
-
-function searchOfficers() {
-
-  applyOfficerFilters();
-}
-
-/* ============================================================
-   FILTER OFFICERS
-   ============================================================ */
-
-function filterOfficers() {
-
-  applyOfficerFilters();
-}
-
-/* ============================================================
-   APPLY FILTERS
-   ============================================================ */
-
-function applyOfficerFilters() {
-
-  const searchText =
-    document.getElementById(
-      'officerSearch'
-    ).value.toLowerCase();
-
-  const department =
-    document.getElementById(
-      'departmentFilter'
-    ).value;
-
-  const status =
-    document.getElementById(
-      'statusFilter'
-    ).value;
-
-  const filtered =
-    officers.filter(officer => {
-
-      /* SEARCH */
-
-      const matchesSearch =
-
-        officer.fullName
-          .toLowerCase()
-          .includes(searchText)
-
-        ||
-
-        officer.email
-          .toLowerCase()
-          .includes(searchText);
-
-      /* DEPARTMENT */
-
-      const matchesDepartment =
-
-        department === 'all'
-
-        ||
-
-        officer.departmentName
-          === department;
-
-      /* STATUS */
-
-      const matchesStatus =
-
-        status === 'all'
-
-        ||
-
-        String(
-          officer.isAvailable
-        ) === status;
-
-      return (
-        matchesSearch
-        &&
-        matchesDepartment
-        &&
-        matchesStatus
-      );
-    });
-
-  renderOfficerTable(filtered);
-}
-
-/* ============================================================
-   DELETE OFFICER
-   ============================================================ */
-
-function deleteOfficer(id) {
-
-  showConfirm(
-
-    'Delete Officer',
-
-    'Are you sure you want to delete this officer?',
-
-    async function() {
-
-      try {
-
-        const response =
-          await fetch(
-            `${OFFICER_API_BASE}/${id}`,
-            {
-              method: 'DELETE'
-            }
-          );
-
-        if (!response.ok) {
-
-          throw new Error(
-            'Failed to delete officer.'
-          );
-        }
-
-        showToast(
-          'Officer deleted successfully.',
-          'success'
-        );
-
-        loadOfficers();
-
-      }
-      catch(error) {
-
-        console.error(error);
-
-        showToast(
-          'Unable to delete officer.',
-          'error'
-        );
-      }
-    }
-  );
-}
-
-
-
