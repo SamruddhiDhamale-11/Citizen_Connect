@@ -285,15 +285,27 @@ namespace CitizenConnect.Services
         // =========================================
 
         public async Task<ComplaintDetailsDto?>
-            GetComplaintDetailsAsync(int complaintId)
+     GetComplaintDetailsAsync(int complaintId)
         {
-            var complaint = await _context.Complaints
+            var complaint =
+                await _context.Complaints
+
                 .AsNoTracking()
+
                 .Include(c => c.ComplaintCategory)
+
                 .Include(c => c.Citizen)
                     .ThenInclude(cit => cit.User)
+
                 .Include(c => c.ComplaintImages)
-                .FirstOrDefaultAsync(c => c.ComplaintId == complaintId);
+
+                .Include(c => c.ComplaintStatusMaster)
+
+                .FirstOrDefaultAsync(c =>
+
+                    c.ComplaintId ==
+                    complaintId
+                );
 
             if (complaint == null)
             {
@@ -302,27 +314,69 @@ namespace CitizenConnect.Services
 
             return new ComplaintDetailsDto
             {
-                ComplaintId = complaint.ComplaintId,
-                ComplaintNumber = complaint.ComplaintNumber,
-                CategoryName = complaint.ComplaintCategory?.CategoryName ?? string.Empty,
-                Title = complaint.Title,
-                Description = complaint.Description ?? string.Empty,
-                Address = complaint.Address ?? string.Empty,
-                Status = complaint.ComplaintStatusMaster.ToString(),
-                Priority = complaint.Priority,
-                IsAnonymous = complaint.IsAnonymous,
-                CitizenName = complaint.IsAnonymous
-                    ? "Anonymous"
-                    : FormatCitizenDisplayName(complaint.Citizen?.User),
-                CreatedAt = complaint.CreatedAt,
-                Images = complaint.ComplaintImages
-                    .OrderBy(i => i.ComplaintImageId)
-                    .Select(i => i.ImagePath)
-                    .Where(p => !string.IsNullOrWhiteSpace(p))
-                    .ToList()
+                ComplaintId =
+                    complaint.ComplaintId,
+
+                ComplaintNumber =
+                    complaint.ComplaintNumber,
+
+                CategoryName =
+                    complaint
+                        .ComplaintCategory
+                        ?.CategoryName
+                    ?? string.Empty,
+
+                Title =
+                    complaint.Title,
+
+                Description =
+                    complaint.Description
+                    ?? string.Empty,
+
+                Address =
+                    complaint.Address
+                    ?? string.Empty,
+
+                Status =
+                    complaint
+                        .ComplaintStatusMaster
+                        ?.StatusName
+                    ?? string.Empty,
+
+                Priority =
+                    complaint.Priority,
+
+                IsAnonymous =
+                    complaint.IsAnonymous,
+
+                CitizenName =
+                    complaint.IsAnonymous
+                        ? "Anonymous"
+                        : FormatCitizenDisplayName(
+                            complaint.Citizen?.User
+                        ),
+
+                CreatedAt =
+                    complaint.CreatedAt,
+
+                Images =
+                    complaint.ComplaintImages
+
+                        .OrderBy(i =>
+                            i.ComplaintImageId
+                        )
+
+                        .Select(i =>
+                            i.ImagePath
+                        )
+
+                        .Where(p =>
+                            !string.IsNullOrWhiteSpace(p)
+                        )
+
+                        .ToList()
             };
         }
-
         private static string FormatCitizenDisplayName(User? user)
         {
             if (user == null)
