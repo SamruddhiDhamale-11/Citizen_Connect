@@ -15,13 +15,13 @@ var LS_KEY = 'adminAreaOverviewData';
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var ADMIN_API_BASE = 'http://localhost:5079/api/admin';
-var COMPLAINT_API_BASE = 'http://localhost:5079/api/Complaint';
+var COMPLAINT_API_BASE = 'http://localhost:5079/api/Admin';
 var API_ORIGIN = 'http://localhost:5079';
 let adminComplaints = [];
 let adminSuggestions = [];
 var activeComplaintId = null;
 var activeSuggestionId = null;
-var SUGGESTION_API_BASE = ADMIN_API_BASE + '/suggestions';
+var SUGGESTION_API_BASE = 'http://localhost:5079/api/Admin' + '/suggestions';
 
 /* ============================================================
    GLOBAL STATE
@@ -1185,7 +1185,7 @@ async function loadAdminComplaints() {
   list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x23F3;</div><div>Loading complaints...</div></div>';
 
   try {
-    var response = await fetch(ADMIN_API_BASE + '/complaints');
+    var response = await fetch('http://localhost:5079/api/Admin' + '/complaints');
     if (!response.ok) throw new Error('Failed to load complaints');
     var data = await response.json();
     adminComplaints = Array.isArray(data)
@@ -1565,7 +1565,7 @@ async function openAdminComplaintDetail(complaintId) {
   activeComplaintId = complaintId;
 
   try {
-    var detailRes = await fetch(COMPLAINT_API_BASE + '/' + encodeURIComponent(complaintId));
+    var detailRes = await fetch('http://localhost:5079/api/Complaint/' + encodeURIComponent(complaintId));
     if (detailRes.ok) {
       var detail = await detailRes.json();
       complaint.desc = pickComplaintField(detail, 'description', 'Description') || complaint.desc;
@@ -1603,13 +1603,8 @@ async function openAdminComplaintDetail(complaintId) {
     '<div class="modal-section-label">Attachment</div>' +
     imageHtml +
     '<div class="complaint-status-form">' +
-      '<div class="modal-section-label">Update Status</div>' +
-      '<select id="adminStatusSelect">' +
-        '<option value="Pending"' + (complaint.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
-        '<option value="InProgress"' + (complaint.status === 'inprogress' ? ' selected' : '') + '>In Progress</option>' +
-        '<option value="Resolved"' + (complaint.status === 'resolved' ? ' selected' : '') + '>Resolved</option>' +
-        '<option value="Rejected"' + (complaint.status === 'rejected' ? ' selected' : '') + '>Rejected</option>' +
-      '</select>' +
+  '<div class="modal-section-label">Update Status</div>' +
+  '<select id="adminStatusSelect"></select>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
       '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
     '</div>' +
@@ -1619,7 +1614,42 @@ async function openAdminComplaintDetail(complaintId) {
   document.getElementById('modalTitle').textContent = 'Complaint Details';
   document.getElementById('modalBody').innerHTML = bodyHtml;
   document.getElementById('modalOverlay').classList.remove('hidden');
+  loadComplaintStatuses(complaint.status);
   loadAdminComplaintHistory(complaintId);
+}
+
+async function loadComplaintStatuses(selectedStatus) {
+  try {
+    var res = await fetch('http://localhost:5079/api/Admin/complaint-statuses');
+    if (!res.ok) {
+      console.error('Failed to load statuses');
+      return;
+    }
+
+    var response = await res.json();
+    var statuses = response.data || [];
+
+    var select = document.getElementById('adminStatusSelect');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    statuses.forEach(function (s) {
+      var opt = document.createElement('option');
+      opt.value = s.complaintStatusMasterId;
+      opt.textContent = s.statusName;
+
+      // auto-select current status
+      if (s.statusName.toLowerCase() === (selectedStatus || '').toLowerCase()) {
+        opt.selected = true;
+      }
+
+      select.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error('Error loading complaint statuses:', err);
+  }
 }
 
 async function openAdminSuggestionDetail(suggestionId) {
@@ -1766,7 +1796,7 @@ async function loadAdminComplaintHistory(complaintId) {
   if (!container) return;
 
   try {
-    var response = await fetch(ADMIN_API_BASE + '/complaint-history/' + encodeURIComponent(complaintId));
+    var response = await fetch('http://localhost:5079/api/Admin' + '/complaint-history/' + encodeURIComponent(complaintId));
     if (!response.ok) throw new Error('History unavailable');
     var data = await response.json();
     if (!Array.isArray(data) || !data.length) {
@@ -1800,7 +1830,7 @@ async function submitAdminStatusUpdate() {
   var remarks = remarksEl ? remarksEl.value.trim() : '';
 
   try {
-    var response = await fetch(ADMIN_API_BASE + '/update-status', {
+    var response = await fetch('http://localhost:5079/api/Admin' + '/update-status', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

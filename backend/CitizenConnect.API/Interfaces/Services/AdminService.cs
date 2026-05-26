@@ -115,52 +115,39 @@ public async Task<List<object>> GetAllCitizensAsync()
             UpdateComplaintStatusAsync(
                 UpdateComplaintStatusDto dto)
         {
-            var complaint = await _context.Complaints
-                .FirstOrDefaultAsync(c =>
-                    c.ComplaintId == dto.ComplaintId);
+          
+          var complaint = await _context.Complaints
+    .FirstOrDefaultAsync(c => c.ComplaintId == dto.ComplaintId);
 
-            if (complaint == null)
-            {
-                return "Complaint not found";
-            }
+if (complaint == null)
+{
+    return "Complaint not found";
+}
 
+// STEP 1: validate status FIRST
+var statusExists = await _context.ComplaintStatusMasters
+    .AnyAsync(x => x.ComplaintStatusMasterId == dto.ComplaintStatusMasterId);
 
-            // STORE OLD STATUS
-            var oldStatus =
-    await _context
-    .ComplaintStatusMasters
+if (!statusExists)
+{
+    return "Invalid Complaint Status Id";
+}
 
+// new stautus
+var newStatus =
+    await _context.ComplaintStatusMasters
     .Where(x =>
-
-        x.ComplaintStatusMasterId ==
-        complaint.ComplaintStatusMasterId
-    )
-
-    .Select(x => x.StatusName)
-
-    .FirstOrDefaultAsync();
-
-
-            // UPDATE STATUS
-            complaint.ComplaintStatusMasterId =
-    dto.ComplaintStatusMasterId;
-
-            complaint.Remarks = dto.Remarks;
-
-
-            // RESOLVED DATE
-            var newStatus =
-    await _context
-    .ComplaintStatusMasters
-
-    .Where(x =>
-
         x.ComplaintStatusMasterId ==
         dto.ComplaintStatusMasterId
     )
-
     .Select(x => x.StatusName)
+    .FirstOrDefaultAsync();
 
+
+// STEP 2: get old status
+var oldStatus = await _context.ComplaintStatusMasters
+    .Where(x => x.ComplaintStatusMasterId == complaint.ComplaintStatusMasterId)
+    .Select(x => x.StatusName)
     .FirstOrDefaultAsync();
 
             if (newStatus == "Resolved")
@@ -346,6 +333,19 @@ public async Task<List<object>> GetAllCitizensAsync()
 
             }
           */
+
+          public async Task<List<ComplaintStatusDto>> GetComplaintStatusesAsync()
+{
+    return await _context.ComplaintStatusMasters
+        .Where(x => x.IsActive)
+        .OrderBy(x => x.DisplayOrder)
+        .Select(x => new ComplaintStatusDto
+        {
+            ComplaintStatusMasterId = x.ComplaintStatusMasterId,
+            StatusName = x.StatusName
+        })
+        .ToListAsync();
+}
     }
 }
             

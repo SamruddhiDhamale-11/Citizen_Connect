@@ -269,7 +269,7 @@ namespace CitizenConnect.Services
 
                     Address = c.Address,
 
-                    Status = c.ComplaintStatusMaster.ToString(),
+                    Status = c.ComplaintStatusMaster.StatusName,
 
                     Priority = c.Priority,
 
@@ -293,13 +293,10 @@ namespace CitizenConnect.Services
                 .AsNoTracking()
 
                 .Include(c => c.ComplaintCategory)
-
-                .Include(c => c.Citizen)
-                    .ThenInclude(cit => cit.User)
-
-                .Include(c => c.ComplaintImages)
-
-                .Include(c => c.ComplaintStatusMaster)
+.Include(c => c.Citizen)
+    .ThenInclude(cit => cit.User)
+.Include(c => c.ComplaintImages)
+.Include(c => c.ComplaintStatusMaster)
 
                 .FirstOrDefaultAsync(c =>
 
@@ -320,11 +317,10 @@ namespace CitizenConnect.Services
                 ComplaintNumber =
                     complaint.ComplaintNumber,
 
-                CategoryName =
-                    complaint
-                        .ComplaintCategory
-                        ?.CategoryName
-                    ?? string.Empty,
+               CategoryName =
+    complaint.ComplaintCategory != null
+        ? complaint.ComplaintCategory.CategoryName
+        : "Unknown",
 
                 Title =
                     complaint.Title,
@@ -337,11 +333,10 @@ namespace CitizenConnect.Services
                     complaint.Address
                     ?? string.Empty,
 
-                Status =
-                    complaint
-                        .ComplaintStatusMaster
-                        ?.StatusName
-                    ?? string.Empty,
+               Status =
+    complaint.ComplaintStatusMaster != null
+        ? complaint.ComplaintStatusMaster.StatusName
+        : "Pending",
 
                 Priority =
                     complaint.Priority,
@@ -350,31 +345,24 @@ namespace CitizenConnect.Services
                     complaint.IsAnonymous,
 
                 CitizenName =
-                    complaint.IsAnonymous
-                        ? "Anonymous"
-                        : FormatCitizenDisplayName(
-                            complaint.Citizen?.User
-                        ),
+    complaint.IsAnonymous
+        ? "Anonymous"
+        : (complaint.Citizen != null && complaint.Citizen.User != null
+            ? FormatCitizenDisplayName(complaint.Citizen.User)
+            : "Unknown"),
 
                 CreatedAt =
                     complaint.CreatedAt,
 
-                Images =
-                    complaint.ComplaintImages
+               Images =
+    complaint.ComplaintImages != null
+        ? complaint.ComplaintImages
+            .OrderBy(i => i.ComplaintImageId)
+            .Select(i => i.ImagePath)
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .ToList()
+        : new List<string>()
 
-                        .OrderBy(i =>
-                            i.ComplaintImageId
-                        )
-
-                        .Select(i =>
-                            i.ImagePath
-                        )
-
-                        .Where(p =>
-                            !string.IsNullOrWhiteSpace(p)
-                        )
-
-                        .ToList()
             };
         }
         private static string FormatCitizenDisplayName(User? user)
