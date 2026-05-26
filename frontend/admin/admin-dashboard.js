@@ -1836,3 +1836,134 @@ document.addEventListener('DOMContentLoaded', function() {
 window.onload = function () {
     loadAdminSuggestions();
 };
+
+var allCitizens = [];
+
+/* LOAD CITIZENS */
+async function loadCitizens() {
+  try {
+    const res = await fetch("http://localhost:5079/api/Admin/citizens");
+    const data = await res.json();
+
+    console.log("CITIZENS =", data);
+
+    allCitizens = data.data || data || [];
+
+    renderCitizens(allCitizens);
+
+  } catch (err) {
+    console.error("Error loading citizens", err);
+
+    document.getElementById("citizenTableBody").innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:30px;">
+          Failed to load citizens
+        </td>
+      </tr>
+    `;
+  }
+}
+
+/* RENDER TABLE */
+function renderCitizens(list) {
+
+  var tbody = document.getElementById("citizenTableBody");
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:40px;">
+          No citizens found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  var html = '';
+
+  list.forEach((c, index) => {
+
+    html += `
+  <tr>
+
+    <td>${index + 1}</td>
+
+    <td>
+      <div class="citizen-info">
+
+        <div class="citizen-avatar">
+          ${(c.firstName || 'C').charAt(0).toUpperCase()}
+        </div>
+
+        <div>
+          <div class="citizen-name">
+            ${c.firstName || ''} ${c.lastName || ''}
+          </div>
+
+          <div class="citizen-sub">
+            Citizen
+          </div>
+        </div>
+
+      </div>
+    </td>
+
+    <td>
+      ${c.email || '-'}
+    </td>
+
+    <td>
+      ${c.mobile || '-'}
+    </td>
+
+    <td>
+      ${
+        c.createdAt
+          ? new Date(c.createdAt).toLocaleDateString()
+          : '-'
+      }
+    </td>
+
+    <td>
+      <div class="citizen-actions">
+        <button class="citizen-btn edit">
+          ✏️
+        </button>
+      </div>
+    </td>
+
+  </tr>
+`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+/* SEARCH */
+function searchCitizens(query) {
+
+  query = query.toLowerCase().trim();
+
+  var filtered = allCitizens.filter(c => {
+
+    var fullName =
+      `${c.firstName || ''} ${c.lastName || ''}`.toLowerCase();
+
+    var email = (c.email || '').toLowerCase();
+
+    var mobile = (c.mobile || '').toLowerCase();
+
+    return (
+      fullName.includes(query) ||
+      email.includes(query) ||
+      mobile.includes(query)
+    );
+  });
+
+  renderCitizens(filtered);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadCitizens();
+});

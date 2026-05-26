@@ -440,18 +440,52 @@
            PANEL: CITIZEN MANAGEMENT
            ============================================================ -->
       <div class="panel" id="panel-citizen-management">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Citizen Management</h1>
-            <p class="page-subtitle">View and manage all registered citizens</p>
-          </div>
-        </div>
-        <div class="placeholder-panel">
-          <div class="placeholder-icon">&#x1F465;</div>
-          <div class="placeholder-title">Citizen Management</div>
-          <div class="placeholder-desc">This module is under development. Citizen registration and profile management will be available here.</div>
-        </div>
-      </div>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Citizen Management</h1>
+      <p class="page-subtitle">
+        View and manage all registered citizens
+      </p>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="filter-search"
+      id="citizenSearch"
+      placeholder="Search by name, email or mobile..."
+      oninput="searchCitizens(this.value)"
+    />
+  </div>
+
+  <!-- TABLE -->
+  <div class="citizen-table-wrapper">
+
+    <table class="citizen-table">
+
+      <thead>
+        <tr>
+          <th>Sr No</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Mobile Number</th>
+          <th>Joined Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="citizenTableBody">
+        <!-- JS -->
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
 
       <!-- ============================================================
            PANEL: COMPLAINTS MANAGEMENT

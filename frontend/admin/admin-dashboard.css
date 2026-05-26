@@ -934,3 +934,132 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 
 }
 
+
+/* ============================================================
+   CITIZEN MANAGEMENT TABLE
+   ============================================================ */
+
+.citizen-table-wrapper{
+  background:#fff;
+  border:1.5px solid #DADADA;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+.citizen-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.citizen-table th,
+.citizen-table td{
+  border:1px solid #E5E7EB;
+}
+
+.citizen-table thead{
+  background:#FAFAFA;
+}
+
+.citizen-table th{
+  padding:16px;
+  text-align:left;
+  font-size:0.76rem;
+  font-weight:700;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+}
+
+.citizen-table td{
+  padding:18px 16px;
+  font-size:0.85rem;
+  color:var(--text);
+  vertical-align:middle;
+}
+
+.citizen-table tbody tr{
+  transition:0.2s ease;
+}
+
+.citizen-table tbody tr:hover{
+  background:#FCFCFC;
+}
+
+/* CENTER FIRST + LAST COLUMN */
+
+.citizen-table th:first-child,
+.citizen-table td:first-child,
+.citizen-table th:last-child,
+.citizen-table td:last-child{
+  text-align:center;
+}
+
+/* CITIZEN INFO */
+
+.citizen-info{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.citizen-avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:var(--red-light);
+  color:var(--red);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  font-size:0.9rem;
+  flex-shrink:0;
+}
+
+.citizen-name{
+  font-weight:700;
+  color:var(--text);
+}
+
+.citizen-sub{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  margin-top:2px;
+}
+
+/* ACTION BUTTON */
+
+.citizen-actions{
+  display:flex;
+  justify-content:center;
+}
+
+.citizen-btn{
+  border:none;
+  width:34px;
+  height:34px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:0.9rem;
+  transition:0.2s ease;
+}
+
+.citizen-btn.edit{
+  background:#EFF6FF;
+  color:#2563EB;
+}
+
+.citizen-btn.edit:hover{
+  background:#DBEAFE;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:992px){
+
+  .citizen-table{
+    min-width:900px;
+  }
+
+}
