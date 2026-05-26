@@ -17,6 +17,8 @@ namespace CitizenConnect.Application.DTOs.Suggestion
         { get; set; }
             = string.Empty;
 
+        public int SuggestionStatusMasterId { get; set; }
+
         public string Description
         { get; set; }
             = string.Empty;

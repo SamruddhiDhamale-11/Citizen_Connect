@@ -20,6 +20,5 @@ namespace CitizenConnect.Application.Interfaces.Services
 
         Task<List<object>>
             GetAllSuggestionsAsync();
-
     }
 }

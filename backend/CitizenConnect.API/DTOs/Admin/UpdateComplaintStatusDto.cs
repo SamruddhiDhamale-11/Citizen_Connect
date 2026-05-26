@@ -7,7 +7,8 @@ namespace CitizenConnect.DTOs.Admin
     {
         public int ComplaintId { get; set; }
 
-        public ComplaintStatus NewStatus { get; set; }
+        public int ComplaintStatusMasterId
+        { get; set; }
 
         public string? Remarks { get; set; }
     }

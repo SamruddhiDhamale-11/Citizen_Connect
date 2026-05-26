@@ -4,6 +4,7 @@ using CitizenConnect.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CitizenConnect.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260525125724_AddSuggestionStatusMaster")]
+    partial class AddSuggestionStatusMaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,9 +153,6 @@ namespace CitizenConnect.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ComplaintStatusMasterId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -188,6 +188,9 @@ namespace CitizenConnect.API.Migrations
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -208,8 +211,6 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("ComplaintNumber")
                         .IsUnique();
-
-                    b.HasIndex("ComplaintStatusMasterId");
 
                     b.HasIndex("DepartmentId");
 
@@ -277,13 +278,11 @@ namespace CitizenConnect.API.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("NewStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("int");
 
-                    b.Property<string>("OldStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("OldStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -296,43 +295,6 @@ namespace CitizenConnect.API.Migrations
                     b.HasIndex("ComplaintId");
 
                     b.ToTable("ComplaintStatusHistories");
-                });
-
-            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusMaster", b =>
-                {
-                    b.Property<int>("ComplaintStatusMasterId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComplaintStatusMasterId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("StatusName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ComplaintStatusMasterId");
-
-                    b.HasIndex("StatusName")
-                        .IsUnique();
-
-                    b.ToTable("ComplaintStatusMasters");
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Department", b =>
@@ -1136,12 +1098,6 @@ namespace CitizenConnect.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CitizenConnect.Domain.Entities.ComplaintStatusMaster", "ComplaintStatusMaster")
-                        .WithMany("Complaints")
-                        .HasForeignKey("ComplaintStatusMasterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("CitizenConnect.Domain.Entities.Department", "Department")
                         .WithMany("Complaints")
                         .HasForeignKey("DepartmentId")
@@ -1162,8 +1118,6 @@ namespace CitizenConnect.API.Migrations
                     b.Navigation("Citizen");
 
                     b.Navigation("ComplaintCategory");
-
-                    b.Navigation("ComplaintStatusMaster");
 
                     b.Navigation("Department");
 
@@ -1374,11 +1328,6 @@ namespace CitizenConnect.API.Migrations
                     b.Navigation("ComplaintImages");
 
                     b.Navigation("ComplaintStatusHistories");
-                });
-
-            modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusMaster", b =>
-                {
-                    b.Navigation("Complaints");
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Department", b =>

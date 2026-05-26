@@ -20,7 +20,6 @@ namespace CitizenConnect.Application.Services
             _context = context;
         }
 
-
         /**
          * =====================================================
          * CREATE SUGGESTION
@@ -55,7 +54,6 @@ namespace CitizenConnect.Application.Services
                 );
             }
 
-
             /**
              * ===============================================
              * GENERATE SUGGESTION NUMBER
@@ -64,7 +62,6 @@ namespace CitizenConnect.Application.Services
 
             var suggestionNumber =
                 $"SG-{DateTime.UtcNow:yyyyMMddHHmmss}";
-
 
             /**
              * ===============================================
@@ -102,15 +99,13 @@ namespace CitizenConnect.Application.Services
                     IsAnonymous =
                         request.IsAnonymous,
 
-                    Status =
-                        SuggestionStatus.Pending,
+                    SuggestionStatusMasterId = 1,
 
                     TotalVotes = 0,
 
                     CreatedAt =
                         DateTime.UtcNow
                 };
-
 
             /**
              * ===============================================
@@ -125,6 +120,15 @@ namespace CitizenConnect.Application.Services
             await _context
                 .SaveChangesAsync();
 
+            /**
+             * ===============================================
+             * LOAD STATUS NAVIGATION
+             * ===============================================
+             */
+
+            await _context.Entry(suggestion)
+                .Reference(x => x.SuggestionStatusMaster)
+                .LoadAsync();
 
             /**
              * ===============================================
@@ -132,24 +136,24 @@ namespace CitizenConnect.Application.Services
              * ===============================================
              */
 
-           var statusHistory =
-    new SuggestionStatusHistory
-    {
-        SuggestionId =
-            suggestion.SuggestionId,
+            var statusHistory =
+                new SuggestionStatusHistory
+                {
+                    SuggestionId =
+                        suggestion.SuggestionId,
 
-        OldStatus =
-            SuggestionStatus.Pending,
+                    OldStatus =
+    "Pending",
 
-        NewStatus =
-            SuggestionStatus.Pending,
+                    NewStatus =
+    "Pending",
 
-        Remarks =
-            "Suggestion created.",
+                    Remarks =
+                        "Suggestion created.",
 
-        ChangedAt =
-            DateTime.UtcNow
-    };
+                    ChangedAt =
+                        DateTime.UtcNow
+                };
 
             await _context
                 .SuggestionStatusHistories
@@ -157,7 +161,6 @@ namespace CitizenConnect.Application.Services
 
             await _context
                 .SaveChangesAsync();
-
 
             /**
              * ===============================================
@@ -182,14 +185,15 @@ namespace CitizenConnect.Application.Services
                 ExpectedBenefit =
                     suggestion.ExpectedBenefit,
 
-                Status =
-                    suggestion.Status,
+                StatusName =
+                    suggestion
+                        .SuggestionStatusMaster
+                        .StatusName,
 
                 CreatedDate =
                     suggestion.CreatedAt
             };
         }
-
 
         /**
          * =====================================================
@@ -205,15 +209,19 @@ namespace CitizenConnect.Application.Services
             var suggestions =
                 await _context
                 .Suggestions
+                .Include(x => x.SuggestionStatusMaster)
+
                 .Where(x =>
 
                     x.CitizenId ==
                     citizenId
                 )
+
                 .OrderByDescending(x =>
 
                     x.CreatedAt
                 )
+
                 .Select(x =>
 
                     new SuggestionResponseDto
@@ -233,122 +241,143 @@ namespace CitizenConnect.Application.Services
                         ExpectedBenefit =
                             x.ExpectedBenefit,
 
-                        Status =
-                            x.Status,
+                        StatusName =
+                            x.SuggestionStatusMaster
+                                .StatusName,
 
                         CreatedDate =
                             x.CreatedAt
                     }
 
                 )
+
                 .ToListAsync();
 
             return suggestions;
         }
+
         /**
- * =====================================================
- * GET SUGGESTION CATEGORIES
- * =====================================================
- */
+         * =====================================================
+         * GET SUGGESTION CATEGORIES
+         * =====================================================
+         */
 
-public async Task<List<object>>
-    GetSuggestionCategoriesAsync()
-{
-    return await _context
-        .SuggestionCategories
-        .Where(x => x.IsActive)
-        .OrderBy(x => x.CategoryName)
-        .Select(x => new
+        public async Task<List<object>>
+            GetSuggestionCategoriesAsync()
         {
-            suggestionCategoryId =
-                x.SuggestionCategoryId,
+            return await _context
+                .SuggestionCategories
 
-            categoryName =
-                x.CategoryName
-        })
-        .Cast<object>()
-        .ToListAsync();
-}
+                .Where(x => x.IsActive)
 
-public async Task<List<object>> GetAllSuggestionsAsync()
-{
-    return await _context.Suggestions
+                .OrderBy(x => x.CategoryName)
 
-        .Join(
-            _context.SuggestionCategories,
+                .Select(x => new
+                {
+                    suggestionCategoryId =
+                        x.SuggestionCategoryId,
 
-            s => s.SuggestionCategoryId,
+                    categoryName =
+                        x.CategoryName
+                })
 
-            c => c.SuggestionCategoryId,
+                .Cast<object>()
 
-            (s, c) => new
-            {
-                s,
-                c
-            }
-        )
+                .ToListAsync();
+        }
 
-        .Join(
-            _context.Citizens,
+        /**
+         * =====================================================
+         * GET ALL SUGGESTIONS
+         * =====================================================
+         */
 
-            sc => sc.s.CitizenId,
+        public async Task<List<object>>
+            GetAllSuggestionsAsync()
+        {
+            return await _context
+                .Suggestions
 
-            ct => ct.CitizenId,
+                .Include(x => x.SuggestionStatusMaster)
 
-            (sc, ct) => new
-            {
-                sc.s,
-                sc.c,
-                ct
-            }
-        )
+                .Join(
+                    _context.SuggestionCategories,
 
-        .Join(
-            _context.Users,
+                    s => s.SuggestionCategoryId,
 
-            x => x.ct.UserId,
+                    c => c.SuggestionCategoryId,
 
-            u => u.UserId,
+                    (s, c) => new
+                    {
+                        s,
+                        c
+                    }
+                )
 
-            (x, u) => new
-            {
-                suggestionId =
-                    x.s.SuggestionId,
+                .Join(
+                    _context.Citizens,
 
-                suggestionNumber =
-                    x.s.SuggestionNumber,
+                    sc => sc.s.CitizenId,
 
-                title =
-                    x.s.Title,
+                    ct => ct.CitizenId,
 
-                description =
-                    x.s.Description,
+                    (sc, ct) => new
+                    {
+                        sc.s,
+                        sc.c,
+                        ct
+                    }
+                )
 
-                status =
-                    x.s.Status.ToString(),
+                .Join(
+                    _context.Users,
 
-                createdAt =
-                    x.s.CreatedAt,
+                    x => x.ct.UserId,
 
-                citizenId =
-                    x.s.CitizenId,
+                    u => u.UserId,
 
-                citizenName =
-                    u.FirstName + " " + u.LastName,
+                    (x, u) => new
+                    {
+                        suggestionId =
+                            x.s.SuggestionId,
 
-                wardId =
-                    x.s.WardId,
+                        suggestionNumber =
+                            x.s.SuggestionNumber,
 
-                categoryName =
-                    x.c.CategoryName,
+                        title =
+                            x.s.Title,
 
-                totalVotes =
-                    x.s.TotalVotes
-            }
-        )
+                        description =
+                            x.s.Description,
 
-        .ToListAsync<object>();
-}
+                        status =
+                            x.s
+                                .SuggestionStatusMaster
+                                .StatusName,
 
+                        createdAt =
+                            x.s.CreatedAt,
+
+                        citizenId =
+                            x.s.CitizenId,
+
+                        citizenName =
+                            u.FirstName +
+                            " " +
+                            u.LastName,
+
+                        wardId =
+                            x.s.WardId,
+
+                        categoryName =
+                            x.c.CategoryName,
+
+                        totalVotes =
+                            x.s.TotalVotes
+                    }
+                )
+
+                .ToListAsync<object>();
+        }
     }
 }

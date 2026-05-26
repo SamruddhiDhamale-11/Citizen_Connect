@@ -80,6 +80,15 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<Officer> Officers
             => Set<Officer>();
 
+
+        public DbSet<WardDepartment> WardDepartments => Set<WardDepartment>();
+
+
+        public DbSet<SuggestionStatusMaster>SuggestionStatusMasters=> Set<SuggestionStatusMaster>();
+
+
+
+        public DbSet<ComplaintStatusMaster>ComplaintStatusMasters=> Set<ComplaintStatusMaster>();
         // =========================================
         // MODEL CONFIGURATION
         // =========================================
@@ -291,6 +300,66 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasIndex(x => x.ComplaintNumber)
                 .IsUnique();
 
+
+            // =========================================
+            // WARD CONFIGURATION
+            // =========================================
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.WardNumber)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.WardName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.AreaName)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.Pincode)
+                .IsRequired()
+                .HasColumnType("char(6)");
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.WardDescription)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.Latitude)
+                .HasColumnType("decimal(9,6)");
+
+            modelBuilder.Entity<Ward>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(9,6)");
+
+            modelBuilder.Entity<Ward>()
+                .HasIndex(x => x.WardNumber)
+                .IsUnique();
+
+
+            // =========================================
+            // DEPARTMENT CONFIGURATION
+            // =========================================
+
+            modelBuilder.Entity<Department>()
+                .Property(x => x.DepartmentName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Department>()
+                .Property(x => x.Description)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Department>()
+                .HasIndex(x => x.DepartmentName)
+                .IsUnique();
+
+
             // =========================================
             // DEPARTMENT CONFIGURATION
             // =========================================
@@ -376,6 +445,87 @@ namespace CitizenConnect.Infrastructure.Data
                 .WithMany(x => x.Localities)
                 .HasForeignKey(x => x.LocalityTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Locality>()
+    .Property(x => x.Latitude)
+    .HasColumnType("decimal(9,6)");
+
+            modelBuilder.Entity<Locality>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(9,6)");
+            // =========================================
+            // WARD <-> DEPARTMENT
+            // MANY TO MANY
+            // =========================================
+
+            modelBuilder.Entity<WardDepartment>()
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.WardDepartments)
+                .HasForeignKey(x => x.WardId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WardDepartment>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.WardDepartments)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            // =========================================
+            // SUGGESTION STATUS MASTER
+            // =========================================
+
+            modelBuilder.Entity<SuggestionStatusMaster>()
+                .Property(x => x.StatusName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<SuggestionStatusMaster>()
+                .Property(x => x.Description)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<SuggestionStatusMaster>()
+                .HasIndex(x => x.StatusName)
+                .IsUnique();
+
+
+
+            modelBuilder.Entity<Suggestion>()
+    .HasOne(x => x.SuggestionStatusMaster)
+    .WithMany(x => x.Suggestions)
+    .HasForeignKey(x => x.SuggestionStatusMasterId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+            // =========================================
+            // COMPLAINT STATUS MASTER
+            // =========================================
+
+            modelBuilder.Entity<ComplaintStatusMaster>()
+                .Property(x => x.StatusName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<ComplaintStatusMaster>()
+                .Property(x => x.Description)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<ComplaintStatusMaster>()
+                .HasIndex(x => x.StatusName)
+                .IsUnique();
+
+            modelBuilder.Entity<Complaint>()
+    .HasOne(x => x.ComplaintStatusMaster)
+    .WithMany(x => x.Complaints)
+    .HasForeignKey(x => x.ComplaintStatusMasterId)
+    .OnDelete(DeleteBehavior.Restrict);
         }
+
+
+
     }
 }

@@ -33,9 +33,10 @@ namespace CitizenConnect.Domain.Entities
 
         public BenefitScope BenefitScope { get; set; }
 
-        public SuggestionStatus Status { get; set; }
-            = SuggestionStatus.Pending;
+        public int SuggestionStatusMasterId { get; set; }
 
+        public SuggestionStatusMaster SuggestionStatusMaster
+        { get; set; } = null!;
         public bool IsAnonymous { get; set; }
 
         public string? AdminRemarks { get; set; }

@@ -9,9 +9,11 @@ namespace CitizenConnect.Domain.Entities
 
         public int ComplaintId { get; set; }
 
-        public ComplaintStatus OldStatus { get; set; }
+        public string OldStatus { get; set; }
+    = string.Empty;
 
-        public ComplaintStatus NewStatus { get; set; }
+        public string NewStatus { get; set; }
+            = string.Empty;
 
         public string? Remarks { get; set; }
 

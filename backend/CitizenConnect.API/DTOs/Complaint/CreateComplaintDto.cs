@@ -20,6 +20,9 @@ namespace CitizenConnect.DTOs.Complaint
 
         public decimal Longitude { get; set; }
 
+        public int ComplaintStatusMasterId
+        { get; set; }
+
         public string Priority { get; set; } = "Medium";
 
         public bool IsAnonymous { get; set; }

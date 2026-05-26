@@ -11,11 +11,11 @@ namespace CitizenConnect.Domain.Entities
 
         public int SuggestionId { get; set; }
 
-        public SuggestionStatus OldStatus
-        { get; set; }
+        public string OldStatus { get; set; }
+     = string.Empty;
 
-        public SuggestionStatus NewStatus
-        { get; set; }
+        public string NewStatus { get; set; }
+            = string.Empty;
 
         public string? Remarks
         { get; set; }

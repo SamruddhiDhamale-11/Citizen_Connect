@@ -31,6 +31,7 @@ namespace CitizenConnect.Services
                 .Include(c => c.Citizen)
                     .ThenInclude(cit => cit.User)
                 .Include(c => c.ComplaintImages)
+                .Include(c => c.ComplaintStatusMaster)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
 
@@ -55,7 +56,7 @@ namespace CitizenConnect.Services
                 Title = c.Title,
                 Description = c.Description ?? string.Empty,
                 Address = c.Address ?? string.Empty,
-                Status = c.Status.ToString(),
+                Status =c.ComplaintStatusMaster?.StatusName?? string.Empty,
                 Priority = c.Priority,
                 CitizenName = c.IsAnonymous
                     ? "Anonymous"
@@ -104,17 +105,44 @@ namespace CitizenConnect.Services
 
 
             // STORE OLD STATUS
-            var oldStatus = complaint.Status;
+            var oldStatus =
+    await _context
+    .ComplaintStatusMasters
+
+    .Where(x =>
+
+        x.ComplaintStatusMasterId ==
+        complaint.ComplaintStatusMasterId
+    )
+
+    .Select(x => x.StatusName)
+
+    .FirstOrDefaultAsync();
 
 
             // UPDATE STATUS
-            complaint.Status = dto.NewStatus;
+            complaint.ComplaintStatusMasterId =
+    dto.ComplaintStatusMasterId;
 
             complaint.Remarks = dto.Remarks;
 
 
             // RESOLVED DATE
-            if (dto.NewStatus.ToString() == "Resolved")
+            var newStatus =
+    await _context
+    .ComplaintStatusMasters
+
+    .Where(x =>
+
+        x.ComplaintStatusMasterId ==
+        dto.ComplaintStatusMasterId
+    )
+
+    .Select(x => x.StatusName)
+
+    .FirstOrDefaultAsync();
+
+            if (newStatus == "Resolved")
             {
                 complaint.ResolvedAt = DateTime.UtcNow;
             }
@@ -125,9 +153,11 @@ namespace CitizenConnect.Services
             {
                 ComplaintId = complaint.ComplaintId,
 
-                OldStatus = oldStatus,
+                OldStatus =
+    oldStatus ?? string.Empty,
 
-                NewStatus = dto.NewStatus,
+                NewStatus =
+    newStatus ?? string.Empty,
 
                 Remarks = dto.Remarks,
 
@@ -175,14 +205,16 @@ namespace CitizenConnect.Services
         }
 
 
-
         public async Task<bool>
-UpdateSuggestionStatusAsync(
-    int suggestionId,
-    UpdateSuggestionStatusDto request)
+            UpdateSuggestionStatusAsync(
+                int suggestionId,
+                UpdateSuggestionStatusDto request)
         {
             var suggestion =
                 await _context.Suggestions
+
+                .Include(x => x.SuggestionStatusMaster)
+
                 .FirstOrDefaultAsync(x =>
 
                     x.SuggestionId ==
@@ -196,12 +228,15 @@ UpdateSuggestionStatusAsync(
 
             /**
              * =====================================
-             * STORE OLD STATUS
+             * STORE OLD STATUS NAME
              * =====================================
              */
 
             var oldStatus =
-                suggestion.Status;
+                suggestion
+                    .SuggestionStatusMaster
+                    .StatusName;
+
 
             /**
              * =====================================
@@ -209,14 +244,36 @@ UpdateSuggestionStatusAsync(
              * =====================================
              */
 
-            suggestion.Status =
-                request.Status;
+            suggestion.SuggestionStatusMasterId =
+                request.SuggestionStatusMasterId;
 
             suggestion.AdminRemarks =
                 request.Remarks;
 
             suggestion.ReviewedAt =
                 DateTime.UtcNow;
+
+
+            /**
+             * =====================================
+             * GET NEW STATUS NAME
+             * =====================================
+             */
+
+            var newStatus =
+                await _context
+                .SuggestionStatusMasters
+
+                .Where(x =>
+
+                    x.SuggestionStatusMasterId ==
+                    request.SuggestionStatusMasterId
+                )
+
+                .Select(x => x.StatusName)
+
+                .FirstOrDefaultAsync();
+
 
             /**
              * =====================================
@@ -234,13 +291,10 @@ UpdateSuggestionStatusAsync(
                         oldStatus,
 
                     NewStatus =
-                        request.Status,
+                        newStatus ?? string.Empty,
 
                     Remarks =
                         request.Remarks,
-
-                    ChangedByUserId =
-                        request.ChangedByUserId,
 
                     ChangedAt =
                         DateTime.UtcNow
@@ -255,13 +309,22 @@ UpdateSuggestionStatusAsync(
             return true;
         }
 
-            ChangedAt =
-                h.ChangedAt
-        })
+        /*    Task<string> IAdminService.UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto)
+            {
+                throw new NotImplementedException();
+            }
 
-        .OrderByDescending(h => h.ChangedAt)
+            Task<List<ComplaintStatusHistoryDto>> IAdminService.GetComplaintHistoryAsync(int complaintId)
+            {
+                throw new NotImplementedException();
+            }
 
-        .ToListAsync();
-}
+            Task<bool> IAdminService.UpdateSuggestionStatusAsync(int suggestionId, UpdateSuggestionStatusDto request)
+            {
+                throw new NotImplementedException();
+
+
+            }
+          */
     }
 }

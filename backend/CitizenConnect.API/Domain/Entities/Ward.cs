@@ -38,5 +38,9 @@ namespace CitizenConnect.Domain.Entities
         public ICollection<Locality> Localities
         { get; set; }
            = new List<Locality>();
+
+        public ICollection<WardDepartment> WardDepartments
+        { get; set; }
+    = new List<WardDepartment>();
     }
 }

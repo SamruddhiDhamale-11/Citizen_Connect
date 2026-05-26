@@ -27,8 +27,11 @@ namespace CitizenConnect.Domain.Entities
 
         public string Priority { get; set; } = "Medium";
 
-        public ComplaintStatus Status { get; set; }
-            = ComplaintStatus.Pending;
+        public int ComplaintStatusMasterId
+        { get; set; }
+
+        public ComplaintStatusMaster ComplaintStatusMaster
+        { get; set; } = null!;
 
         public bool IsAnonymous { get; set; }
 

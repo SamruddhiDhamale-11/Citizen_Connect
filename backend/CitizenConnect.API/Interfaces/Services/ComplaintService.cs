@@ -142,10 +142,10 @@ namespace CitizenConnect.Services
 
                 IsAnonymous = dto.IsAnonymous,
 
-                Status =
-                    officer != null
-                        ? ComplaintStatus.Assigned
-                        : ComplaintStatus.Pending
+                ComplaintStatusMasterId =
+                 officer != null
+                   ? 2
+                   : 1
             };
 
             await _context.Complaints
@@ -213,7 +213,9 @@ namespace CitizenConnect.Services
                     complaint.Address,
 
                 Status =
-                    complaint.Status.ToString(),
+    officer != null
+        ? "Assigned"
+        : "Pending",
 
                 Priority =
                     complaint.Priority,
@@ -267,7 +269,7 @@ namespace CitizenConnect.Services
 
                     Address = c.Address,
 
-                    Status = c.Status.ToString(),
+                    Status = c.ComplaintStatusMaster.ToString(),
 
                     Priority = c.Priority,
 
@@ -306,7 +308,7 @@ namespace CitizenConnect.Services
                 Title = complaint.Title,
                 Description = complaint.Description ?? string.Empty,
                 Address = complaint.Address ?? string.Empty,
-                Status = complaint.Status.ToString(),
+                Status = complaint.ComplaintStatusMaster.ToString(),
                 Priority = complaint.Priority,
                 IsAnonymous = complaint.IsAnonymous,
                 CitizenName = complaint.IsAnonymous

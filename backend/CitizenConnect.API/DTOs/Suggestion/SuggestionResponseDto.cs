@@ -23,9 +23,8 @@ namespace CitizenConnect.Application.DTOs.Suggestion
         { get; set; }
             = string.Empty;
 
-        public SuggestionStatus Status
-        { get; set; }
-
+        public string StatusName { get; set; }
+    = string.Empty;
         public DateTime CreatedDate
         { get; set; }
     }
