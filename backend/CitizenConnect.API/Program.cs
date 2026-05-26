@@ -6,8 +6,19 @@ using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
 using CitizenConnect.API.Configurations;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
+var webRootPath =
+    Path.Combine(
+        Directory.GetCurrentDirectory(),
+        "wwwroot"
+    );
+
+if (!Directory.Exists(webRootPath))
+{
+    Directory.CreateDirectory(webRootPath);
+}
 
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
