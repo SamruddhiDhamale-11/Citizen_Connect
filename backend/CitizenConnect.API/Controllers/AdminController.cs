@@ -1,27 +1,54 @@
 ﻿using CitizenConnect.DTOs.Admin;
 using CitizenConnect.Interfaces.Services;
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace CitizenConnect.Controllers
 {
+    /// <summary>
+    /// AdminController handles all admin operations
+    /// such as managing citizens, complaints, and suggestions.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
 
+        /// <summary>
+        /// Constructor - Injects Admin Service dependency
+        /// </summary>
         public AdminController(
             IAdminService adminService)
         {
             _adminService = adminService;
         }
 
+        // =====================================================
+        // CITIZEN MANAGEMENT
+        // =====================================================
 
-        // =========================================
-        // GET ALL COMPLAINTS
-        // =========================================
+        /// <summary>
+        /// Get all citizens for Admin Dashboard
+        /// </summary>
+        [HttpGet("citizens")]
+        public async Task<IActionResult> GetAllCitizens()
+        {
+            var result = await _adminService.GetAllCitizensAsync();
 
+            return Ok(new
+            {
+                success = true,
+                data = result
+            });
+        }
+
+        // =====================================================
+        // COMPLAINT MANAGEMENT
+        // =====================================================
+
+        /// <summary>
+        /// Get all complaints
+        /// </summary>
         [HttpGet("complaints")]
         public async Task<IActionResult>
             GetAllComplaints()
@@ -33,15 +60,17 @@ namespace CitizenConnect.Controllers
             return Ok(result);
         }
 
+        // =====================================================
+        // COMPLAINT STATUS UPDATE
+        // =====================================================
 
-        // =========================================
-        // UPDATE COMPLAINT STATUS
-        // =========================================
-
+        /// <summary>
+        /// Update complaint status (Pending / InProgress / Resolved)
+        /// </summary>
         [HttpPut("update-status")]
-public async Task<IActionResult>
-    UpdateComplaintStatus(
-        [FromBody] UpdateComplaintStatusDto dto)
+        public async Task<IActionResult>
+            UpdateComplaintStatus(
+                [FromBody] UpdateComplaintStatusDto dto)
         {
             var result =
                 await _adminService
@@ -50,11 +79,13 @@ public async Task<IActionResult>
             return Ok(result);
         }
 
+        // =====================================================
+        // COMPLAINT HISTORY
+        // =====================================================
 
-        // =========================================
-        // GET COMPLAINT HISTORY
-        // =========================================
-
+        /// <summary>
+        /// Get complaint status history for tracking changes
+        /// </summary>
         [HttpGet("complaint-history/{complaintId}")]
         public async Task<IActionResult>
             GetComplaintHistory(int complaintId)
@@ -67,19 +98,19 @@ public async Task<IActionResult>
             return Ok(result);
         }
 
+        // =====================================================
+        // SUGGESTION MANAGEMENT
+        // =====================================================
 
-        //chage the suggession Status.
-
-
-
-        [HttpPut(
-    "suggestions/{suggestionId}/status")]
+        /// <summary>
+        /// Update suggestion status (Reviewed / Approved / Rejected)
+        /// </summary>
+        [HttpPut("suggestions/{suggestionId}/status")]
         public async Task<IActionResult>
-UpdateSuggestionStatus(
-    int suggestionId,
-
-    [FromBody]
-    UpdateSuggestionStatusDto request)
+            UpdateSuggestionStatus(
+                int suggestionId,
+                [FromBody]
+                UpdateSuggestionStatusDto request)
         {
             var result =
                 await _adminService
@@ -90,7 +121,6 @@ UpdateSuggestionStatus(
             return Ok(new
             {
                 success = result,
-
                 message =
                     "Suggestion status updated successfully."
             });

@@ -4,34 +4,15 @@ using CitizenConnect.DTOs.Complaint;
 namespace CitizenConnect.Interfaces.Services
 {
     public interface IAdminService
-    {
-        // =========================================
-        // ALL COMPLAINTS
-        // =========================================
+{
+    Task<List<ComplaintResponseDto>> GetAllComplaintsAsync();
 
-        Task<List<ComplaintResponseDto>>
-            GetAllComplaintsAsync();
+    Task<List<object>> GetAllCitizensAsync();
 
+    Task<string> UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto);
 
-        // =========================================
-        // UPDATE COMPLAINT STATUS
-        // =========================================
+    Task<List<ComplaintStatusHistoryDto>> GetComplaintHistoryAsync(int complaintId);
 
-        Task<string> UpdateComplaintStatusAsync(
-            UpdateComplaintStatusDto dto);
-
-
-        // =========================================
-        // COMPLAINT HISTORY
-        // =========================================
-
-        Task<List<ComplaintStatusHistoryDto>>
-            GetComplaintHistoryAsync(int complaintId);
-
-
-        Task<bool>
-UpdateSuggestionStatusAsync(
-    int suggestionId,
-    UpdateSuggestionStatusDto request);
-    }
+    Task<bool> UpdateSuggestionStatusAsync(int suggestionId, UpdateSuggestionStatusDto request);
+}
 }

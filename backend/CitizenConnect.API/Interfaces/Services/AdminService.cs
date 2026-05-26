@@ -40,6 +40,27 @@ namespace CitizenConnect.Services
                 .ToList();
         }
 
+        // =========================================
+// GET ALL CITIZENS
+// =========================================
+public async Task<List<object>> GetAllCitizensAsync()
+{
+    var citizens = await _context.Citizens
+        .Include(c => c.User)
+        .ToListAsync();
+
+    return citizens.Select(c => new
+    {
+        citizenId = c.CitizenId,
+        firstName = c.User.FirstName,
+        lastName = c.User.LastName,
+        email = c.User.Email,
+        mobile = c.User.MobileNo,
+        wardId = c.WardId,
+        createdAt = c.CreatedAt
+    }).ToList<object>();
+}
+
         private static ComplaintResponseDto MapToComplaintResponseDto(Complaint c)
         {
             var imagePaths = c.ComplaintImages
@@ -308,7 +329,6 @@ namespace CitizenConnect.Services
 
             return true;
         }
-
         /*    Task<string> IAdminService.UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto)
             {
                 throw new NotImplementedException();
@@ -328,3 +348,4 @@ namespace CitizenConnect.Services
           */
     }
 }
+            

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Vj8BArpD6cc=",
+  "dgSpecHash": "f09fKry96cY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Samruddhi\\Desktop\\Cursor CC\\kiro citizen connect - succesfully submitting complaints and suggestions in db\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
+  "projectFilePath": "C:\\Users\\Samruddhi\\Desktop\\GITHUB CITIZEN CONNECT\\kiro citizen connect - succesfully submitting complaints and suggestions in db\\backend\\CitizenConnect.API\\CitizenConnect.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Samruddhi\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\Samruddhi\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
