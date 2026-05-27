@@ -6,6 +6,7 @@ using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
 using CitizenConnect.API.Configurations;
+using CitizenConnect.API.Interfaces.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IOfficerService,OfficerService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();

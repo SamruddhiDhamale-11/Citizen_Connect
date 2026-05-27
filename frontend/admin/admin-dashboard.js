@@ -19,10 +19,17 @@ var COMPLAINT_API_BASE = 'http://localhost:5079/api/Admin';
 var API_ORIGIN = 'http://localhost:5079';
 let adminComplaints = [];
 let adminSuggestions = [];
+let officers = [];
+let departments = [];
+let selectedOfficerId = null;
 var activeComplaintId = null;
 var activeSuggestionId = null;
 var SUGGESTION_API_BASE = 'http://localhost:5079/api/Admin' + '/suggestions';
+const OFFICER_API_BASE =
+  'http://localhost:5079/api/officers';
 
+const DEPARTMENT_API_BASE =
+  'http://localhost:5079/api/departments';
 /* ============================================================
    GLOBAL STATE
    ============================================================ */
@@ -1997,3 +2004,645 @@ function searchCitizens(query) {
 document.addEventListener("DOMContentLoaded", function () {
   loadCitizens();
 });
+
+
+
+function openOfficerModal() {
+
+  selectedOfficerId = null;
+
+  document.getElementById(
+    'officerModalTitle'
+  ).textContent = 'Add Officer';
+
+  document.getElementById(
+    'saveOfficerBtn'
+  ).textContent = 'Save Officer';
+
+  clearOfficerForm();
+
+  document.getElementById(
+    'officerModalOverlay'
+  ).classList.remove('hidden');
+}
+
+/* ============================================================
+   CLOSE MODAL
+   ============================================================ */
+
+function closeOfficerModal() {
+
+  document.getElementById(
+    'officerModalOverlay'
+  ).classList.add('hidden');
+}
+
+/* ============================================================
+   CLEAR FORM
+   ============================================================ */
+
+function clearOfficerForm() {
+
+  document.getElementById(
+    'officerFirstName'
+  ).value = '';
+
+  document.getElementById(
+    'officerLastName'
+  ).value = '';
+
+  document.getElementById(
+    'officerEmail'
+  ).value = '';
+
+  document.getElementById(
+    'officerMobile'
+  ).value = '';
+
+  document.getElementById(
+    'officerDesignation'
+  ).value = '';
+
+  document.getElementById(
+    'officerDepartment'
+  ).value = '';
+
+  document.getElementById(
+    'officerAvailability'
+  ).value = 'true';
+}
+
+/* ============================================================
+   LOAD OFFICERS
+   ============================================================ */
+
+async function loadOfficers() {
+
+  try {
+
+    const response =
+      await fetch(OFFICER_API_BASE);
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Failed to load officers.'
+      );
+    }
+
+    officers =
+      await response.json();
+
+    renderOfficerTable(officers);
+
+  }
+  catch(error) {
+
+    console.error(error);
+
+    showToast(
+      'Unable to load officers.',
+      'error'
+    );
+  }
+}
+
+/* ============================================================
+   RENDER OFFICERS
+   ============================================================ */
+
+function renderOfficerTable(data) {
+
+  const tableBody =
+    document.getElementById(
+      'officerTableBody'
+    );
+
+  if (!tableBody) return;
+
+  if (!data.length) {
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="7">
+
+          <div class="staff-empty">
+
+            <div class="staff-empty-icon">
+              👮
+            </div>
+
+            <div class="staff-empty-title">
+              No Officers Found
+            </div>
+
+          </div>
+
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tableBody.innerHTML = '';
+
+  data.forEach(officer => {
+
+    const statusClass =
+      officer.isAvailable
+        ? 'active'
+        : 'inactive';
+
+    const statusLabel =
+      officer.isAvailable
+        ? 'Available'
+        : 'Unavailable';
+
+    tableBody.innerHTML += `
+
+      <tr>
+
+        <td>${officer.fullName}</td>
+
+        <td>${officer.email}</td>
+
+        <td>${officer.mobileNumber}</td>
+
+        <td>${officer.departmentName}</td>
+
+        <td>${officer.designation}</td>
+
+        <td>
+          <span class="staff-status ${statusClass}">
+            ${statusLabel}
+          </span>
+        </td>
+
+        <td>
+
+          <div class="staff-actions">
+
+            <button class="staff-btn edit"
+                    onclick="editOfficer(${officer.officerId})">
+
+              ✏️
+
+            </button>
+
+            <button class="staff-btn delete"
+                    onclick="deleteOfficer(${officer.officerId})">
+
+              🗑️
+
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+    `;
+  });
+}
+
+/* ============================================================
+   LOAD DEPARTMENTS
+   ============================================================ */
+
+async function loadDepartments() {
+
+  try {
+
+    const response =
+      await fetch(DEPARTMENT_API_BASE);
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Failed to load departments.'
+      );
+    }
+
+    departments =
+      await response.json();
+
+    renderDepartmentDropdowns();
+
+  }
+  catch(error) {
+
+    console.error(error);
+  }
+}
+
+/* ============================================================
+   RENDER DEPARTMENTS
+   ============================================================ */
+
+function renderDepartmentDropdowns() {
+
+  /* =====================================================
+     FORM DROPDOWN
+     ===================================================== */
+
+  const departmentSelect =
+    document.getElementById(
+      'officerDepartment'
+    );
+
+  if (departmentSelect) {
+
+    departmentSelect.innerHTML = `
+      <option value="">
+        Select Department
+      </option>
+    `;
+
+    departments.forEach(department => {
+
+      departmentSelect.innerHTML += `
+        <option value="${department.departmentId}">
+          ${department.departmentName}
+        </option>
+      `;
+    });
+  }
+
+  /* =====================================================
+     FILTER DROPDOWN
+     ===================================================== */
+
+  const filterSelect =
+    document.getElementById(
+      'departmentFilter'
+    );
+
+  if (filterSelect) {
+
+    filterSelect.innerHTML = `
+      <option value="all">
+        All Departments
+      </option>
+    `;
+
+    departments.forEach(department => {
+
+      filterSelect.innerHTML += `
+        <option value="${department.departmentName}">
+          ${department.departmentName}
+        </option>
+      `;
+    });
+  }
+}
+
+
+  /* =====================================================
+     FILTER DROPDOWN
+     ===================================================== */
+
+  const filterSelect =
+    document.getElementById(
+      'departmentFilter'
+    );
+
+  if (filterSelect) {
+
+    filterSelect.innerHTML = `
+      <option value="all">
+        All Departments
+      </option>
+    `;
+
+    departments.forEach(department => {
+
+      filterSelect.innerHTML += `
+        <option value="${department.departmentName}">
+          ${department.departmentName}
+        </option>
+      `;
+    });
+  }
+
+
+
+/* ============================================================
+   SAVE OFFICER
+   ============================================================ */
+
+async function saveOfficer() {
+
+  try {
+
+    const payload = {
+
+      firstName:
+        document.getElementById(
+          'officerFirstName'
+        ).value,
+
+      lastName:
+        document.getElementById(
+          'officerLastName'
+        ).value,
+
+      email:
+        document.getElementById(
+          'officerEmail'
+        ).value,
+
+      mobileNumber:
+        document.getElementById(
+          'officerMobile'
+        ).value,
+
+      designation:
+        document.getElementById(
+          'officerDesignation'
+        ).value,
+
+      departmentId:
+        Number(
+          document.getElementById(
+            'officerDepartment'
+          ).value
+        ),
+
+      isAvailable:
+        document.getElementById(
+          'officerAvailability'
+        ).value === 'true'
+    };
+
+    let response;
+
+    if (selectedOfficerId) {
+
+      response =
+        await fetch(
+          `${OFFICER_API_BASE}/${selectedOfficerId}`,
+          {
+            method: 'PUT',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify(payload)
+          }
+        );
+    }
+    else {
+
+      response =
+        await fetch(
+          OFFICER_API_BASE,
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify(payload)
+          }
+        );
+    }
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Failed to save officer.'
+      );
+    }
+
+    showToast(
+      'Officer saved successfully.',
+      'success'
+    );
+
+    closeOfficerModal();
+
+    loadOfficers();
+
+  }
+  catch(error) {
+
+    console.error(error);
+
+    showToast(
+      'Unable to save officer.',
+      'error'
+    );
+  }
+}
+
+/* ============================================================
+   EDIT OFFICER
+   ============================================================ */
+
+async function editOfficer(id) {
+
+  try {
+
+    const response =
+      await fetch(
+        `${OFFICER_API_BASE}/${id}`
+      );
+
+    const officer =
+      await response.json();
+
+    selectedOfficerId = id;
+
+    const names =
+      officer.fullName.split(' ');
+
+    document.getElementById(
+      'officerFirstName'
+    ).value = names[0];
+
+    document.getElementById(
+      'officerLastName'
+    ).value =
+      names.slice(1).join(' ');
+
+    document.getElementById(
+      'officerEmail'
+    ).value = officer.email;
+
+    document.getElementById(
+      'officerMobile'
+    ).value =
+      officer.mobileNumber;
+
+    document.getElementById(
+      'officerDesignation'
+    ).value =
+      officer.designation;
+
+    document.getElementById(
+      'officerDepartment'
+    ).value =
+      officer.departmentId;
+
+    document.getElementById(
+      'officerAvailability'
+    ).value =
+      String(officer.isAvailable);
+
+    document.getElementById(
+      'officerModalOverlay'
+    ).classList.remove('hidden');
+
+  }
+  catch(error) {
+
+    console.error(error);
+  }
+}
+
+/* ============================================================
+   DELETE OFFICER
+   ============================================================ */
+
+function deleteOfficer(id) {
+
+  showConfirm(
+    'Delete Officer',
+
+    'Are you sure?',
+
+    async function() {
+
+      try {
+
+        const response =
+          await fetch(
+            `${OFFICER_API_BASE}/${id}`,
+            {
+              method: 'DELETE'
+            }
+          );
+
+        if (!response.ok) {
+
+          throw new Error(
+            'Delete failed.'
+          );
+        }
+
+        showToast(
+          'Officer deleted.',
+          'success'
+        );
+
+        loadOfficers();
+
+      }
+      catch(error) {
+
+        console.error(error);
+      }
+    }
+  );
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+function searchOfficers() {
+
+  applyOfficerFilters();
+}
+
+/* ============================================================
+   FILTER
+   ============================================================ */
+
+function filterOfficers() {
+
+  applyOfficerFilters();
+}
+
+/* ============================================================
+   APPLY FILTERS
+   ============================================================ */
+
+function applyOfficerFilters() {
+
+  const search =
+    document.getElementById(
+      'officerSearch'
+    ).value.toLowerCase();
+
+  const department =
+    document.getElementById(
+      'departmentFilter'
+    ).value;
+
+  const status =
+    document.getElementById(
+      'statusFilter'
+    ).value;
+
+  const filtered =
+    officers.filter(officer => {
+
+      const matchesSearch =
+
+        officer.fullName
+          .toLowerCase()
+          .includes(search);
+
+      const matchesDepartment =
+
+        department === 'all'
+
+        ||
+
+        officer.departmentName
+          === department;
+
+      const matchesStatus =
+
+        status === 'all'
+
+        ||
+
+        String(
+          officer.isAvailable
+        ) === status;
+
+      return (
+        matchesSearch
+        &&
+        matchesDepartment
+        &&
+        matchesStatus
+      );
+    });
+
+  renderOfficerTable(filtered);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+window.addEventListener(
+  'load',
+
+  function() {
+
+    loadDepartments();
+
+    loadOfficers();
+  }
+);
