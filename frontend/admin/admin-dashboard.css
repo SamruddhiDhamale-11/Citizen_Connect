@@ -1075,9 +1075,6 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 }
 
 .item-card-footer-left{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
   flex:1;
 }
 
@@ -1093,15 +1090,11 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
   font-weight:600;
   color:var(--red);
   cursor:pointer;
-  width:fit-content;
+  white-space:nowrap;
   transition:0.2s ease;
 }
 
 .complaint-history-link:hover{
   color:var(--red-dark);
   text-decoration:underline;
-}
-
-.priority-pill{
-  align-self:flex-end;
 }

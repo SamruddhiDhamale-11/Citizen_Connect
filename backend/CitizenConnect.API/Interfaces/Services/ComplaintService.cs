@@ -297,6 +297,7 @@ namespace CitizenConnect.Services
     .ThenInclude(cit => cit.User)
 .Include(c => c.ComplaintImages)
 .Include(c => c.ComplaintStatusMaster)
+.Include(c => c.ComplaintStatusHistories)
 
                 .FirstOrDefaultAsync(c =>
 

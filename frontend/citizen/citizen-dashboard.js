@@ -572,7 +572,7 @@ function resetComplaintForm() {
 }
 
 // ---- Submit Suggestion ----
-function submitSuggestion(e) {
+async function submitSuggestion(e) {
   e.preventDefault();
   const errEl = document.getElementById("suggestionError");
   errEl.classList.add("hidden");
@@ -988,3 +988,13 @@ function showToast(icon, msg) {
   toast.classList.remove("hidden");
   setTimeout(function () { toast.classList.add("hidden"); }, 4000);
 }
+
+
+window.showPanel = showPanel;
+window.logout = logout;
+window.toggleSidebar = toggleSidebar;
+window.closeSidebar = closeSidebar;
+window.submitComplaint = submitComplaint;
+window.submitSuggestion = submitSuggestion;
+window.filterItems = filterItems;
+window.searchItems = searchItems;
