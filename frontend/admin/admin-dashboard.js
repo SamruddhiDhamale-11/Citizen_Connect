@@ -25,8 +25,12 @@ let selectedOfficerId = null;
 var activeComplaintId = null;
 var activeSuggestionId = null;
 var SUGGESTION_API_BASE = 'http://localhost:5079/api/Admin' + '/suggestions';
+
 const OFFICER_API_BASE =
   'http://localhost:5079/api/officers';
+
+var adminComplaintsData = [];
+
 
 const DEPARTMENT_API_BASE =
   'http://localhost:5079/api/departments';
@@ -1424,29 +1428,29 @@ function pickComplaintField(obj, camelKey, pascalKey) {
   return val === undefined || val === null ? '' : val;
 }
 
-function mapAdminComplaintToCard(c) {
-  var rawImages = c.images || c.Images || [];
-  if (!Array.isArray(rawImages)) rawImages = [];
-  var imagePath = pickComplaintField(c, 'imageUrl', 'ImageUrl') || rawImages[0] || '';
-  var images = rawImages.length
-    ? rawImages.map(resolveComplaintImageUrl).filter(Boolean)
-    : (imagePath ? [resolveComplaintImageUrl(imagePath)] : []);
+  function mapAdminComplaintToCard(c) {
+    var rawImages = c.images || c.Images || [];
+    if (!Array.isArray(rawImages)) rawImages = [];
+    var imagePath = pickComplaintField(c, 'imageUrl', 'ImageUrl') || rawImages[0] || '';
+    var images = rawImages.length
+      ? rawImages.map(resolveComplaintImageUrl).filter(Boolean)
+      : (imagePath ? [resolveComplaintImageUrl(imagePath)] : []);
 
-  return {
-    complaintId: c.complaintId != null ? c.complaintId : c.ComplaintId,
-    id: pickComplaintField(c, 'complaintNumber', 'ComplaintNumber') || ('CMP-' + (c.complaintId || c.ComplaintId)),
-    title: pickComplaintField(c, 'title', 'Title'),
-    category: pickComplaintField(c, 'categoryName', 'CategoryName'),
-    desc: pickComplaintField(c, 'description', 'Description'),
-    location: pickComplaintField(c, 'address', 'Address'),
-    citizen: pickComplaintField(c, 'citizenName', 'CitizenName') || '—',
-    date: formatComplaintDate(c.createdAt || c.CreatedAt),
-    status: normalizeAdminComplaintStatus(c.status || c.Status),
-    priority: (pickComplaintField(c, 'priority', 'Priority') || 'medium').toLowerCase(),
-    imageUrl: images[0] || '',
-    images: images
-  };
-}
+    return {
+      complaintId: c.complaintId != null ? c.complaintId : c.ComplaintId,
+      id: pickComplaintField(c, 'complaintNumber', 'ComplaintNumber') || ('CMP-' + (c.complaintId || c.ComplaintId)),
+      title: pickComplaintField(c, 'title', 'Title'),
+      category: pickComplaintField(c, 'categoryName', 'CategoryName'),
+      desc: pickComplaintField(c, 'description', 'Description'),
+      location: pickComplaintField(c, 'address', 'Address'),
+      citizen: pickComplaintField(c, 'citizenName', 'CitizenName') || '—',
+      date: formatComplaintDate(c.createdAt || c.CreatedAt),
+      status: normalizeAdminComplaintStatus(c.status || c.Status),
+      priority: (pickComplaintField(c, 'priority', 'Priority') || 'medium').toLowerCase(),
+      imageUrl: images[0] || '',
+      images: images
+    };
+  }
 
 function mapAdminSuggestionToCard(s) {
   return {
@@ -1478,7 +1482,7 @@ function resolveComplaintImageUrl(path) {
   if (!path) return '';
   var p = String(path).trim();
   if (p.indexOf('http://') === 0 || p.indexOf('https://') === 0) return p;
-  if (p.charAt(0) !== '/') p = '/' + p;
+  if (p.charAt(0) !== '/') p = '/' + p; 
   return API_ORIGIN + p;
 }
 
@@ -1517,6 +1521,8 @@ function buildComplaintImagesHtml(complaint) {
 }
 
 function renderAdminComplaints(data) {
+  adminComplaintsData = data;
+  console.log(data[0]);
   var list = document.getElementById('adminComplaintsList');
   if (!list) return;
   if (!data.length) {
@@ -1533,13 +1539,133 @@ function renderAdminComplaints(data) {
       '<div class="item-card-desc">' + escHtml(c.desc || '—') + '</div>' +
       (c.imageUrl ? '<div class="item-card-thumb-wrap"><img class="complaint-card-thumb" src="' + escHtml(c.imageUrl) + '" alt="" /></div>' : '') +
       '<div class="item-card-footer">' +
-        '<span class="item-card-date">' + escHtml(c.date) + '</span>' +
-        '<span class="item-card-date">' + escHtml(c.citizen) + '</span>' +
-        '<span class="item-card-date">' + escHtml(c.location || '—') + '</span>' +
-        '<span class="priority-pill ' + c.priority + '">' + escHtml(c.priority.toUpperCase()) + '</span>' +
-      '</div>' +
+
+  '<div class="item-card-footer-left">' +
+
+    '<div class="item-card-footer-meta">' +
+      '<span class="item-card-date">' + escHtml(c.date) + '</span>' +
+      '<span class="item-card-date">' + escHtml(c.citizen) + '</span>' +
+      '<span class="item-card-date">' + escHtml(c.location || '—') + '</span>' +
+
+      '<span class="priority-pill ' + c.priority + '">' +
+        escHtml(c.priority.toUpperCase()) +
+      '</span>' +
+
+    '</div>' +
+
+  '</div>' +
+
+  '<div class="complaint-history-link" onclick="event.stopPropagation(); openComplaintHistoryPopup(' + c.complaintId + ')">' +
+    'Status History' +
+  '</div>' +
+
+'</div>' +
     '</div>';
   }).join('');
+}
+
+function openComplaintHistoryPopup(complaintId) {
+  
+  var complaint = adminComplaintsData.find(function(c){
+    return c.complaintId === complaintId;
+  });
+
+  if (!complaint) return;
+console.log(Object.keys(complaint));
+  var historyHtml = '';
+ var history =
+  complaint.statusHistory ||
+  complaint.history ||
+  complaint.complaintStatusHistory ||
+  complaint.images ||
+  [];
+
+ if (history.length) {
+  console.log(history);
+
+    historyHtml = history.map(function(h){
+
+     return `
+  <div class="complaint-history-item">
+
+    <strong>
+      ${escHtml(h.oldStatus || h.previousStatus || '—')}
+      →
+      ${escHtml(h.newStatus || h.status || '—')}
+    </strong>
+
+    <div style="margin-top:6px;">
+      ${escHtml(h.updatedBy || h.changedBy || 'Admin')}
+      ·
+      ${formatDate(h.createdAt || h.date || h.updatedAt)}
+    </div>
+
+    <div style="margin-top:6px;">
+      ${escHtml(h.comment || h.notes || h.remark || '—')}
+    </div>
+
+  </div>
+`;
+
+    }).join('');
+
+  } else {
+
+    historyHtml = `
+      <div class="item-empty">
+        No status history found.
+      </div>
+    `;
+  }
+
+  var modal = `
+    <div class="modal-overlay" id="historyModal">
+
+      <div class="modal-card">
+
+        <div class="modal-header">
+          <div class="modal-title">Status History</div>
+
+          <button class="modal-close"
+            onclick="closeHistoryModal()">
+            ✕
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="complaint-history-list">
+            ${historyHtml}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modal);
+} 
+
+function closeHistoryModal() {
+  var modal = document.getElementById('historyModal');
+
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function formatDate(dateString) {
+
+  if (!dateString) return '—';
+
+  var d = new Date(dateString);
+
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+
 }
 
 function filterAdminComplaints(status) {
@@ -1614,15 +1740,12 @@ async function openAdminComplaintDetail(complaintId) {
   '<select id="adminStatusSelect"></select>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
       '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
-    '</div>' +
-    '<div class="modal-section-label">Status History</div>' +
-    '<div class="complaint-history-list" id="adminComplaintHistory"><div class="modal-value">Loading history...</div></div>';
+    '</div>';
 
-  document.getElementById('modalTitle').textContent = 'Complaint Details';
-  document.getElementById('modalBody').innerHTML = bodyHtml;
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  loadComplaintStatuses(complaint.status);
-  loadAdminComplaintHistory(complaintId);
+document.getElementById('modalTitle').textContent = 'Complaint Details';
+document.getElementById('modalBody').innerHTML = bodyHtml;
+document.getElementById('modalOverlay').classList.remove('hidden');
+loadComplaintStatuses(complaint.status);
 }
 
 async function loadComplaintStatuses(selectedStatus) {
@@ -1798,30 +1921,6 @@ async function openAdminSuggestionDetail(suggestionId) {
     .classList.remove('hidden');
 }
 
-async function loadAdminComplaintHistory(complaintId) {
-  var container = document.getElementById('adminComplaintHistory');
-  if (!container) return;
-
-  try {
-    var response = await fetch('http://localhost:5079/api/Admin' + '/complaint-history/' + encodeURIComponent(complaintId));
-    if (!response.ok) throw new Error('History unavailable');
-    var data = await response.json();
-    if (!Array.isArray(data) || !data.length) {
-      container.innerHTML = '<div class="modal-value">No status history yet.</div>';
-      return;
-    }
-    container.innerHTML = data.map(function(h) {
-      return '<div class="complaint-history-item">' +
-        '<strong>' + escHtml(h.oldStatus || '—') + ' → ' + escHtml(h.newStatus || '—') + '</strong><br>' +
-        escHtml(h.changedBy || 'System') + ' · ' + formatComplaintDate(h.changedAt) +
-        (h.remarks ? '<br><span>' + escHtml(h.remarks) + '</span>' : '') +
-      '</div>';
-    }).join('');
-  } catch (_) {
-    container.innerHTML = '<div class="modal-value">Unable to load history.</div>';
-  }
-}
-
 async function submitAdminStatusUpdate() {
   if (!activeComplaintId) return;
 
@@ -1841,11 +1940,10 @@ async function submitAdminStatusUpdate() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        complaintId: activeComplaintId,
-        newStatus: newStatus,
-        changedByUserId: parseInt(userId, 10),
-        remarks: remarks || null
-      })
+  complaintId: activeComplaintId,
+  complaintStatusMasterId: parseInt(newStatus, 10),
+  remarks: remarks || null
+})
     });
 
     if (!response.ok) throw new Error('Update failed');

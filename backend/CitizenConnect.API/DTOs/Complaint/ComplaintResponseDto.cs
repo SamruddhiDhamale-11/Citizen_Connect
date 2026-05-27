@@ -1,4 +1,5 @@
-﻿namespace CitizenConnect.DTOs.Complaint
+﻿using CitizenConnect.DTOs.Admin;
+namespace CitizenConnect.DTOs.Complaint
 {
     public class ComplaintResponseDto
     {
@@ -23,6 +24,9 @@
         public string ImageUrl { get; set; } = string.Empty;
 
         public List<string> Images { get; set; } = new List<string>();
+
+public List<ComplaintStatusHistoryDto> StatusHistory { get; set; }
+    = new();
 
         public DateTime CreatedAt { get; set; }
 

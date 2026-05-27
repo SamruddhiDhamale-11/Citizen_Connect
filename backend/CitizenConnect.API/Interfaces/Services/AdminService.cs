@@ -84,7 +84,19 @@ public async Task<List<object>> GetAllCitizensAsync()
                     : FormatCitizenName(c.Citizen?.User),
                 ImageUrl = imagePaths.FirstOrDefault() ?? string.Empty,
                 Images = imagePaths,
-                CreatedAt = c.CreatedAt
+                CreatedAt = c.CreatedAt,
+
+StatusHistory = c.ComplaintStatusHistories
+    .OrderByDescending(h => h.ChangedAt)
+    .Select(h => new ComplaintStatusHistoryDto
+    {
+        OldStatus = h.OldStatus,
+        NewStatus = h.NewStatus,
+        ChangedBy = "Admin",
+        Remarks = h.Remarks,
+        ChangedAt = h.ChangedAt
+    })
+    .ToList()
             };
         }
 
@@ -149,14 +161,14 @@ var oldStatus = await _context.ComplaintStatusMasters
     .Where(x => x.ComplaintStatusMasterId == complaint.ComplaintStatusMasterId)
     .Select(x => x.StatusName)
     .FirstOrDefaultAsync();
-
+    complaint.ComplaintStatusMasterId = dto.ComplaintStatusMasterId;
             if (newStatus == "Resolved")
             {
                 complaint.ResolvedAt = DateTime.UtcNow;
             }
 
 
-            // SAVE STATUS HISTORY
+            // SAVE STATUS HISTORY  
             var history = new ComplaintStatusHistory
             {
                 ComplaintId = complaint.ComplaintId,
