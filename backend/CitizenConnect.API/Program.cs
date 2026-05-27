@@ -5,9 +5,14 @@ using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
+using CitizenConnect.API.Configurations;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("Cloudinary"));
 // ==============================
 // CONTROLLERS
 // ==============================
@@ -31,11 +36,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
-builder.Services.AddScoped<ICitizenService, CitizenService>();
-
-builder.Services.AddScoped<ICitizenService, CitizenService>();
-
-
 
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();

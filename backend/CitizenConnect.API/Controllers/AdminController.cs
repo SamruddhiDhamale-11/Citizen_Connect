@@ -125,5 +125,20 @@ namespace CitizenConnect.Controllers
                     "Suggestion status updated successfully."
             });
         }
+
+        //get complaints
+        [HttpGet("complaint-statuses")]
+public async Task<IActionResult> GetComplaintStatuses()
+{
+    var result = await _adminService.GetComplaintStatusesAsync();
+
+    return Ok(new
+    {
+        success = true,
+        data = result
+    });
+}
+
+
     }
 }

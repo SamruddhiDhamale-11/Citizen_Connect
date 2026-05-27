@@ -12,6 +12,7 @@ namespace CitizenConnect.Interfaces.Services
     Task<string> UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto);
 
     Task<List<ComplaintStatusHistoryDto>> GetComplaintHistoryAsync(int complaintId);
+    Task<List<ComplaintStatusDto>> GetComplaintStatusesAsync();
 
     Task<bool> UpdateSuggestionStatusAsync(int suggestionId, UpdateSuggestionStatusDto request);
 }
