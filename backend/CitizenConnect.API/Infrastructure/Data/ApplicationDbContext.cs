@@ -12,9 +12,9 @@ namespace CitizenConnect.Infrastructure.Data
         {
         }
 
-        // =========================================
+        // =====================================================
         // DB SETS
-        // =========================================
+        // =====================================================
 
         public DbSet<User> Users => Set<User>();
 
@@ -26,11 +26,14 @@ namespace CitizenConnect.Infrastructure.Data
 
         public DbSet<Ward> Wards => Set<Ward>();
 
-        public DbSet<ResidenceType> ResidenceTypes
-            => Set<ResidenceType>();
+        public DbSet<Jurisdiction> Jurisdictions
+            => Set<Jurisdiction>();
 
         public DbSet<JurisdictionType> JurisdictionTypes
             => Set<JurisdictionType>();
+
+        public DbSet<ResidenceType> ResidenceTypes
+            => Set<ResidenceType>();
 
         public DbSet<Complaint> Complaints
             => Set<Complaint>();
@@ -65,14 +68,10 @@ namespace CitizenConnect.Infrastructure.Data
                 => Set<SuggestionStatusHistory>();
 
         public DbSet<Locality> Localities
-    => Set<Locality>();
+            => Set<Locality>();
 
         public DbSet<LocalityType> LocalityTypes
             => Set<LocalityType>();
-
-        // =========================================
-        // NEW MODULES
-        // =========================================
 
         public DbSet<Department> Departments
             => Set<Department>();
@@ -80,27 +79,42 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<Officer> Officers
             => Set<Officer>();
 
+        public DbSet<WardDepartment> WardDepartments
+            => Set<WardDepartment>();
 
-        public DbSet<WardDepartment> WardDepartments => Set<WardDepartment>();
+        public DbSet<SuggestionStatusMaster>
+            SuggestionStatusMasters
+                => Set<SuggestionStatusMaster>();
 
+        public DbSet<ComplaintStatusMaster>
+            ComplaintStatusMasters
+                => Set<ComplaintStatusMaster>();
 
-        public DbSet<SuggestionStatusMaster>SuggestionStatusMasters=> Set<SuggestionStatusMaster>();
+        // =====================================================
+        // DYNAMIC FACILITY SYSTEM
+        // =====================================================
 
+        public DbSet<FacilityModule> FacilityModules
+            => Set<FacilityModule>();
 
+        public DbSet<FacilityField> FacilityFields
+            => Set<FacilityField>();
 
-        public DbSet<ComplaintStatusMaster>ComplaintStatusMasters=> Set<ComplaintStatusMaster>();
-        // =========================================
+        public DbSet<FacilityData> FacilityDatas
+            => Set<FacilityData>();
+
+        // =====================================================
         // MODEL CONFIGURATION
-        // =========================================
+        // =====================================================
 
         protected override void OnModelCreating(
             ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // =========================================
+            // =====================================================
             // USER -> ROLE
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<User>()
                 .HasOne(x => x.Role)
@@ -108,9 +122,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // CITIZEN -> USER
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Citizen>()
                 .HasOne(x => x.User)
@@ -118,9 +132,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey<Citizen>(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // POLITICIAN -> USER
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Politician>()
                 .HasOne(x => x.User)
@@ -128,9 +142,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey<Politician>(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // CITIZEN -> WARD
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Citizen>()
                 .HasOne(x => x.Ward)
@@ -138,9 +152,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.WardId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // CITIZEN -> RESIDENCE TYPE
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Citizen>()
                 .HasOne(x => x.ResidenceType)
@@ -148,9 +162,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.ResidenceTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // POLITICIAN -> WARD
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Politician>()
                 .HasOne(x => x.Ward)
@@ -159,29 +173,39 @@ namespace CitizenConnect.Infrastructure.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // POLITICIAN -> JURISDICTION TYPE
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Politician>()
                 .HasOne(x => x.JurisdictionType)
-                .WithMany(x => x.Politicians)
+                .WithMany()
                 .HasForeignKey(x => x.JurisdictionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
-            // WARD -> JURISDICTION TYPE
-            // =========================================
+            // =====================================================
+            // JURISDICTION -> JURISDICTION TYPE
+            // =====================================================
+
+            modelBuilder.Entity<Jurisdiction>()
+                .HasOne(j => j.JurisdictionType)
+                .WithMany(jt => jt.Jurisdictions)
+                .HasForeignKey(j => j.JurisdictionTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // WARD -> JURISDICTION
+            // =====================================================
 
             modelBuilder.Entity<Ward>()
-                .HasOne(x => x.JurisdictionType)
-                .WithMany(x => x.Wards)
-                .HasForeignKey(x => x.JurisdictionTypeId)
+                .HasOne(w => w.Jurisdiction)
+                .WithMany(j => j.Wards)
+                .HasForeignKey(w => w.JurisdictionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // COMPLAINT -> CITIZEN
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Complaint>()
                 .HasOne(x => x.Citizen)
@@ -189,9 +213,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.CitizenId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // COMPLAINT -> WARD
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Complaint>()
                 .HasOne(x => x.Ward)
@@ -199,9 +223,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.WardId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // COMPLAINT -> CATEGORY
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Complaint>()
                 .HasOne(x => x.ComplaintCategory)
@@ -209,9 +233,29 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.ComplaintCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
+            // COMPLAINT -> DEPARTMENT
+            // =====================================================
+
+            modelBuilder.Entity<Complaint>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // COMPLAINT -> ASSIGNED OFFICER
+            // =====================================================
+
+            modelBuilder.Entity<Complaint>()
+                .HasOne(x => x.AssignedOfficer)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.AssignedOfficerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
             // COMPLAINT IMAGE -> COMPLAINT
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<ComplaintImage>()
                 .HasOne(x => x.Complaint)
@@ -219,9 +263,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.ComplaintId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
             // COMPLAINT STATUS HISTORY
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<ComplaintStatusHistory>()
                 .HasOne(x => x.Complaint)
@@ -229,24 +273,123 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.ComplaintId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
-            // SUGGESTION VOTE
-            // =========================================
+            // =====================================================
+            // LOCALITY -> WARD
+            // =====================================================
 
-            modelBuilder.Entity<SuggestionVote>()
-                .HasOne(x => x.Citizen)
-                .WithMany()
-                .HasForeignKey(x => x.CitizenId)
+            modelBuilder.Entity<Locality>()
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.Localities)
+                .HasForeignKey(x => x.WardId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
-            // SUGGESTION STATUS HISTORY
-            // =========================================
+            // =====================================================
+            // LOCALITY -> LOCALITY TYPE
+            // =====================================================
 
+            modelBuilder.Entity<Locality>()
+                .HasOne(x => x.LocalityType)
+                .WithMany(x => x.Localities)
+                .HasForeignKey(x => x.LocalityTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // =========================================
+            // =====================================================
+            // OFFICER -> DEPARTMENT
+            // =====================================================
+
+            modelBuilder.Entity<Officer>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.Officers)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // COMPLAINT CATEGORY -> DEPARTMENT
+            // =====================================================
+
+            modelBuilder.Entity<ComplaintCategory>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.ComplaintCategories)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // WARD DEPARTMENT
+            // =====================================================
+
+            modelBuilder.Entity<WardDepartment>()
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.WardDepartments)
+                .HasForeignKey(x => x.WardId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WardDepartment>()
+                .HasOne(x => x.Department)
+                .WithMany(x => x.WardDepartments)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // SUGGESTION STATUS MASTER
+            // =====================================================
+
+            modelBuilder.Entity<SuggestionStatusMaster>()
+                .HasIndex(x => x.StatusName)
+                .IsUnique();
+
+            modelBuilder.Entity<Suggestion>()
+                .HasOne(x => x.SuggestionStatusMaster)
+                .WithMany(x => x.Suggestions)
+                .HasForeignKey(x => x.SuggestionStatusMasterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // COMPLAINT STATUS MASTER
+            // =====================================================
+
+            modelBuilder.Entity<ComplaintStatusMaster>()
+                .HasIndex(x => x.StatusName)
+                .IsUnique();
+
+            modelBuilder.Entity<Complaint>()
+                .HasOne(x => x.ComplaintStatusMaster)
+                .WithMany(x => x.Complaints)
+                .HasForeignKey(x => x.ComplaintStatusMasterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // FACILITY MODULE -> FACILITY FIELD
+            // =====================================================
+
+            modelBuilder.Entity<FacilityField>()
+                .HasOne(f => f.FacilityModule)
+                .WithMany(m => m.FacilityFields)
+                .HasForeignKey(f => f.FacilityModuleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // =====================================================
+            // FACILITY DATA -> JURISDICTION
+            // =====================================================
+
+            modelBuilder.Entity<FacilityData>()
+                .HasOne(f => f.Jurisdiction)
+                .WithMany()
+                .HasForeignKey(f => f.JurisdictionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // FACILITY DATA -> WARD
+            // =====================================================
+
+            modelBuilder.Entity<FacilityData>()
+                .HasOne(f => f.Ward)
+                .WithMany()
+                .HasForeignKey(f => f.WardId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
             // UNIQUE CONSTRAINTS
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<User>()
                 .HasIndex(x => x.Email)
@@ -260,9 +403,17 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasIndex(x => x.DepartmentName)
                 .IsUnique();
 
-            // =========================================
-            // COLUMN CONFIGURATIONS
-            // =========================================
+            modelBuilder.Entity<Ward>()
+                .HasIndex(x => x.WardNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<Complaint>()
+                .HasIndex(x => x.ComplaintNumber)
+                .IsUnique();
+
+            // =====================================================
+            // USER CONFIGURATION
+            // =====================================================
 
             modelBuilder.Entity<User>()
                 .Property(x => x.FirstName)
@@ -280,30 +431,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .Property(x => x.Email)
                 .HasMaxLength(150);
 
-            modelBuilder.Entity<Ward>()
-                .Property(x => x.Latitude)
-                .HasColumnType("decimal(18,6)");
-
-            modelBuilder.Entity<Ward>()
-                .Property(x => x.Longitude)
-                .HasColumnType("decimal(18,6)");
-
-            modelBuilder.Entity<Complaint>()
-                .Property(x => x.Latitude)
-                .HasColumnType("decimal(18,6)");
-
-            modelBuilder.Entity<Complaint>()
-                .Property(x => x.Longitude)
-                .HasColumnType("decimal(18,6)");
-
-            modelBuilder.Entity<Complaint>()
-                .HasIndex(x => x.ComplaintNumber)
-                .IsUnique();
-
-
-            // =========================================
+            // =====================================================
             // WARD CONFIGURATION
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Ward>()
                 .Property(x => x.WardNumber)
@@ -337,14 +467,33 @@ namespace CitizenConnect.Infrastructure.Data
                 .Property(x => x.Longitude)
                 .HasColumnType("decimal(9,6)");
 
-            modelBuilder.Entity<Ward>()
-                .HasIndex(x => x.WardNumber)
-                .IsUnique();
+            // =====================================================
+            // LOCALITY CONFIGURATION
+            // =====================================================
 
+            modelBuilder.Entity<Locality>()
+                .Property(x => x.Latitude)
+                .HasColumnType("decimal(9,6)");
 
-            // =========================================
+            modelBuilder.Entity<Locality>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(9,6)");
+
+            // =====================================================
+            // COMPLAINT LOCATION CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<Complaint>()
+                .Property(x => x.Latitude)
+                .HasColumnType("decimal(9,6)");
+
+            modelBuilder.Entity<Complaint>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(9,6)");
+
+            // =====================================================
             // DEPARTMENT CONFIGURATION
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Department>()
                 .Property(x => x.DepartmentName)
@@ -355,33 +504,9 @@ namespace CitizenConnect.Infrastructure.Data
                 .Property(x => x.Description)
                 .HasMaxLength(500);
 
-            modelBuilder.Entity<Department>()
-                .HasIndex(x => x.DepartmentName)
-                .IsUnique();
-
-
-            // =========================================
-            // DEPARTMENT CONFIGURATION
-            // =========================================
-
-            modelBuilder.Entity<Department>()
-                .Property(x => x.DepartmentName)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            // =========================================
-            // COMPLAINT CATEGORY -> DEPARTMENT
-            // =========================================
-
-            modelBuilder.Entity<ComplaintCategory>()
-                .HasOne(x => x.Department)
-                .WithMany(x => x.ComplaintCategories)
-                .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =========================================
+            // =====================================================
             // OFFICER CONFIGURATION
-            // =========================================
+            // =====================================================
 
             modelBuilder.Entity<Officer>()
                 .Property(x => x.FirstName)
@@ -402,130 +527,6 @@ namespace CitizenConnect.Infrastructure.Data
                 .Property(x => x.MobileNumber)
                 .IsRequired()
                 .HasMaxLength(15);
-
-            // =========================================
-            // OFFICER -> DEPARTMENT
-            // =========================================
-
-            modelBuilder.Entity<Officer>()
-                .HasOne(x => x.Department)
-                .WithMany(x => x.Officers)
-                .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =========================================
-            // COMPLAINT -> DEPARTMENT
-            // =========================================
-
-            modelBuilder.Entity<Complaint>()
-                .HasOne(x => x.Department)
-                .WithMany(x => x.Complaints)
-                .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =========================================
-            // COMPLAINT -> ASSIGNED OFFICER
-            // =========================================
-
-            modelBuilder.Entity<Complaint>()
-                .HasOne(x => x.AssignedOfficer)
-                .WithMany(x => x.Complaints)
-                .HasForeignKey(x => x.AssignedOfficerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-            modelBuilder.Entity<Locality>()
-    .HasOne(x => x.Ward)
-    .WithMany(x => x.Localities)
-    .HasForeignKey(x => x.WardId)
-    .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Locality>()
-                .HasOne(x => x.LocalityType)
-                .WithMany(x => x.Localities)
-                .HasForeignKey(x => x.LocalityTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-            modelBuilder.Entity<Locality>()
-    .Property(x => x.Latitude)
-    .HasColumnType("decimal(9,6)");
-
-            modelBuilder.Entity<Locality>()
-                .Property(x => x.Longitude)
-                .HasColumnType("decimal(9,6)");
-            // =========================================
-            // WARD <-> DEPARTMENT
-            // MANY TO MANY
-            // =========================================
-
-            modelBuilder.Entity<WardDepartment>()
-                .HasOne(x => x.Ward)
-                .WithMany(x => x.WardDepartments)
-                .HasForeignKey(x => x.WardId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<WardDepartment>()
-                .HasOne(x => x.Department)
-                .WithMany(x => x.WardDepartments)
-                .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-
-            // =========================================
-            // SUGGESTION STATUS MASTER
-            // =========================================
-
-            modelBuilder.Entity<SuggestionStatusMaster>()
-                .Property(x => x.StatusName)
-                .IsRequired()
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<SuggestionStatusMaster>()
-                .Property(x => x.Description)
-                .HasMaxLength(250);
-
-            modelBuilder.Entity<SuggestionStatusMaster>()
-                .HasIndex(x => x.StatusName)
-                .IsUnique();
-
-
-
-            modelBuilder.Entity<Suggestion>()
-    .HasOne(x => x.SuggestionStatusMaster)
-    .WithMany(x => x.Suggestions)
-    .HasForeignKey(x => x.SuggestionStatusMasterId)
-    .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
-            // =========================================
-            // COMPLAINT STATUS MASTER
-            // =========================================
-
-            modelBuilder.Entity<ComplaintStatusMaster>()
-                .Property(x => x.StatusName)
-                .IsRequired()
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<ComplaintStatusMaster>()
-                .Property(x => x.Description)
-                .HasMaxLength(250);
-
-            modelBuilder.Entity<ComplaintStatusMaster>()
-                .HasIndex(x => x.StatusName)
-                .IsUnique();
-
-            modelBuilder.Entity<Complaint>()
-    .HasOne(x => x.ComplaintStatusMaster)
-    .WithMany(x => x.Complaints)
-    .HasForeignKey(x => x.ComplaintStatusMasterId)
-    .OnDelete(DeleteBehavior.Restrict);
         }
-
-
-
     }
 }

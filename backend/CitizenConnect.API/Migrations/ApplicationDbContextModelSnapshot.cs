@@ -70,7 +70,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("Localities");
+                    b.ToTable("Localities", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Citizen", b =>
@@ -119,7 +119,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("Citizens");
+                    b.ToTable("Citizens", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Complaint", b =>
@@ -217,7 +217,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("Complaints");
+                    b.ToTable("Complaints", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintImage", b =>
@@ -254,7 +254,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("ComplaintId");
 
-                    b.ToTable("ComplaintImages");
+                    b.ToTable("ComplaintImages", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusHistory", b =>
@@ -295,7 +295,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("ComplaintId");
 
-                    b.ToTable("ComplaintStatusHistories");
+                    b.ToTable("ComplaintStatusHistories", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.ComplaintStatusMaster", b =>
@@ -332,7 +332,7 @@ namespace CitizenConnect.API.Migrations
                     b.HasIndex("StatusName")
                         .IsUnique();
 
-                    b.ToTable("ComplaintStatusMasters");
+                    b.ToTable("ComplaintStatusMasters", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Department", b =>
@@ -366,7 +366,7 @@ namespace CitizenConnect.API.Migrations
                     b.HasIndex("DepartmentName")
                         .IsUnique();
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.JurisdictionType", b =>
@@ -395,7 +395,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasKey("JurisdictionTypeId");
 
-                    b.ToTable("JurisdictionTypes");
+                    b.ToTable("JurisdictionTypes", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.LocalityType", b =>
@@ -424,7 +424,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasKey("LocalityTypeId");
 
-                    b.ToTable("LocalityTypes");
+                    b.ToTable("LocalityTypes", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Officer", b =>
@@ -478,7 +478,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Officers");
+                    b.ToTable("Officers", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Politician", b =>
@@ -557,7 +557,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("Politicians");
+                    b.ToTable("Politicians", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.ResidenceType", b =>
@@ -583,7 +583,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasKey("ResidenceTypeId");
 
-                    b.ToTable("ResidenceTypes");
+                    b.ToTable("ResidenceTypes", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Role", b =>
@@ -612,7 +612,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Suggestion", b =>
@@ -685,7 +685,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("Suggestions");
+                    b.ToTable("Suggestions", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.SuggestionAttachment", b =>
@@ -726,7 +726,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("SuggestionId");
 
-                    b.ToTable("SuggestionAttachments");
+                    b.ToTable("SuggestionAttachments", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.SuggestionCategory", b =>
@@ -755,7 +755,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasKey("SuggestionCategoryId");
 
-                    b.ToTable("SuggestionCategories");
+                    b.ToTable("SuggestionCategories", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.SuggestionStatusHistory", b =>
@@ -796,7 +796,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("SuggestionId");
 
-                    b.ToTable("SuggestionStatusHistories");
+                    b.ToTable("SuggestionStatusHistories", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.SuggestionStatusMaster", b =>
@@ -833,7 +833,7 @@ namespace CitizenConnect.API.Migrations
                     b.HasIndex("StatusName")
                         .IsUnique();
 
-                    b.ToTable("SuggestionStatusMasters");
+                    b.ToTable("SuggestionStatusMasters", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.SuggestionVote", b =>
@@ -868,7 +868,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("SuggestionId");
 
-                    b.ToTable("SuggestionVotes");
+                    b.ToTable("SuggestionVotes", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.User", b =>
@@ -942,7 +942,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.Ward", b =>
@@ -1001,7 +1001,7 @@ namespace CitizenConnect.API.Migrations
                     b.HasIndex("WardNumber")
                         .IsUnique();
 
-                    b.ToTable("Wards");
+                    b.ToTable("Wards", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.Domain.Entities.WardDepartment", b =>
@@ -1027,7 +1027,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("WardDepartments");
+                    b.ToTable("WardDepartments", (string)null);
                 });
 
             modelBuilder.Entity("ComplaintCategory", b =>
@@ -1064,7 +1064,7 @@ namespace CitizenConnect.API.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("ComplaintCategories");
+                    b.ToTable("ComplaintCategories", (string)null);
                 });
 
             modelBuilder.Entity("CitizenConnect.API.Domain.Entities.Locality", b =>

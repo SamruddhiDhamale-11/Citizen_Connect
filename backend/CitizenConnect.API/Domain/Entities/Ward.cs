@@ -15,16 +15,17 @@ namespace CitizenConnect.Domain.Entities
 
         public string Pincode { get; set; } = string.Empty;
 
-        public int JurisdictionTypeId { get; set; }
-
         public string? WardDescription { get; set; }
 
         public decimal Latitude { get; set; }
 
         public decimal Longitude { get; set; }
 
+        public int JurisdictionId { get; set; }
+
         // Navigation
-        public JurisdictionType JurisdictionType { get; set; } = null!;
+        public Jurisdiction Jurisdiction
+        { get; set; } = null!;
 
         public ICollection<Citizen> Citizens { get; set; }
             = new List<Citizen>();
