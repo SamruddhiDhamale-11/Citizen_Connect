@@ -13,21 +13,17 @@ const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
 
 // ---- Init ----
 document.addEventListener("DOMContentLoaded", function () {
+
   if (!requireCitizenSession()) return;
+
   setDate();
   setupCharCounters();
   loadComplaintCategories();
-
   loadSuggestionCategories();
-  loadCitizenProfile().then(function () {
-    return loadCitizenComplaints();
-  });
-  loadCitizenSuggestions();
 
   loadCitizenProfile().then(function () {
     return loadCitizenComplaints();
   });
-  renderSuggestions(SUGGESTIONS);
 
 });
 
@@ -812,7 +808,7 @@ async function submitSuggestion(e) {
     description: desc,
     expectedBenefit: benefit,
     benefitScope: benefitScope,
-    isAnonymous: false
+    isAnonymous: document.getElementById("suggestionAnon")?.checked ?? false,
   };
 
   try {

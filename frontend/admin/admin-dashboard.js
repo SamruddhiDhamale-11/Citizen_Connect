@@ -1267,99 +1267,83 @@ function getSuggestionStatusText(status) {
 function renderAdminSuggestions(data) {
 
   var list = document.getElementById('adminSuggestionsList');
-
   if (!list) return;
 
-  if (!data.length) {
+  let html = '';
 
-    list.innerHTML =
-      '<div class="item-empty">' +
-        '<div class="item-empty-icon">&#x1F4A1;</div>' +
-        '<div>No suggestions found.</div>' +
-      '</div>';
+  data.forEach(function(s) {
 
-    return;
-  }
+    html += `
+      <div class="item-card"
+           data-suggestion-id="${s.suggestionId}"
+           onclick="openAdminSuggestionDetail('${s.suggestionId}')">
 
-  list.innerHTML = data.map(function(s) {
+        <div class="item-card-top">
 
-    let statusClass = '';
+          <div>
+            <div class="item-card-title">${s.title || 'No Title'}</div>
 
-    const status = String(s.status).toLowerCase();
+            <div class="item-card-cat">
+              ${s.categoryName || 'General'} &nbsp;&nbsp;
+              ${s.suggestionNumber || ('SUG-' + s.suggestionId)}
+            </div>
+          </div>
 
-    if (status === '1' || status === 'pending')
-      statusClass = 'pending';
+          <span class="status-pill pending">
+            ${s.status}
+          </span>
 
-    else if (status === '2' || status === 'approved')
-      statusClass = 'resolved';
+        </div>
 
-    else if (status === '3' || status === 'rejected')
-      statusClass = 'rejected';
+        <div class="item-card-desc">
+          ${s.description || '—'}
+        </div>
 
-    return (
+        <div class="item-card-footer">
 
-      '<div class="item-card" ' +
-        'data-suggestion-id="' + s.suggestionId + '" ' +
-        'onclick="openAdminSuggestionDetail(' + s.suggestionId + ')">' +
+          <div class="item-card-footer-meta">
+           <span class="item-card-date">
+  ${formatDateDMY(s.createdAt || s.createdDate)}
+</span>
+            <span class="item-card-date">${s.citizenName || '—'}</span>
+            <span class="item-card-date">${s.address || '—'}</span>
+            <span class="item-card-date">Votes: ${s.totalVotes || 0}</span>
+          </div>
 
-          '<div class="item-card-top">' +
+          <div class="complaint-history-link"
+               onclick="event.stopPropagation(); openComplaintHistoryPopup('${s.suggestionId}')">
+            Status History
+          </div>
 
-            '<div>' +
+        </div>
 
-              '<div class="item-card-title">' +
-                escHtml(s.title || 'No Title') +
-              '</div>' +
+      </div>
+    `;
 
-              '<div class="item-card-cat">' +
-                escHtml(s.categoryName || 'General') +
-                ' &nbsp;&nbsp; ' +
-                escHtml(
-                  s.suggestionNumber ||
-                  ('SUG-' + s.suggestionId)
-                ) +
-              '</div>' +
+  });
 
-            '</div>' +
+  list.innerHTML = html;
 
-            '<span class="status-pill ' + statusClass + '">' +
-              escHtml(getSuggestionStatusText(s.status)) +
-            '</span>' +
+}
 
-          '</div>' +
+function formatDateDMY(dateInput) {
 
-          '<div class="item-card-desc">' +
-            escHtml(s.description || '—') +
-          '</div>' +
+  if (!dateInput) return '—';
 
-          '<div class="item-card-footer">' +
+  const date = new Date(dateInput);
 
-            '<span class="item-card-date">' +
-              escHtml(
-                formatComplaintDate(
-                  s.createdAt || s.createdDate
-                )
-              ) +
-            '</span>' +
+  if (isNaN(date.getTime())) return '—';
 
-            '<span class="item-card-date">' +
-              escHtml(s.citizenName || '—') +
-            '</span>' +
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
 
-            '<span class="item-card-date">' +
-              escHtml(s.address || '—') +
-            '</span>' +
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
 
-            '<span class="item-card-date">' +
-              'Votes: ' + escHtml(String(s.totalVotes || 0)) +
-            '</span>' +
-
-          '</div>' +
-
-      '</div>'
-
-    );
-
-  }).join('');
+  return day + ' ' + month + ' ' + year;
 }
 
 function viewSuggestion(id) {
@@ -1530,7 +1514,7 @@ function renderAdminComplaints(data) {
     return;
   }
   list.innerHTML = data.map(function(c) {
-    return '<div class="item-card" data-complaint-id="' + c.complaintId + '" data-status="' + c.status + '" data-title="' + escHtml(c.title).toLowerCase() + '" data-citizen="' + escHtml(c.citizen).toLowerCase() + '" onclick="openAdminComplaintDetail(' + c.complaintId + ')">' +
+    return '<div class="item-card" data-complaint-id="' + c.complaintId + '" data-status="' + c.status + '" data-title="' + escHtml(c.title).toLowerCase() + '" data-citizen="' + escHtml(c.citizen).toLowerCase() + '" onclick="openAdminComplaintDetail(event, ' + c.complaintId + ')">' +
       '<div class="item-card-top">' +
         '<div><div class="item-card-title">' + escHtml(c.title) + '</div>' +
         '<div class="item-card-cat">' + escHtml(c.category) + ' &nbsp;&nbsp; ' + escHtml(c.id) + '</div></div>' +
@@ -1538,10 +1522,9 @@ function renderAdminComplaints(data) {
       '</div>' +
       '<div class="item-card-desc">' + escHtml(c.desc || '—') + '</div>' +
       (c.imageUrl ? '<div class="item-card-thumb-wrap"><img class="complaint-card-thumb" src="' + escHtml(c.imageUrl) + '" alt="" /></div>' : '') +
-      '<div class="item-card-footer">' +
 
+  '<div class="item-card-footer">' +
   '<div class="item-card-footer-left">' +
-
     '<div class="item-card-footer-meta">' +
       '<span class="item-card-date">' + escHtml(c.date) + '</span>' +
       '<span class="item-card-date">' + escHtml(c.citizen) + '</span>' +
@@ -1559,8 +1542,7 @@ function renderAdminComplaints(data) {
     'Status History' +
   '</div>' +
 
-'</div>' +
-    '</div>';
+'</div></div></div>'
   }).join('');
 }
 
@@ -1691,7 +1673,8 @@ function applyAdminComplaintFilters() {
   });
 }
 
-async function openAdminComplaintDetail(complaintId) {
+async function openAdminComplaintDetail(event, complaintId) {
+  if (event) event.stopPropagation();
   var complaint = adminComplaints.find(function(c) { return c.complaintId === complaintId; });
   if (!complaint) return;
 
