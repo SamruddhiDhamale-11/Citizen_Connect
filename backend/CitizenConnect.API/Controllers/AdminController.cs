@@ -1,6 +1,9 @@
 ﻿using CitizenConnect.DTOs.Admin;
 using CitizenConnect.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using CitizenConnect.Infrastructure.Data;
+using CitizenConnect.Application.Interfaces.Services;
 
 namespace CitizenConnect.Controllers
 {
@@ -13,15 +16,18 @@ namespace CitizenConnect.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
+        private readonly ApplicationDbContext _context;
 
         /// <summary>
         /// Constructor - Injects Admin Service dependency
         /// </summary>
         public AdminController(
-            IAdminService adminService)
-        {
-            _adminService = adminService;
-        }
+    IAdminService adminService,
+    ApplicationDbContext context)
+{
+    _adminService = adminService;
+    _context = context;
+}
 
         // =====================================================
         // CITIZEN MANAGEMENT
@@ -126,7 +132,7 @@ namespace CitizenConnect.Controllers
             });
         }
 
-        //get complaints
+        //get complaints dropdown
         [HttpGet("complaint-statuses")]
 public async Task<IActionResult> GetComplaintStatuses()
 {
@@ -139,6 +145,38 @@ public async Task<IActionResult> GetComplaintStatuses()
     });
 }
 
+    //get suggestions dropdown
+    [HttpGet("statuses")]
+public async Task<IActionResult> GetSuggestionStatuses()
+{
+    try
+    {
+        var statuses = await _context
+            .SuggestionStatusMasters
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.DisplayOrder)
+            .Select(x => new
+            {
+                suggestionStatusMasterId = x.SuggestionStatusMasterId,
+                statusName = x.StatusName
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            success = true,
+            data = statuses
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
+}
 
     }
 }

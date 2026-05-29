@@ -3,6 +3,7 @@ using CitizenConnect.Domain.Entities;
 using CitizenConnect.DTOs.Complaint;
 using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Interfaces.Services;
+using CitizenConnect.Application.Interfaces.Services;
 
 using Microsoft.EntityFrameworkCore;
 

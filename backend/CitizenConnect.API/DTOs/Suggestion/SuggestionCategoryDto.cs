@@ -1,4 +1,4 @@
-namespace CitizenConnect.Application.DTOs.Suggestion
+namespace CitizenConnect.API.DTOs.Suggestion
 {
     public class SuggestionCategoryDto
     {
