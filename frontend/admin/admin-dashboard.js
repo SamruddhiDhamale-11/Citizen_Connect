@@ -1276,7 +1276,16 @@ function renderAdminSuggestions(data) {
 
   var list = document.getElementById('adminSuggestionsList');
   if (!list) return;
+if (!data || data.length === 0) {
 
+  list.innerHTML = `
+    <div class="empty-state">
+      No suggestions found.
+    </div>
+  `;
+
+  return;
+}
   let html = '';
 
   data.forEach(function(s) {
@@ -1322,10 +1331,14 @@ function renderAdminSuggestions(data) {
             <span class="item-card-date">Votes: ${s.totalVotes || 0}</span>
           </div>
 
-          <div class="complaint-history-link"
-               onclick="event.stopPropagation(); openComplaintHistoryPopup('${s.suggestionId}')">
-            Status History
-          </div>
+        <div class="complaint-history-link"
+     onclick="event.stopPropagation(); openSuggestionHistoryPopup('${s.suggestionId}')">
+  Status History
+</div>
+
+<div id="history-${s.suggestionId}" class="inline-history-box" style="display:none;">
+  <div class="modal-value">Click to load history...</div>
+</div>
 
         </div>
 
@@ -1335,7 +1348,48 @@ function renderAdminSuggestions(data) {
   });
 
   list.innerHTML = html;
+}
 
+function openSuggestionHistoryPopup(suggestionId) {
+
+  const suggestion = allSuggestions.find(function(s) {
+    return String(s.suggestionId) === String(suggestionId);
+  });
+
+  if (!suggestion) return;
+
+  const historyHtml = `
+    <div class="modal-section-label">Suggestion</div>
+    <div class="modal-value">${escHtml(suggestion.title || '—')}</div>
+
+    <div class="modal-section-label">Status History</div>
+    <div id="suggestion-history-container">
+      <div class="modal-value">Loading history...</div>
+    </div>
+  `;
+
+  document.getElementById('modalTitle').textContent = 'Suggestion Status History';
+  document.getElementById('modalBody').innerHTML = historyHtml;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+
+  loadSuggestionHistoryInline(suggestionId, 'suggestion-history-container');
+} 
+
+function getSuggestionStatusLabel(status) {
+
+  if (status === null || status === undefined) return '';
+
+  var s = String(status).toLowerCase().trim();
+
+  if (s === '1') return 'Pending';
+  if (s === '2') return 'Under Review';
+  if (s === '3') return 'Approved';
+  if (s === '4') return 'Implemented';
+  if (s === 'pending') return 'Pending';
+  if (s === 'approved') return 'Approved';
+  if (s === 'rejected') return 'Rejected';
+
+  return status;
 }
 
 function formatDateDMY(dateInput) {
@@ -1402,8 +1456,8 @@ function filterAdminSuggestions(status) {
 
     const filtered = allSuggestions.filter(function(s) {
 
-        return getSuggestionStatusText(s.status)
-            .toLowerCase() === status.toLowerCase();
+        return String(s.status)
+    .toLowerCase() === status.toLowerCase();
     });
 
     renderAdminSuggestions(filtered);
@@ -1521,6 +1575,7 @@ function renderAdminComplaints(data) {
   console.log(data[0]);
   var list = document.getElementById('adminComplaintsList');
   if (!list) return;
+  
   if (!data.length) {
     list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>No complaints found.</div></div>';
     return;
@@ -1567,11 +1622,10 @@ function openComplaintHistoryPopup(complaintId) {
   if (!complaint) return;
 console.log(Object.keys(complaint));
   var historyHtml = '';
- var history =
+var history =
   complaint.statusHistory ||
   complaint.history ||
   complaint.complaintStatusHistory ||
-  complaint.images ||
   [];
 
  if (history.length) {
@@ -1580,22 +1634,29 @@ console.log(Object.keys(complaint));
     historyHtml = history.map(function(h){
 
      return `
-  <div class="complaint-history-item">
+  <div class="history-item">
 
-    <strong>
-      ${escHtml(h.oldStatus || h.previousStatus || '—')}
-      →
-      ${escHtml(h.newStatus || h.status || '—')}
-    </strong>
+    <div class="history-dot"></div>
 
-    <div style="margin-top:6px;">
-      ${escHtml(h.updatedBy || h.changedBy || 'Admin')}
-      ·
-      ${formatDate(h.createdAt || h.date || h.updatedAt)}
-    </div>
+    <div class="history-content">
 
-    <div style="margin-top:6px;">
-      ${escHtml(h.comment || h.notes || h.remark || '—')}
+      <div class="history-status">
+        ${h.oldStatus
+          ? getComplaintStatusLabel(h.oldStatus) + ' → ' + getComplaintStatusLabel(h.newStatus)
+          : 'Complaint Created'}
+      </div>
+
+      <div class="history-date">
+        ${formatDate(h.createdAt || h.changedAt)}
+      </div>
+
+      ${h.remarks || h.comment
+        ? `<div class="history-remarks">
+             📝 ${h.remarks || h.comment}
+           </div>`
+        : ''
+      }
+
     </div>
 
   </div>
@@ -1636,9 +1697,27 @@ console.log(Object.keys(complaint));
 
     </div>
   `;
-
   document.body.insertAdjacentHTML('beforeend', modal);
 } 
+
+function getComplaintStatusLabel(status) {
+
+  if (!status) return '';
+
+  var s = String(status).toLowerCase().trim();
+
+  if (s === '1') return 'Pending';
+  if (s === '2') return 'In Progress';
+  if (s === '3') return 'Resolved';
+  if (s === '4') return 'Rejected';
+
+  if (s === 'pending') return 'Pending';
+  if (s === 'inprogress') return 'In Progress';
+  if (s === 'resolved') return 'Resolved';
+  if (s === 'rejected') return 'Rejected';
+
+  return status;
+}
 
 function closeHistoryModal() {
   var modal = document.getElementById('historyModal');
@@ -1676,13 +1755,64 @@ function applyAdminComplaintFilters() {
   var status = statusEl ? statusEl.value : 'all';
   var q = searchEl ? searchEl.value.toLowerCase().trim() : '';
   var cards = document.querySelectorAll('#adminComplaintsList .item-card');
+  var visibleCount = 0;
   cards.forEach(function(card) {
     var statusMatch = status === 'all' || card.dataset.status === status;
     var searchMatch = !q ||
       (card.dataset.title || '').includes(q) ||
       (card.dataset.citizen || '').includes(q);
-    card.style.display = statusMatch && searchMatch ? '' : 'none';
+    if (statusMatch && searchMatch) {
+  card.style.display = '';
+  visibleCount++;
+} else {
+  card.style.display = 'none';
+}
   });
+  function filterAdminComplaints(status) {
+  applyAdminComplaintFilters();
+}
+
+function searchAdminComplaints(query) {
+  applyAdminComplaintFilters();
+}
+
+function applyAdminComplaintFilters() {
+  var statusEl = document.getElementById('adminComplaintStatusFilter');
+  var searchEl = document.getElementById('adminComplaintSearch');
+  var status = statusEl ? statusEl.value : 'all';
+  var q = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  var cards = document.querySelectorAll('#adminComplaintsList .item-card');
+  var visibleCount = 0;
+  cards.forEach(function(card) {
+    var statusMatch = status === 'all' || card.dataset.status === status;
+    var searchMatch = !q ||
+      (card.dataset.title || '').includes(q) ||
+      (card.dataset.citizen || '').includes(q);
+    if (statusMatch && searchMatch) {
+  card.style.display = '';
+  visibleCount++;
+} else {
+  card.style.display = 'none';
+}
+});
+var list = document.getElementById('adminComplaintsList');
+
+var emptyMsg = document.getElementById('complaintEmptyMessage');
+
+if (emptyMsg) {
+  emptyMsg.remove();
+}
+
+if (visibleCount === 0) {
+  list.insertAdjacentHTML(
+    'beforeend',
+    '<div id="complaintEmptyMessage" class="item-empty">' +
+      '<div class="item-empty-icon">&#x1F4CB;</div>' +
+      '<div>No complaints found.</div>' +
+    '</div>'
+  );
+}
+}
 }
 
 async function openAdminComplaintDetail(event, complaintId) {
@@ -1930,13 +2060,7 @@ async function openAdminSuggestionDetail(suggestionId) {
       'Update Status' +
     '</button>' +
 
-  '</div>' +
-
-  '<div class="modal-section-label">Status History</div>' +
-
-  '<div class="complaint-history-list" id="adminSuggestionHistory">' +
-    '<div class="modal-value">Loading history...</div>' +
-  '</div>';
+  '</div>' 
 
   document.getElementById('modalTitle').textContent =
     'Suggestion Details';
@@ -1946,6 +2070,82 @@ async function openAdminSuggestionDetail(suggestionId) {
 
   document.getElementById('modalOverlay')
     .classList.remove('hidden');
+}
+
+async function loadSuggestionHistoryInline(suggestionId, containerId) {
+
+  try {
+
+    const res = await fetch(
+      `http://localhost:5079/api/suggestions/history/${suggestionId}`
+    );
+
+    const result = await res.json();
+
+    const history = result.data || [];
+
+    const container = document.getElementById(containerId);
+
+    if (!container) return;
+
+    if (!history.length) {
+      container.innerHTML = `<div class="modal-value">No history found</div>`;
+      return;
+    }
+
+    container.innerHTML = history
+  .filter(function(h) {
+
+    // remove junk rows
+    if (!h.oldStatus || !h.newStatus) return false;
+
+    // remove same-to-same updates
+    if (h.oldStatus === h.newStatus) return false;
+
+    // remove meaningless labels
+    if (String(h.remarks || '').toLowerCase().includes('status change')) return false;
+
+    return true;
+  })
+  .sort(function(a, b) {
+    return new Date(a.changedAt) - new Date(b.changedAt);
+  })
+  .map(function(h) {
+
+    return `
+  <div class="history-item">
+
+    <div class="history-dot"></div>
+
+    <div class="history-content">
+
+      <div class="history-status">
+        ${getSuggestionStatusLabel(h.oldStatus)}
+        <span class="arrow">→</span>
+        ${getSuggestionStatusLabel(h.newStatus)}
+      </div>
+
+      <div class="history-date">
+        ${formatDate(h.changedAt)}
+      </div>
+
+      ${h.remarks && h.remarks.trim() !== ''
+        ? `<div class="history-remarks">
+             📝 ${escHtml(h.remarks)}
+           </div>`
+        : ''
+      }
+
+    </div>
+
+  </div>
+`;
+  })
+  .join('');
+
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function getSuggestionStatusClass(status) {
@@ -2222,25 +2422,20 @@ document.addEventListener("DOMContentLoaded", function () {
   loadCitizens();
 });
 
-
-
 function openOfficerModal() {
 
   selectedOfficerId = null;
 
-  document.getElementById(
-    'officerModalTitle'
-  ).textContent = 'Add Officer';
+  document.getElementById('officerModalTitle')
+    .textContent = 'Add Officer';
 
-  document.getElementById(
-    'saveOfficerBtn'
-  ).textContent = 'Save Officer';
+  document.getElementById('saveOfficerBtn')
+    .textContent = 'Save Officer';
 
   clearOfficerForm();
 
-  document.getElementById(
-    'officerModalOverlay'
-  ).classList.remove('hidden');
+  document.getElementById('officerModalOverlay')
+    .classList.remove('hidden');
 }
 
 /* ============================================================
@@ -2260,29 +2455,18 @@ function closeOfficerModal() {
 
 function clearOfficerForm() {
 
-  document.getElementById(
-    'officerFirstName'
-  ).value = '';
-
-  document.getElementById(
-    'officerLastName'
-  ).value = '';
-
-  document.getElementById(
-    'officerEmail'
-  ).value = '';
-
-  document.getElementById(
-    'officerMobile'
-  ).value = '';
-
-  document.getElementById(
-    'officerDesignation'
-  ).value = '';
-
-  document.getElementById(
+  [
+    'officerFirstName',
+    'officerLastName',
+    'officerEmail',
+    'officerMobile',
+    'officerDesignation',
     'officerDepartment'
-  ).value = '';
+  ].forEach(function(id) {
+
+    document.getElementById(id).value = '';
+
+  });
 
   document.getElementById(
     'officerAvailability'
@@ -2324,10 +2508,6 @@ async function loadOfficers() {
   }
 }
 
-/* ============================================================
-   RENDER OFFICERS
-   ============================================================ */
-
 function renderOfficerTable(data) {
 
   const tableBody =
@@ -2342,19 +2522,12 @@ function renderOfficerTable(data) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="7">
-
           <div class="staff-empty">
-
-            <div class="staff-empty-icon">
-              👮
-            </div>
-
+            <div class="staff-empty-icon">👮</div>
             <div class="staff-empty-title">
               No Officers Found
             </div>
-
           </div>
-
         </td>
       </tr>
     `;
@@ -2362,7 +2535,7 @@ function renderOfficerTable(data) {
     return;
   }
 
-  tableBody.innerHTML = '';
+  let html = '';
 
   data.forEach(officer => {
 
@@ -2376,18 +2549,12 @@ function renderOfficerTable(data) {
         ? 'Available'
         : 'Unavailable';
 
-    tableBody.innerHTML += `
-
+    html += `
       <tr>
-
         <td>${officer.fullName}</td>
-
         <td>${officer.email}</td>
-
         <td>${officer.mobileNumber}</td>
-
         <td>${officer.departmentName}</td>
-
         <td>${officer.designation}</td>
 
         <td>
@@ -2397,30 +2564,26 @@ function renderOfficerTable(data) {
         </td>
 
         <td>
-
           <div class="staff-actions">
 
             <button class="staff-btn edit"
                     onclick="editOfficer(${officer.officerId})">
-
               ✏️
-
             </button>
 
             <button class="staff-btn delete"
                     onclick="deleteOfficer(${officer.officerId})">
-
               🗑️
-
             </button>
 
           </div>
-
         </td>
 
       </tr>
     `;
   });
+
+  tableBody.innerHTML = html;
 }
 
 /* ============================================================
@@ -2513,37 +2676,6 @@ function renderDepartmentDropdowns() {
     });
   }
 }
-
-
-  /* =====================================================
-     FILTER DROPDOWN
-     ===================================================== */
-
-  const filterSelect =
-    document.getElementById(
-      'departmentFilter'
-    );
-
-  if (filterSelect) {
-
-    filterSelect.innerHTML = `
-      <option value="all">
-        All Departments
-      </option>
-    `;
-
-    departments.forEach(department => {
-
-      filterSelect.innerHTML += `
-        <option value="${department.departmentName}">
-          ${department.departmentName}
-        </option>
-      `;
-    });
-  }
-
-
-
 /* ============================================================
    SAVE OFFICER
    ============================================================ */
@@ -2553,102 +2685,50 @@ async function saveOfficer() {
   try {
 
     const payload = {
-
-      firstName:
-        document.getElementById(
-          'officerFirstName'
-        ).value,
-
-      lastName:
-        document.getElementById(
-          'officerLastName'
-        ).value,
-
-      email:
-        document.getElementById(
-          'officerEmail'
-        ).value,
-
-      mobileNumber:
-        document.getElementById(
-          'officerMobile'
-        ).value,
-
-      designation:
-        document.getElementById(
-          'officerDesignation'
-        ).value,
-
-      departmentId:
-        Number(
-          document.getElementById(
-            'officerDepartment'
-          ).value
-        ),
-
-      isAvailable:
-        document.getElementById(
-          'officerAvailability'
-        ).value === 'true'
+      firstName: document.getElementById('officerFirstName').value,
+      lastName: document.getElementById('officerLastName').value,
+      email: document.getElementById('officerEmail').value,
+      mobileNumber: document.getElementById('officerMobile').value,
+      designation: document.getElementById('officerDesignation').value,
+      departmentId: Number(document.getElementById('officerDepartment').value),
+      isAvailable: document.getElementById('officerAvailability').value === 'true'
     };
 
     let response;
 
     if (selectedOfficerId) {
 
-      response =
-        await fetch(
-          `${OFFICER_API_BASE}/${selectedOfficerId}`,
-          {
-            method: 'PUT',
+      response = await fetch(
+        `${OFFICER_API_BASE}/${selectedOfficerId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
+      );
 
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
+    } else {
 
-            body:
-              JSON.stringify(payload)
-          }
-        );
-    }
-    else {
-
-      response =
-        await fetch(
-          OFFICER_API_BASE,
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body:
-              JSON.stringify(payload)
-          }
-        );
-    }
-
-    if (!response.ok) {
-
-      throw new Error(
-        'Failed to save officer.'
+      response = await fetch(
+        OFFICER_API_BASE,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
       );
     }
 
-    showToast(
-      'Officer saved successfully.',
-      'success'
-    );
+    if (!response.ok) {
+      throw new Error('Failed to save officer.');
+    }
+
+    showToast('Officer saved successfully.', 'success');
 
     closeOfficerModal();
-
     loadOfficers();
 
-  }
-  catch(error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -2667,60 +2747,28 @@ async function editOfficer(id) {
 
   try {
 
-    const response =
-      await fetch(
-        `${OFFICER_API_BASE}/${id}`
-      );
-
-    const officer =
-      await response.json();
+    const response = await fetch(`${OFFICER_API_BASE}/${id}`);
+    const officer = await response.json();
 
     selectedOfficerId = id;
 
-    const names =
-      officer.fullName.split(' ');
+    const names = officer.fullName.split(' ');
 
-    document.getElementById(
-      'officerFirstName'
-    ).value = names[0];
+    document.getElementById('officerFirstName').value = names[0];
+    document.getElementById('officerLastName').value = names.slice(1).join(' ');
+    document.getElementById('officerEmail').value = officer.email;
+    document.getElementById('officerMobile').value = officer.mobileNumber;
+    document.getElementById('officerDesignation').value = officer.designation;
+    document.getElementById('officerDepartment').value = officer.departmentId;
+    document.getElementById('officerAvailability').value = String(officer.isAvailable);
 
-    document.getElementById(
-      'officerLastName'
-    ).value =
-      names.slice(1).join(' ');
+    document.getElementById('officerModalOverlay')
+      .classList.remove('hidden');
 
-    document.getElementById(
-      'officerEmail'
-    ).value = officer.email;
-
-    document.getElementById(
-      'officerMobile'
-    ).value =
-      officer.mobileNumber;
-
-    document.getElementById(
-      'officerDesignation'
-    ).value =
-      officer.designation;
-
-    document.getElementById(
-      'officerDepartment'
-    ).value =
-      officer.departmentId;
-
-    document.getElementById(
-      'officerAvailability'
-    ).value =
-      String(officer.isAvailable);
-
-    document.getElementById(
-      'officerModalOverlay'
-    ).classList.remove('hidden');
-
-  }
-  catch(error) {
+  } catch (error) {
 
     console.error(error);
+
   }
 }
 
@@ -2730,44 +2778,28 @@ async function editOfficer(id) {
 
 function deleteOfficer(id) {
 
-  showConfirm(
-    'Delete Officer',
+  showConfirm('Delete Officer', 'Are you sure?', async function() {
 
-    'Are you sure?',
+    try {
 
-    async function() {
+      const response = await fetch(
+        `${OFFICER_API_BASE}/${id}`,
+        { method: 'DELETE' }
+      );
 
-      try {
-
-        const response =
-          await fetch(
-            `${OFFICER_API_BASE}/${id}`,
-            {
-              method: 'DELETE'
-            }
-          );
-
-        if (!response.ok) {
-
-          throw new Error(
-            'Delete failed.'
-          );
-        }
-
-        showToast(
-          'Officer deleted.',
-          'success'
-        );
-
-        loadOfficers();
-
+      if (!response.ok) {
+        throw new Error('Delete failed.');
       }
-      catch(error) {
 
-        console.error(error);
-      }
+      showToast('Officer deleted.', 'success');
+      loadOfficers();
+
+    } catch (error) {
+
+      console.error(error);
+
     }
-  );
+  });
 }
 
 /* ============================================================
@@ -2775,7 +2807,6 @@ function deleteOfficer(id) {
    ============================================================ */
 
 function searchOfficers() {
-
   applyOfficerFilters();
 }
 
@@ -2784,7 +2815,6 @@ function searchOfficers() {
    ============================================================ */
 
 function filterOfficers() {
-
   applyOfficerFilters();
 }
 
@@ -2794,57 +2824,27 @@ function filterOfficers() {
 
 function applyOfficerFilters() {
 
-  const search =
-    document.getElementById(
-      'officerSearch'
-    ).value.toLowerCase();
+  const search = document.getElementById('officerSearch').value.toLowerCase();
+  const department = document.getElementById('departmentFilter').value;
+  const status = document.getElementById('statusFilter').value;
 
-  const department =
-    document.getElementById(
-      'departmentFilter'
-    ).value;
+  const filtered = officers.filter(officer => {
 
-  const status =
-    document.getElementById(
-      'statusFilter'
-    ).value;
+    const matchesSearch =
+      officer.fullName.toLowerCase().includes(search);
 
-  const filtered =
-    officers.filter(officer => {
+    const matchesDepartment =
+      department === 'all' ||
+      officer.departmentName === department;
 
-      const matchesSearch =
+    const matchesStatus =
+      status === 'all' ||
+      String(officer.isAvailable) === status;
 
-        officer.fullName
-          .toLowerCase()
-          .includes(search);
-
-      const matchesDepartment =
-
-        department === 'all'
-
-        ||
-
-        officer.departmentName
-          === department;
-
-      const matchesStatus =
-
-        status === 'all'
-
-        ||
-
-        String(
-          officer.isAvailable
-        ) === status;
-
-      return (
-        matchesSearch
-        &&
-        matchesDepartment
-        &&
-        matchesStatus
-      );
-    });
+    return matchesSearch &&
+           matchesDepartment &&
+           matchesStatus;
+  });
 
   renderOfficerTable(filtered);
 }
@@ -2853,13 +2853,7 @@ function applyOfficerFilters() {
    INIT
    ============================================================ */
 
-window.addEventListener(
-  'load',
-
-  function() {
-
-    loadDepartments();
-
-    loadOfficers();
-  }
-);
+window.addEventListener('load', () => {
+  loadDepartments();
+  loadOfficers();
+});
