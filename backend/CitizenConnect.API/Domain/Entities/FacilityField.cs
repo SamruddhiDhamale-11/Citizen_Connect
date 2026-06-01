@@ -1,4 +1,5 @@
-﻿using CitizenConnect.Domain.Common;
+﻿using CitizenConnect.API.Domain.Enums;
+using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.API.Domain.Entities
 {
@@ -15,8 +16,8 @@ namespace CitizenConnect.API.Domain.Entities
         // number
         // textarea
         // dropdown
-        public string FieldType { get; set; }
-            = string.Empty;
+        public FacilityFieldType FieldType
+        { get; set; }
 
         public bool IsRequired { get; set; }
 
@@ -29,5 +30,13 @@ namespace CitizenConnect.API.Domain.Entities
         // Navigation
         public FacilityModule FacilityModule
         { get; set; } = null!;
+
+        public ICollection<FacilityData> FacilityDatas
+        { get; set; } = new List<FacilityData>();
+
+        public ICollection<FacilityFieldOption> FacilityFieldOptions
+        { get; set; }
+        = new List<FacilityFieldOption>();
+
     }
 }

@@ -1,7 +1,9 @@
 using CitizenConnect.API.Configurations;
 using CitizenConnect.API.Interfaces.Services;
+using CitizenConnect.API.Services;
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
+using CitizenConnect.Application.Services.Interfaces;
 using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Infrastructure.Seed;
 using CitizenConnect.Interfaces.Services;
@@ -42,6 +44,27 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
+builder.Services.AddScoped<
+    IJurisdictionService,
+    JurisdictionService>();
+
+builder.Services.AddScoped<
+    IFacilityModuleService,
+    FacilityModuleService>();
+
+builder.Services.AddScoped<
+    IFacilityDataService,
+    FacilityDataService>();
+
+builder.Services.AddScoped<
+    IFacilityFieldOptionService,
+    FacilityFieldOptionService>();
+
+builder.Services.AddScoped<
+    IFacilityFieldService,
+    FacilityFieldService>();
+
+
 builder.Services
     .AddScoped<ICloudinaryService,
                CloudinaryService>();

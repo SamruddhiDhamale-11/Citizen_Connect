@@ -69,7 +69,7 @@ namespace CitizenConnect.Application.DTOs.Auth
         // =====================================================
 
         // Mandatory
-        public int JurisdictionId { get; set; }
+        public int JurisdictionTypeId { get; set; }
 
         // NULL = Jurisdiction level politician
         // Value = Ward level politician

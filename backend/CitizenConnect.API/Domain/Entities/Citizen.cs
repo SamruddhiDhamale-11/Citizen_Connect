@@ -26,5 +26,13 @@ namespace CitizenConnect.Domain.Entities
 
         public ICollection<Complaint> Complaints { get; set; }
     = new List<Complaint>();
+
+        public ICollection<Suggestion> Suggestions
+        { get; set; }
+    = new List<Suggestion>();
+
+        public ICollection<SuggestionVote> SuggestionVotes
+        { get; set; }
+            = new List<SuggestionVote>();
     }
 }

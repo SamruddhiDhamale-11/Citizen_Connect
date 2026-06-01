@@ -260,8 +260,8 @@ namespace CitizenConnect.Application.Services
                 // registration form (the ward dropdown was removed).
                 // Politicians identify their ward via WardNumber and WardName
                 // text fields. We only validate JurisdictionTypeId here.
-                var jurisdictionExists = await _context.Jurisdictions
-    .AnyAsync(j => j.JurisdictionId == dto.JurisdictionId);
+                var jurisdictionExists = await _context.JurisdictionTypes
+    .AnyAsync(x => x.JurisdictionTypeId == dto.JurisdictionTypeId);
 
                 if (!jurisdictionExists)
                 {
@@ -360,7 +360,7 @@ namespace CitizenConnect.Application.Services
 
                     GovernmentId = dto.GovernmentId,
 
-                    JurisdictionId = dto.JurisdictionId,
+                    JurisdictionTypeId = dto.JurisdictionTypeId,
 
                     WardId = dto.WardId,
 

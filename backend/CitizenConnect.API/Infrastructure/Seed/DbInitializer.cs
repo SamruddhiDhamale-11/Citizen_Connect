@@ -1,5 +1,6 @@
 ﻿
 using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.API.Domain.Enums;
 using CitizenConnect.Domain.Entities;
 using CitizenConnect.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -114,8 +115,8 @@ namespace CitizenConnect.Infrastructure.Seed
                         WardName = "Ward 1",
                         AreaName = "Ambale East",
                         Pincode = "412206",
-                        JurisdictionId =
-                            jurisdiction.JurisdictionId,
+                        JurisdictionTypeId =
+    jurisdiction.JurisdictionTypeId,
 
                         Latitude = 18.520430m,
                         Longitude = 73.856743m
@@ -127,8 +128,8 @@ namespace CitizenConnect.Infrastructure.Seed
                         WardName = "Ward 2",
                         AreaName = "Ambale West",
                         Pincode = "412206",
-                        JurisdictionId =
-                            jurisdiction.JurisdictionId,
+                        JurisdictionTypeId =
+    jurisdiction.JurisdictionTypeId,
 
                         Latitude = 18.520430m,
                         Longitude = 73.856743m
@@ -140,8 +141,8 @@ namespace CitizenConnect.Infrastructure.Seed
                         WardName = "Ward 3",
                         AreaName = "Ambale Center",
                         Pincode = "412206",
-                        JurisdictionId =
-                            jurisdiction.JurisdictionId,
+                        JurisdictionTypeId =
+    jurisdiction.JurisdictionTypeId,
 
                         Latitude = 18.520430m,
                         Longitude = 73.856743m
@@ -243,7 +244,7 @@ namespace CitizenConnect.Infrastructure.Seed
 
                         FieldName = "Borewells",
 
-                        FieldType = "number",
+                        FieldType = FacilityFieldType.Number,
 
                         IsRequired = true,
 
@@ -260,7 +261,7 @@ namespace CitizenConnect.Infrastructure.Seed
 
                         FieldName = "Water Tanks",
 
-                        FieldType = "number",
+                        FieldType = FacilityFieldType.Number,
 
                         IsRequired = true,
 
@@ -279,7 +280,7 @@ namespace CitizenConnect.Infrastructure.Seed
 
                         FieldName = "Hospitals",
 
-                        FieldType = "number",
+                        FieldType = FacilityFieldType.Number,
 
                         IsRequired = true,
 
@@ -298,7 +299,7 @@ namespace CitizenConnect.Infrastructure.Seed
 
                         FieldName = "Schools",
 
-                        FieldType = "number",
+                        FieldType = FacilityFieldType.Number,
 
                         IsRequired = true,
 

@@ -1,6 +1,6 @@
-﻿
-namespace CitizenConnect.Application.DTOs
-    .FacilityFieldDtos
+﻿using CitizenConnect.API.Domain.Enums;
+
+namespace CitizenConnect.Application.DTOs.Facility
 {
     public class FacilityFieldResponseDto
     {
@@ -11,17 +11,14 @@ namespace CitizenConnect.Application.DTOs
         public string FieldName { get; set; }
             = string.Empty;
 
-        public string FieldType { get; set; }
-            = string.Empty;
+        public FacilityFieldType FieldType { get; set; }
 
         public bool IsRequired { get; set; }
 
         public int DisplayOrder { get; set; }
 
-        public string? Placeholder
-        { get; set; }
+        public string? Placeholder { get; set; }
 
         public bool IsActive { get; set; }
     }
 }
-

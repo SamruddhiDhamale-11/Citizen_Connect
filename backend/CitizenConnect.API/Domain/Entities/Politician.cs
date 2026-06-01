@@ -38,7 +38,10 @@ namespace CitizenConnect.Domain.Entities
         // =====================================
 
         // Mandatory
-        public int JurisdictionId { get; set; }
+        public int JurisdictionTypeId { get; set; }
+
+        public JurisdictionType JurisdictionType
+        { get; set; } = null!;
 
         // Optional
         // NULL = Jurisdiction level politician
@@ -51,8 +54,7 @@ namespace CitizenConnect.Domain.Entities
 
         public User User { get; set; } = null!;
 
-        public Jurisdiction Jurisdiction
-        { get; set; } = null!;
+       
 
         public Ward? Ward { get; set; }
     }

@@ -103,6 +103,9 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<FacilityData> FacilityDatas
             => Set<FacilityData>();
 
+        public DbSet<FacilityFieldOption> FacilityFieldOptions
+    => Set<FacilityFieldOption>();
+
         // =====================================================
         // MODEL CONFIGURATION
         // =====================================================
@@ -147,10 +150,10 @@ namespace CitizenConnect.Infrastructure.Data
             // =====================================================
 
             modelBuilder.Entity<Politician>()
-                .HasOne(x => x.Jurisdiction)
-                .WithMany(x => x.Politicians)
-                .HasForeignKey(x => x.JurisdictionId)
-                .OnDelete(DeleteBehavior.Restrict);
+     .HasOne(x => x.JurisdictionType)
+     .WithMany(x => x.Politicians)
+     .HasForeignKey(x => x.JurisdictionTypeId)
+     .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
             // POLITICIAN -> WARD
@@ -188,21 +191,20 @@ namespace CitizenConnect.Infrastructure.Data
             // =====================================================
 
             modelBuilder.Entity<Jurisdiction>()
-                .HasOne(j => j.JurisdictionType)
-                .WithMany(jt => jt.Jurisdictions)
-                .HasForeignKey(j => j.JurisdictionTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
+    .HasOne(j => j.JurisdictionType)
+    .WithMany()
+    .HasForeignKey(j => j.JurisdictionTypeId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
             // WARD -> JURISDICTION
             // =====================================================
 
             modelBuilder.Entity<Ward>()
-                .HasOne(w => w.Jurisdiction)
-                .WithMany(j => j.Wards)
-                .HasForeignKey(w => w.JurisdictionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+    .HasOne(w => w.JurisdictionType)
+    .WithMany(jt => jt.Wards)
+    .HasForeignKey(w => w.JurisdictionTypeId)
+    .OnDelete(DeleteBehavior.Restrict);
             // =====================================================
             // COMPLAINT -> CITIZEN
             // =====================================================
@@ -343,6 +345,25 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.SuggestionStatusMasterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+            modelBuilder.Entity<Suggestion>()
+    .HasOne(x => x.Citizen)
+    .WithMany(x => x.Suggestions)
+    .HasForeignKey(x => x.CitizenId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<SuggestionVote>()
+    .HasOne(x => x.Citizen)
+    .WithMany(x => x.SuggestionVotes)
+    .HasForeignKey(x => x.CitizenId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SuggestionVote>()
+    .HasOne(x => x.Suggestion)
+    .WithMany(x => x.SuggestionVotes)
+    .HasForeignKey(x => x.SuggestionId)
+    .OnDelete(DeleteBehavior.Restrict);
             // =====================================================
             // COMPLAINT STATUS MASTER
             // =====================================================
@@ -422,14 +443,13 @@ namespace CitizenConnect.Infrastructure.Data
             modelBuilder.Entity<Department>()
                 .HasIndex(x => x.DepartmentName)
                 .IsUnique();
-
             modelBuilder.Entity<Ward>()
-     .HasIndex(x => new
-     {
-         x.JurisdictionId,
-         x.WardNumber
-     })
-     .IsUnique();
+                .HasIndex(x => new
+                {
+                    x.JurisdictionTypeId,
+                    x.WardNumber
+                })
+                .IsUnique();
 
 
             modelBuilder.Entity<Complaint>()
@@ -678,6 +698,17 @@ namespace CitizenConnect.Infrastructure.Data
                 .Property(x => x.FieldValue)
                 .HasMaxLength(2000);
 
+            modelBuilder.Entity<FacilityData>()
+    .HasOne(x => x.FacilityField)
+    .WithMany(x => x.FacilityDatas)
+    .HasForeignKey(x => x.FacilityFieldId);
+
+
+            modelBuilder.Entity<FacilityData>()
+    .HasOne(x => x.FacilityModule)
+    .WithMany(x => x.FacilityDatas)
+    .HasForeignKey(x => x.FacilityModuleId);
+
             // =====================================================
             // FACILITY DATA INDEXES
             // =====================================================
@@ -694,6 +725,28 @@ namespace CitizenConnect.Infrastructure.Data
             modelBuilder.Entity<FacilityData>()
                 .HasIndex(x => x.FacilityFieldId);
 
+
+            modelBuilder.Entity<FacilityFieldOption>()
+    .HasOne(x => x.FacilityField)
+    .WithMany(x => x.FacilityFieldOptions)
+    .HasForeignKey(x => x.FacilityFieldId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FacilityFieldOption>()
+    .Property(x => x.OptionText)
+    .IsRequired()
+    .HasMaxLength(200);
+
+            modelBuilder.Entity<FacilityData>()
+    .HasIndex(x => new
+    {
+        x.JurisdictionId,
+        x.WardId,
+        x.FacilityModuleId,
+        x.FacilityFieldId
+    })
+    .IsUnique();
+
             modelBuilder.Entity<FacilityField>()
     .HasIndex(x => new
     {
@@ -702,6 +755,26 @@ namespace CitizenConnect.Infrastructure.Data
     })
     .IsUnique();
 
+
+            modelBuilder.Entity<Officer>()
+    .HasIndex(x => x.Email)
+    .IsUnique();
+            modelBuilder.Entity<Officer>()
+    .HasIndex(x => x.MobileNumber)
+    .IsUnique();
+
+            modelBuilder.Entity<Role>()
+    .HasIndex(x => x.RoleName)
+    .IsUnique();
+
+
+            modelBuilder.Entity<WardDepartment>()
+    .HasIndex(x => new
+    {
+        x.WardId,
+        x.DepartmentId
+    })
+    .IsUnique();
 
 
             modelBuilder.Entity<Complaint>()
@@ -722,6 +795,14 @@ namespace CitizenConnect.Infrastructure.Data
         x.FacilityModuleId
     });
 
+
+            modelBuilder.Entity<FacilityFieldOption>()
+    .HasIndex(x => new
+    {
+        x.FacilityFieldId,
+        x.OptionText
+    })
+    .IsUnique();
         }
     }
 }

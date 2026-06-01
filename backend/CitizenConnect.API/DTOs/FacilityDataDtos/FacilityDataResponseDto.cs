@@ -1,6 +1,4 @@
-﻿
-namespace CitizenConnect.Application.DTOs
-    .FacilityDataDtos
+﻿namespace CitizenConnect.API.DTOs.FacilityDataDto
 {
     public class FacilityDataResponseDto
     {
@@ -27,7 +25,5 @@ namespace CitizenConnect.Application.DTOs
 
         public string FieldValue { get; set; }
             = string.Empty;
-
-        public DateTime CreatedAt { get; set; }
     }
 }

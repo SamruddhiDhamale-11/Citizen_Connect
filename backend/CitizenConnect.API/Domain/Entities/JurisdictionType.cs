@@ -1,6 +1,4 @@
-﻿
-using CitizenConnect.API.Domain.Entities;
-using CitizenConnect.Domain.Common;
+﻿using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.Domain.Entities
 {
@@ -8,13 +6,19 @@ namespace CitizenConnect.Domain.Entities
     {
         public int JurisdictionTypeId { get; set; }
 
-        public string JurisdictionTypeName { get; set; } = string.Empty;
+        public string JurisdictionTypeName { get; set; }
+            = string.Empty;
 
         public string? JurisdictionDescription { get; set; }
 
         // Navigation
-        public ICollection<Jurisdiction> Jurisdictions
+
+        public ICollection<Ward> Wards
         { get; set; }
-        = new List<Jurisdiction>();
+            = new List<Ward>();
+
+        public ICollection<Politician> Politicians
+        { get; set; }
+            = new List<Politician>();
     }
 }

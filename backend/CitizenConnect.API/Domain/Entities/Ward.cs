@@ -21,10 +21,11 @@ namespace CitizenConnect.Domain.Entities
 
         public decimal Longitude { get; set; }
 
-        public int JurisdictionId { get; set; }
+        public int JurisdictionTypeId { get; set; }
 
         // Navigation
-        public Jurisdiction Jurisdiction { get; set; } = null!;
+        public JurisdictionType JurisdictionType
+        { get; set; } = null!;
 
         public ICollection<Citizen> Citizens { get; set; }= new List<Citizen>();
 
