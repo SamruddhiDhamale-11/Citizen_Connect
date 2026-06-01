@@ -176,8 +176,32 @@ public async Task<IActionResult> UploadAttachment(
     }
 }
 
+// =====================================================
+// SUGGESTION HISTORY
+// =====================================================
 
+[HttpGet("history/{suggestionId}")]
+public async Task<IActionResult> GetSuggestionHistory(int suggestionId)
+{
+    try
+    {
+        var result = await _suggestionService.GetSuggestionHistoryAsync(suggestionId);
 
+        return Ok(new
+        {
+            success = true,
+            data = result
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
+}
 
     }
 }

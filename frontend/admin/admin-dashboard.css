@@ -1133,3 +1133,53 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
   background: #e2e3e5;
   color: #41464b;
 }
+
+/* status history css */
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-left: 2px solid #e0e0e0;
+  margin-left: 8px;
+  position: relative;
+}
+
+.history-dot {
+  width: 10px;
+  height: 10px;
+  background: #4a90e2;
+  border-radius: 50%;
+  position: absolute;
+  left: -6px;
+  top: 14px;
+}
+
+.history-content {
+  padding-left: 12px;
+}
+
+.history-status {
+  font-weight: 600;
+  color: #333;
+}
+
+.history-status .arrow {
+  margin: 0 6px;
+  color: #888;
+}
+
+.history-date {
+  font-size: 12px;
+  color: #777;
+  margin-top: 2px;
+}
+
+.history-remarks {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #444;
+  background: #f6f8fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}

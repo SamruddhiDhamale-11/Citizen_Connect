@@ -192,5 +192,22 @@ namespace CitizenConnect.Application.Services
                     })
                 .ToListAsync<object>();
         }
+
+        public async Task<List<SuggestionHistoryDto>> GetSuggestionHistoryAsync(int suggestionId)
+{
+    var history = await _context.SuggestionStatusHistories
+    .Where(x => x.SuggestionId == suggestionId)
+    .OrderByDescending(x => x.ChangedAt)
+    .Select(x => new SuggestionHistoryDto
+    {
+        OldStatus = x.OldStatus,
+        NewStatus = x.NewStatus,
+        Remarks = x.Remarks,
+        ChangedAt = x.ChangedAt
+    })
+    .ToListAsync();
+
+return history;
+}
     }
 }
