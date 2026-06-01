@@ -24,11 +24,9 @@ namespace CitizenConnect.Domain.Entities
         public int JurisdictionId { get; set; }
 
         // Navigation
-        public Jurisdiction Jurisdiction
-        { get; set; } = null!;
+        public Jurisdiction Jurisdiction { get; set; } = null!;
 
-        public ICollection<Citizen> Citizens { get; set; }
-            = new List<Citizen>();
+        public ICollection<Citizen> Citizens { get; set; }= new List<Citizen>();
 
         public ICollection<Politician> Politicians { get; set; }
             = new List<Politician>();
@@ -43,5 +41,10 @@ namespace CitizenConnect.Domain.Entities
         public ICollection<WardDepartment> WardDepartments
         { get; set; }
     = new List<WardDepartment>();
+
+
+        public ICollection<FacilityData> FacilityDatas
+        { get; set; }
+    = new List<FacilityData>();
     }
 }

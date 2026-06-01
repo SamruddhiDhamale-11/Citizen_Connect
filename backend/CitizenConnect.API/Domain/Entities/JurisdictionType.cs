@@ -16,8 +16,5 @@ namespace CitizenConnect.Domain.Entities
         public ICollection<Jurisdiction> Jurisdictions
         { get; set; }
         = new List<Jurisdiction>();
-
-        public ICollection<Politician> Politicians { get; set; }
-            = new List<Politician>();
     }
 }

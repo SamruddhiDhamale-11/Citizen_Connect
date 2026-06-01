@@ -24,11 +24,15 @@ namespace CitizenConnect.API.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         // Navigation
-        public JurisdictionType JurisdictionType
-        { get; set; } = null!;
+        public JurisdictionType JurisdictionType{ get; set; } = null!;
 
-        public ICollection<Ward> Wards
-        { get; set; }
-            = new List<Ward>();
+        public ICollection<Ward> Wards { get; set; }= new List<Ward>();
+        
+        public ICollection<Politician> Politicians { get; set; } = new List<Politician>();
+
+        public ICollection<FacilityData> FacilityDatas { get; set; } = new List<FacilityData>();
+
     }
+
+
 }

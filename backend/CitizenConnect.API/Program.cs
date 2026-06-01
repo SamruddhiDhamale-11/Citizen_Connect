@@ -1,12 +1,12 @@
 using CitizenConnect.API.Configurations;
+using CitizenConnect.API.Interfaces.Services;
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
 using CitizenConnect.Infrastructure.Data;
+using CitizenConnect.Infrastructure.Seed;
 using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
-using CitizenConnect.API.Configurations;
-using CitizenConnect.API.Interfaces.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,6 +72,17 @@ var app = builder.Build();
 // ==============================
 // MIDDLEWARE PIPELINE
 // ==============================
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context =
+        services.GetRequiredService<ApplicationDbContext>();
+
+    //await DbInitializer.SeedAsync(context);
+}
 
 if (app.Environment.IsDevelopment())
 {

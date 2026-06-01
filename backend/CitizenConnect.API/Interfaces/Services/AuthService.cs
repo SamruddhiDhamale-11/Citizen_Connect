@@ -239,6 +239,20 @@ namespace CitizenConnect.Application.Services
                     };
                 }
 
+
+                var governmentIdExists =
+    await _context.Politicians
+    .AnyAsync(x => x.GovernmentId == dto.GovernmentId);
+
+                if (governmentIdExists)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Government ID already exists"
+                    };
+                }
+
                 // ==============================
                 // VALIDATE FOREIGN KEYS
                 // ==============================
@@ -246,8 +260,17 @@ namespace CitizenConnect.Application.Services
                 // registration form (the ward dropdown was removed).
                 // Politicians identify their ward via WardNumber and WardName
                 // text fields. We only validate JurisdictionTypeId here.
-                var jurisdictionExists = await _context.JurisdictionTypes
-                    .AnyAsync(j => j.JurisdictionTypeId == dto.JurisdictionTypeId);
+                var jurisdictionExists = await _context.Jurisdictions
+    .AnyAsync(j => j.JurisdictionId == dto.JurisdictionId);
+
+                if (!jurisdictionExists)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid Jurisdiction"
+                    };
+                }
 
                 if (!jurisdictionExists)
                 {
@@ -286,6 +309,21 @@ namespace CitizenConnect.Application.Services
                     idProofPath = $"/uploads/idproofs/{fileName}";
                 }
 
+
+                if (dto.WardId.HasValue)
+                {
+                    var wardExists = await _context.Wards
+                        .AnyAsync(w => w.WardId == dto.WardId.Value);
+
+                    if (!wardExists)
+                    {
+                        return new AuthResponseDto
+                        {
+                            Success = false,
+                            Message = "Invalid Ward"
+                        };
+                    }
+                }
                 // ==============================
                 // CREATE USER
                 // ==============================
@@ -308,20 +346,27 @@ namespace CitizenConnect.Application.Services
                 // ==============================
                 var politician = new Politician
                 {
-                    UserId             = user.UserId,
-                    PartyName          = dto.PartyName,
-                    PoliticianRole     = dto.PoliticianRole,
-                    Age                = dto.Age,
-                    Gender             = dto.Gender,
-                    Address            = dto.Address,
-                    GovernmentId       = dto.GovernmentId,
-                    WardNumber         = dto.WardNumber,
-                    WardName           = dto.WardName,
-                    PartName           = dto.PartName,
-                    WardId             = dto.WardId,   /* nullable — may be null */
-                    JurisdictionTypeId = dto.JurisdictionTypeId,
-                    ProfilePhoto       = profilePhotoPath,
-                    IdProofPath        = idProofPath
+                    UserId = user.UserId,
+
+                    PartyName = dto.PartyName,
+
+                    PoliticianRole = dto.PoliticianRole,
+
+                    Age = dto.Age,
+
+                    Gender = dto.Gender,
+
+                    Address = dto.Address,
+
+                    GovernmentId = dto.GovernmentId,
+
+                    JurisdictionId = dto.JurisdictionId,
+
+                    WardId = dto.WardId,
+
+                    ProfilePhoto = profilePhotoPath,
+
+                    IdProofPath = idProofPath
                 };
 
                 await _context.Politicians.AddAsync(politician);

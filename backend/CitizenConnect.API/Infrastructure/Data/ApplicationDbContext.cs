@@ -143,6 +143,27 @@ namespace CitizenConnect.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
+            // POLITICIAN -> JURISDICTION
+            // =====================================================
+
+            modelBuilder.Entity<Politician>()
+                .HasOne(x => x.Jurisdiction)
+                .WithMany(x => x.Politicians)
+                .HasForeignKey(x => x.JurisdictionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // POLITICIAN -> WARD
+            // =====================================================
+
+            modelBuilder.Entity<Politician>()
+                .HasOne(x => x.Ward)
+                .WithMany(x => x.Politicians)
+                .HasForeignKey(x => x.WardId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
             // CITIZEN -> WARD
             // =====================================================
 
@@ -160,27 +181,6 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasOne(x => x.ResidenceType)
                 .WithMany(x => x.Citizens)
                 .HasForeignKey(x => x.ResidenceTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =====================================================
-            // POLITICIAN -> WARD
-            // =====================================================
-
-            modelBuilder.Entity<Politician>()
-                .HasOne(x => x.Ward)
-                .WithMany(x => x.Politicians)
-                .HasForeignKey(x => x.WardId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =====================================================
-            // POLITICIAN -> JURISDICTION TYPE
-            // =====================================================
-
-            modelBuilder.Entity<Politician>()
-                .HasOne(x => x.JurisdictionType)
-                .WithMany()
-                .HasForeignKey(x => x.JurisdictionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
@@ -366,14 +366,13 @@ namespace CitizenConnect.Infrastructure.Data
                 .WithMany(m => m.FacilityFields)
                 .HasForeignKey(f => f.FacilityModuleId)
                 .OnDelete(DeleteBehavior.Cascade);
-
             // =====================================================
             // FACILITY DATA -> JURISDICTION
             // =====================================================
 
             modelBuilder.Entity<FacilityData>()
                 .HasOne(f => f.Jurisdiction)
-                .WithMany()
+                .WithMany(j => j.FacilityDatas)
                 .HasForeignKey(f => f.JurisdictionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -383,8 +382,29 @@ namespace CitizenConnect.Infrastructure.Data
 
             modelBuilder.Entity<FacilityData>()
                 .HasOne(f => f.Ward)
-                .WithMany()
+                .WithMany(w => w.FacilityDatas)
                 .HasForeignKey(f => f.WardId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // FACILITY DATA -> FACILITY FIELD
+            // =====================================================
+
+            modelBuilder.Entity<FacilityData>()
+                .HasOne(f => f.FacilityField)
+                .WithMany()
+                .HasForeignKey(f => f.FacilityFieldId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =====================================================
+            // FACILITY DATA -> FACILITY MODULE
+            // =====================================================
+
+            modelBuilder.Entity<FacilityData>()
+                .HasOne(f => f.FacilityModule)
+                .WithMany()
+                .HasForeignKey(f => f.FacilityModuleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
@@ -404,11 +424,37 @@ namespace CitizenConnect.Infrastructure.Data
                 .IsUnique();
 
             modelBuilder.Entity<Ward>()
-                .HasIndex(x => x.WardNumber)
-                .IsUnique();
+     .HasIndex(x => new
+     {
+         x.JurisdictionId,
+         x.WardNumber
+     })
+     .IsUnique();
+
+
+            modelBuilder.Entity<Complaint>()
+                .Property(x => x.ComplaintNumber)
+                .IsRequired()
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Complaint>()
                 .HasIndex(x => x.ComplaintNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<Jurisdiction>()
+                .HasIndex(x => x.JurisdictionName)
+                .IsUnique();
+
+            modelBuilder.Entity<JurisdictionType>()
+                .HasIndex(x => x.JurisdictionTypeName)
+                .IsUnique();
+
+            modelBuilder.Entity<Politician>()
+                .HasIndex(x => x.GovernmentId)
+                .IsUnique();
+
+            modelBuilder.Entity<FacilityModule>()
+                .HasIndex(x => x.ModuleName)
                 .IsUnique();
 
             // =====================================================
@@ -430,6 +476,44 @@ namespace CitizenConnect.Infrastructure.Data
             modelBuilder.Entity<User>()
                 .Property(x => x.Email)
                 .HasMaxLength(150);
+
+            // =====================================================
+            // JURISDICTION TYPE CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<JurisdictionType>()
+                .Property(x => x.JurisdictionTypeName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<JurisdictionType>()
+                .Property(x => x.JurisdictionDescription)
+                .HasMaxLength(500);
+
+            // =====================================================
+            // JURISDICTION CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<Jurisdiction>()
+                .Property(x => x.JurisdictionName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Jurisdiction>()
+                .Property(x => x.Address)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Jurisdiction>()
+                .Property(x => x.Pincode)
+                .HasColumnType("char(6)");
+
+            modelBuilder.Entity<Jurisdiction>()
+                .Property(x => x.Latitude)
+                .HasColumnType("decimal(9,6)");
+
+            modelBuilder.Entity<Jurisdiction>()
+                .Property(x => x.Longitude)
+                .HasColumnType("decimal(9,6)");
 
             // =====================================================
             // WARD CONFIGURATION
@@ -466,6 +550,33 @@ namespace CitizenConnect.Infrastructure.Data
             modelBuilder.Entity<Ward>()
                 .Property(x => x.Longitude)
                 .HasColumnType("decimal(9,6)");
+
+            // =====================================================
+            // POLITICIAN CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<Politician>()
+                .Property(x => x.PartyName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Politician>()
+                .Property(x => x.PoliticianRole)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Politician>()
+                .Property(x => x.Gender)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Politician>()
+                .Property(x => x.Address)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Politician>()
+    .Property(x => x.GovernmentId)
+    .IsRequired()
+    .HasMaxLength(100);
 
             // =====================================================
             // LOCALITY CONFIGURATION
@@ -527,6 +638,90 @@ namespace CitizenConnect.Infrastructure.Data
                 .Property(x => x.MobileNumber)
                 .IsRequired()
                 .HasMaxLength(15);
+
+            // =====================================================
+            // FACILITY MODULE CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<FacilityModule>()
+                .Property(x => x.ModuleName)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            modelBuilder.Entity<FacilityModule>()
+    .Property(x => x.ModuleDescription)
+    .HasMaxLength(500);
+
+            // =====================================================
+            // FACILITY FIELD CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<FacilityField>()
+                .Property(x => x.FieldName)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            modelBuilder.Entity<FacilityField>()
+                .Property(x => x.FieldType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<FacilityField>()
+    .Property(x => x.Placeholder)
+    .HasMaxLength(200);
+
+            // =====================================================
+            // FACILITY DATA CONFIGURATION
+            // =====================================================
+
+            modelBuilder.Entity<FacilityData>()
+                .Property(x => x.FieldValue)
+                .HasMaxLength(2000);
+
+            // =====================================================
+            // FACILITY DATA INDEXES
+            // =====================================================
+
+            modelBuilder.Entity<FacilityData>()
+                .HasIndex(x => x.JurisdictionId);
+
+            modelBuilder.Entity<FacilityData>()
+                .HasIndex(x => x.WardId);
+
+            modelBuilder.Entity<FacilityData>()
+                .HasIndex(x => x.FacilityModuleId);
+
+            modelBuilder.Entity<FacilityData>()
+                .HasIndex(x => x.FacilityFieldId);
+
+            modelBuilder.Entity<FacilityField>()
+    .HasIndex(x => new
+    {
+        x.FacilityModuleId,
+        x.FieldName
+    })
+    .IsUnique();
+
+
+
+            modelBuilder.Entity<Complaint>()
+    .HasIndex(x => x.CreatedAt);
+
+            modelBuilder.Entity<FacilityData>()
+    .HasIndex(x => x.CreatedAt);
+
+            modelBuilder.Entity<Suggestion>()
+    .HasIndex(x => x.CreatedAt);
+
+
+            modelBuilder.Entity<FacilityData>()
+    .HasIndex(x => new
+    {
+        x.JurisdictionId,
+        x.WardId,
+        x.FacilityModuleId
+    });
+
         }
     }
 }
