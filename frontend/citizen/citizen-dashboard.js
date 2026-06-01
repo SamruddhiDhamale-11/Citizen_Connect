@@ -808,7 +808,7 @@ async function submitSuggestion(e) {
     description: desc,
     expectedBenefit: benefit,
     benefitScope: benefitScope,
-    isAnonymous: document.getElementById("suggestionAnon")?.checked ?? false,
+    isAnonymous: document.getElementById("suggestionAnon").checked
   };
 
   try {

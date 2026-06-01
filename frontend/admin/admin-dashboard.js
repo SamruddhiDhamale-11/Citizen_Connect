@@ -25,6 +25,7 @@ let selectedOfficerId = null;
 var activeComplaintId = null;
 var activeSuggestionId = null;
 var SUGGESTION_API_BASE = 'http://localhost:5079/api/Admin' + '/suggestions';
+let suggestionStatuses = [];
 
 const OFFICER_API_BASE =
   'http://localhost:5079/api/officers';
@@ -1230,7 +1231,14 @@ async function loadAdminSuggestions() {
 
         console.log(result);
 
-        allSuggestions = result.data || [];
+        allSuggestions = (result.data || []).map(function(s) {
+    return {
+        ...s,
+        isAnonymous:
+            s.isAnonymous === true ||
+            s.isAnonymous === "true"
+    };
+});
 
         renderAdminSuggestions(allSuggestions);
 
@@ -1289,9 +1297,9 @@ function renderAdminSuggestions(data) {
             </div>
           </div>
 
-          <span class="status-pill pending">
-            ${s.status}
-          </span>
+         <span class="status-pill ${getSuggestionStatusClass(s.status)}">
+  ${s.status}
+</span>
 
         </div>
 
@@ -1305,7 +1313,11 @@ function renderAdminSuggestions(data) {
            <span class="item-card-date">
   ${formatDateDMY(s.createdAt || s.createdDate)}
 </span>
-            <span class="item-card-date">${s.citizenName || '—'}</span>
+            <span class="item-card-date">
+  ${s.isAnonymous
+      ? 'Anonymous'
+      : (s.citizenName || '—')}
+</span>
             <span class="item-card-date">${s.address || '—'}</span>
             <span class="item-card-date">Votes: ${s.totalVotes || 0}</span>
           </div>
@@ -1765,6 +1777,29 @@ async function loadComplaintStatuses(selectedStatus) {
   }
 }
 
+async function loadSuggestionStatuses() {
+
+  try {
+
+    const response = await fetch(
+      'http://localhost:5079/api/admin/statuses'
+    );
+
+    const result = await response.json();
+
+    console.log('Suggestion Statuses =', result);
+
+    suggestionStatuses = result.data || [];
+
+  } catch (error) {
+
+    console.error(
+      'Error loading suggestion statuses:',
+      error
+    );
+  }
+}
+
 async function openAdminSuggestionDetail(suggestionId) {
 
   console.log("FUNCTION CALLED");
@@ -1774,6 +1809,8 @@ async function openAdminSuggestionDetail(suggestionId) {
   var suggestion = allSuggestions.find(function(s) {
     return String(s.suggestionId) === String(suggestionId);
   });
+
+  console.log("Anonymous Value =", suggestion.isAnonymous);
 
   if (!suggestion) {
     console.log("Suggestion not found");
@@ -1815,10 +1852,14 @@ async function openAdminSuggestionDetail(suggestionId) {
     escHtml(suggestion.description || '—') +
   '</div>' +
 
-  '<div class="modal-section-label">Citizen</div>' +
-  '<div class="modal-value">' +
-    escHtml(suggestion.citizenName || '—') +
-  '</div>' +
+'<div class="modal-section-label">Citizen</div>' +
+'<div class="modal-value">' +
+  escHtml(
+    suggestion.isAnonymous
+      ? 'Anonymous'
+      : (suggestion.citizenName || '—')
+  ) +
+'</div>' +
 
   '<div class="modal-section-label">Address</div>' +
   '<div class="modal-value">' +
@@ -1830,12 +1871,12 @@ async function openAdminSuggestionDetail(suggestionId) {
     escHtml(String(suggestion.totalVotes || 0)) +
   '</div>' +
 
-  '<div class="modal-section-label">Status</div>' +
-  '<div class="modal-value">' +
-    '<span class="status-pill ' + statusClass + '">' +
-      escHtml(getSuggestionStatusText(suggestion.status)) +
-    '</span>' +
-  '</div>' +
+ '<div class="modal-section-label">Status</div>' +
+'<div class="modal-value">' +
+  '<span class="status-pill ' + getSuggestionStatusClass(suggestion.status) + '">' +
+    escHtml(suggestion.status || 'Unknown') +
+  '</span>' +
+'</div>' +
 
   '<div class="modal-section-label">Filed On</div>' +
   '<div class="modal-value">' +
@@ -1858,25 +1899,28 @@ async function openAdminSuggestionDetail(suggestionId) {
 
     '<select id="adminSuggestionStatusSelect">' +
 
-      '<option value="Pending"' +
-        ((status === '1' || status === 'pending')
-          ? ' selected'
-          : '') +
-      '>Pending</option>' +
+  suggestionStatuses.map(function(statusItem) {
 
-      '<option value="Approved"' +
-        ((status === '2' || status === 'approved')
-          ? ' selected'
-          : '') +
-      '>Approved</option>' +
+    return '<option value="' +
+      statusItem.suggestionStatusMasterId + '"' +
 
-      '<option value="Rejected"' +
-        ((status === '3' || status === 'rejected')
-          ? ' selected'
-          : '') +
-      '>Rejected</option>' +
+      (
+        String(statusItem.statusName).toLowerCase() ===
+        String(suggestion.status).toLowerCase()
 
-    '</select>' +
+          ? ' selected'
+          : ''
+      ) +
+
+      '>' +
+
+      escHtml(statusItem.statusName) +
+
+      '</option>';
+
+  }).join('') +
+
+'</select>' +
 
     '<textarea id="adminSuggestionRemarks" placeholder="Remarks (optional)"></textarea>' +
 
@@ -1902,6 +1946,95 @@ async function openAdminSuggestionDetail(suggestionId) {
 
   document.getElementById('modalOverlay')
     .classList.remove('hidden');
+}
+
+function getSuggestionStatusClass(status) {
+
+  if (!status)
+    return 'status-unknown';
+
+  status = String(status).toLowerCase();
+
+  if (status === 'pending')
+    return 'status-pending';
+
+  if (status === 'under review')
+    return 'status-review';
+
+  if (status === 'approved')
+    return 'status-approved';
+
+  if (status === 'implemented')
+    return 'status-implemented';
+
+  if (status === 'rejected')
+    return 'status-rejected';
+
+  return 'status-unknown';
+}
+
+async function submitSuggestionStatusUpdate(suggestionId) {
+
+    try {
+
+        const statusId =
+            document.getElementById(
+                'adminSuggestionStatusSelect'
+            ).value;
+
+        const remarks =
+            document.getElementById(
+                'adminSuggestionRemarks'
+            ).value;
+
+        const response = await fetch(
+            'http://localhost:5079/api/admin/suggestions/' +
+            suggestionId +
+            '/status',
+            {
+                method: 'PUT',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+
+                    suggestionId: suggestionId,
+
+                    suggestionStatusMasterId:
+                        parseInt(statusId),
+
+                    remarks: remarks,
+
+                    changedByUserId: 1
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        console.log(result);
+
+        if (result.success) {
+
+            alert('Suggestion status updated successfully');
+
+            closeModal();
+
+            await loadAdminSuggestions();
+
+        } else {
+
+            alert(result.message || 'Update failed');
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert('Error updating suggestion status');
+    }
 }
 
 async function submitAdminStatusUpdate() {
@@ -1951,8 +2084,11 @@ document.addEventListener('DOMContentLoaded', function() {
   syncAreaSummary();
 });
 
-window.onload = function () {
-    loadAdminSuggestions();
+window.onload = async function () {
+
+    await loadSuggestionStatuses();
+
+    await loadAdminSuggestions();
 };
 
 var allCitizens = [];

@@ -32,5 +32,7 @@ namespace CitizenConnect.Application.DTOs.Suggestion
 
         public bool IsAnonymous
         { get; set; }
+
+        public IFormFile? Attachment { get; set; }
     }
 }
