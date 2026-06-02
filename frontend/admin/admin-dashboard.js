@@ -1614,91 +1614,116 @@ function renderAdminComplaints(data) {
 }
 
 function openComplaintHistoryPopup(complaintId) {
-  
-  var complaint = adminComplaintsData.find(function(c){
-    return c.complaintId === complaintId;
+
+  const complaint = adminComplaintsData.find(function(c) {
+    return String(c.complaintId) === String(complaintId);
   });
 
   if (!complaint) return;
-console.log(Object.keys(complaint));
-  var historyHtml = '';
-var history =
-  complaint.statusHistory ||
-  complaint.history ||
-  complaint.complaintStatusHistory ||
-  [];
 
- if (history.length) {
-  console.log(history);
-
-    historyHtml = history.map(function(h){
-
-     return `
-  <div class="history-item">
-
-    <div class="history-dot"></div>
-
-    <div class="history-content">
-
-      <div class="history-status">
-        ${h.oldStatus
-          ? getComplaintStatusLabel(h.oldStatus) + ' → ' + getComplaintStatusLabel(h.newStatus)
-          : 'Complaint Created'}
-      </div>
-
-      <div class="history-date">
-        ${formatDate(h.createdAt || h.changedAt)}
-      </div>
-
-      ${h.remarks || h.comment
-        ? `<div class="history-remarks">
-             📝 ${h.remarks || h.comment}
-           </div>`
-        : ''
-      }
-
+  const historyHtml = `
+    <div class="modal-section-label">Complaint</div>
+    <div class="modal-value">
+      ${escHtml(complaint.title || '—')}
     </div>
 
-  </div>
-`;
-
-    }).join('');
-
-  } else {
-
-    historyHtml = `
-      <div class="item-empty">
-        No status history found.
-      </div>
-    `;
-  }
-
-  var modal = `
-    <div class="modal-overlay" id="historyModal">
-
-      <div class="modal-card">
-
-        <div class="modal-header">
-          <div class="modal-title">Status History</div>
-
-          <button class="modal-close"
-            onclick="closeHistoryModal()">
-            ✕
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <div class="complaint-history-list">
-            ${historyHtml}
-          </div>
-        </div>
-
-      </div>
-
+    <div class="modal-section-label">Status History</div>
+    <div id="complaint-history-container">
+      <div class="modal-value">Loading history...</div>
     </div>
   `;
-  document.body.insertAdjacentHTML('beforeend', modal);
-} 
+
+  document.getElementById('modalTitle').textContent =
+    'Complaint Status History';
+
+  document.getElementById('modalBody').innerHTML =
+    historyHtml;
+
+  document.getElementById('modalOverlay')
+    .classList.remove('hidden');
+
+  loadComplaintHistoryInline(
+    complaintId,
+    'complaint-history-container'
+  );
+}
+
+function closeComplaintHistoryModal() {
+
+  var modal =
+    document.getElementById('complaintHistoryModal');
+
+  if (modal) {
+    modal.remove();
+  }
+
+}
+
+async function loadComplaintHistoryInline(complaintId, containerId) {
+
+  try {
+
+   const res = await fetch(
+  `http://localhost:5079/api/Admin/complaint-history/${complaintId}`
+);
+
+    const history = await res.json();
+
+    const container = document.getElementById(containerId);
+
+    if (!container) return;
+
+    container.innerHTML = renderStatusHistory(history, 'complaint');
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderStatusHistory(history, type) {
+
+  if (!history || history.length === 0) {
+    return `
+  <div class="item-empty">
+    <div class="item-empty-icon">📜</div>
+    <div>No status history found</div>
+  </div>
+`;
+  }
+
+  return history.map(function(h){
+
+    var statusText =
+      h.oldStatus
+        ? getComplaintStatusLabel(h.oldStatus) + ' → ' + getComplaintStatusLabel(h.newStatus)
+        : (type === 'complaint' ? 'Complaint Created' : 'Suggestion Created');
+
+    return `
+      <div class="history-item">
+
+        <div class="history-dot"></div>
+
+        <div class="history-content">
+
+          <div class="history-status">
+            ${statusText}
+          </div>
+
+          <div class="history-date">
+            ${formatDate(h.createdAt || h.changedAt)}
+          </div>
+
+          ${h.remarks
+            ? `<div class="history-remarks">📝 ${h.remarks}</div>`
+            : ''
+          }
+
+        </div>
+
+      </div>
+    `;
+  }).join('');
+}
 
 function getComplaintStatusLabel(status) {
 
@@ -1767,33 +1792,6 @@ function applyAdminComplaintFilters() {
 } else {
   card.style.display = 'none';
 }
-  });
-  function filterAdminComplaints(status) {
-  applyAdminComplaintFilters();
-}
-
-function searchAdminComplaints(query) {
-  applyAdminComplaintFilters();
-}
-
-function applyAdminComplaintFilters() {
-  var statusEl = document.getElementById('adminComplaintStatusFilter');
-  var searchEl = document.getElementById('adminComplaintSearch');
-  var status = statusEl ? statusEl.value : 'all';
-  var q = searchEl ? searchEl.value.toLowerCase().trim() : '';
-  var cards = document.querySelectorAll('#adminComplaintsList .item-card');
-  var visibleCount = 0;
-  cards.forEach(function(card) {
-    var statusMatch = status === 'all' || card.dataset.status === status;
-    var searchMatch = !q ||
-      (card.dataset.title || '').includes(q) ||
-      (card.dataset.citizen || '').includes(q);
-    if (statusMatch && searchMatch) {
-  card.style.display = '';
-  visibleCount++;
-} else {
-  card.style.display = 'none';
-}
 });
 var list = document.getElementById('adminComplaintsList');
 
@@ -1811,7 +1809,6 @@ if (visibleCount === 0) {
       '<div>No complaints found.</div>' +
     '</div>'
   );
-}
 }
 }
 
