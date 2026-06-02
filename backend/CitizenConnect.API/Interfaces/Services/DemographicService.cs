@@ -161,5 +161,96 @@ namespace CitizenConnect.API.Services
 
             return true;
         }
+
+        public async Task<IEnumerable<ResponseDemographicDto>>
+    GetByJurisdictionAsync(int jurisdictionId)
+        {
+            return await _context.Demographics
+                .Where(x => x.JurisdictionId == jurisdictionId)
+                .Select(x => new ResponseDemographicDto
+                {
+                    DemographicId = x.DemographicId,
+                    JurisdictionId = x.JurisdictionId,
+                    JurisdictionName = x.Jurisdiction.JurisdictionName,
+                    WardId = x.WardId,
+                    WardName = x.Ward != null
+                        ? x.Ward.WardName
+                        : null,
+                    TotalPopulation = x.TotalPopulation,
+                    MalePopulation = x.MalePopulation,
+                    FemalePopulation = x.FemalePopulation,
+                    ChildPopulation = x.ChildPopulation,
+                    SeniorCitizenPopulation = x.SeniorCitizenPopulation,
+                    TotalHouseholds = x.TotalHouseholds,
+                    MaleLiteracyRate = x.MaleLiteracyRate,
+                    FemaleLiteracyRate = x.FemaleLiteracyRate,
+                    TotalLiteracyRate = x.TotalLiteracyRate,
+                    TotalVoters = x.TotalVoters,
+                    SurveyYear = x.SurveyYear,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
+        }
+
+
+        public async Task<IEnumerable<ResponseDemographicDto>>
+    GetByWardAsync(int wardId)
+        {
+            return await _context.Demographics
+                .Where(x => x.WardId == wardId)
+                .Select(x => new ResponseDemographicDto
+                {
+                    DemographicId = x.DemographicId,
+                    JurisdictionId = x.JurisdictionId,
+                    JurisdictionName = x.Jurisdiction.JurisdictionName,
+                    WardId = x.WardId,
+                    WardName = x.Ward != null
+                        ? x.Ward.WardName
+                        : null,
+                    TotalPopulation = x.TotalPopulation,
+                    MalePopulation = x.MalePopulation,
+                    FemalePopulation = x.FemalePopulation,
+                    ChildPopulation = x.ChildPopulation,
+                    SeniorCitizenPopulation = x.SeniorCitizenPopulation,
+                    TotalHouseholds = x.TotalHouseholds,
+                    MaleLiteracyRate = x.MaleLiteracyRate,
+                    FemaleLiteracyRate = x.FemaleLiteracyRate,
+                    TotalLiteracyRate = x.TotalLiteracyRate,
+                    TotalVoters = x.TotalVoters,
+                    SurveyYear = x.SurveyYear,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<ResponseDemographicDto>>
+    GetBySurveyYearAsync(int surveyYear)
+        {
+            return await _context.Demographics
+                .Where(x => x.SurveyYear == surveyYear)
+                .Select(x => new ResponseDemographicDto
+                {
+                    DemographicId = x.DemographicId,
+                    JurisdictionId = x.JurisdictionId,
+                    JurisdictionName = x.Jurisdiction.JurisdictionName,
+                    WardId = x.WardId,
+                    WardName = x.Ward != null
+                        ? x.Ward.WardName
+                        : null,
+                    TotalPopulation = x.TotalPopulation,
+                    MalePopulation = x.MalePopulation,
+                    FemalePopulation = x.FemalePopulation,
+                    ChildPopulation = x.ChildPopulation,
+                    SeniorCitizenPopulation = x.SeniorCitizenPopulation,
+                    TotalHouseholds = x.TotalHouseholds,
+                    MaleLiteracyRate = x.MaleLiteracyRate,
+                    FemaleLiteracyRate = x.FemaleLiteracyRate,
+                    TotalLiteracyRate = x.TotalLiteracyRate,
+                    TotalVoters = x.TotalVoters,
+                    SurveyYear = x.SurveyYear,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
+        }
     }
 }

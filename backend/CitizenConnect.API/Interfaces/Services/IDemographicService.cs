@@ -15,5 +15,14 @@ namespace CitizenConnect.API.Interfaces.Services
             UpdateDemographicDto dto);
 
         Task<bool> DeleteAsync(int demographicId);
+
+        Task<IEnumerable<ResponseDemographicDto>>
+    GetByJurisdictionAsync(int jurisdictionId);
+
+        Task<IEnumerable<ResponseDemographicDto>>
+            GetByWardAsync(int wardId);
+
+        Task<IEnumerable<ResponseDemographicDto>>
+            GetBySurveyYearAsync(int surveyYear);
     }
 }

@@ -64,6 +64,10 @@ builder.Services.AddScoped<
     IFacilityFieldService,
     FacilityFieldService>();
 
+builder.Services.AddScoped<
+    IDemographicService,
+    DemographicService>();
+
 
 builder.Services
     .AddScoped<ICloudinaryService,
