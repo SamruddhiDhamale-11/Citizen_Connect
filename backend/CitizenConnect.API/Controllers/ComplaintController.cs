@@ -1,5 +1,8 @@
 ﻿using CitizenConnect.DTOs.Complaint;
 using CitizenConnect.Interfaces.Services;
+using CitizenConnect.Infrastructure.Data;   // 👈 ADD THIS
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;    
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +13,15 @@ namespace CitizenConnect.Controllers
     public class ComplaintController : ControllerBase
     {
         private readonly IComplaintService _complaintService;
+private readonly ApplicationDbContext _context;
 
-        public ComplaintController(
-            IComplaintService complaintService)
-        {
-            _complaintService = complaintService;
-        }
+public ComplaintController(
+    IComplaintService complaintService,
+    ApplicationDbContext context)
+{
+    _complaintService = complaintService;
+    _context = context;
+}
 
 
         // =========================================
@@ -93,8 +99,6 @@ namespace CitizenConnect.Controllers
 
             return Ok(result);
         }
-
-
        
     }
 }

@@ -10,7 +10,6 @@ using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Services;
 using Microsoft.EntityFrameworkCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 

@@ -2688,6 +2688,7 @@ async function saveOfficer() {
       mobileNumber: document.getElementById('officerMobile').value,
       designation: document.getElementById('officerDesignation').value,
       departmentId: Number(document.getElementById('officerDepartment').value),
+      categoryId: Number(document.getElementById('officerCategory').value),
       isAvailable: document.getElementById('officerAvailability').value === 'true'
     };
 
@@ -2756,7 +2757,13 @@ async function editOfficer(id) {
     document.getElementById('officerEmail').value = officer.email;
     document.getElementById('officerMobile').value = officer.mobileNumber;
     document.getElementById('officerDesignation').value = officer.designation;
-    document.getElementById('officerDepartment').value = officer.departmentId;
+    document.getElementById('officerDepartment').value =
+  officer.departmentId;
+
+await loadCategoriesByDepartment(officer.departmentId);
+
+document.getElementById('officerCategory').value =
+  officer.categoryId;
     document.getElementById('officerAvailability').value = String(officer.isAvailable);
 
     document.getElementById('officerModalOverlay')
@@ -2854,3 +2861,47 @@ window.addEventListener('load', () => {
   loadDepartments();
   loadOfficers();
 });
+
+document.addEventListener('change', function (e) {
+
+  if (e.target.id === 'officerDepartment') {
+
+    const departmentId = e.target.value;
+
+    loadCategoriesByDepartment(departmentId);
+  }
+
+});
+
+async function loadCategoriesByDepartment(departmentId) {
+    try {
+        console.log("STEP 1 - Department selected:", departmentId);
+
+        const url = `${COMPLAINT_API_BASE}/categories/by-department/${departmentId}`;
+        console.log("Calling API:", url);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.error("API failed with status:", response.status);
+            return;
+        }
+
+        const result = await response.json();
+
+        console.log("STEP 1 - FILTERED CATEGORIES:", result);
+
+        const dropdown = document.getElementById("officerCategory");
+        dropdown.innerHTML = `<option value="">Select Category</option>`;
+
+        result.data.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.complaintCategoryId;
+            opt.textContent = c.categoryName;
+            dropdown.appendChild(opt);
+        });
+
+    } catch (err) {
+        console.error("Error loading categories:", err);
+    }
+}
