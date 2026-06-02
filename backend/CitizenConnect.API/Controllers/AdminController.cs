@@ -178,5 +178,24 @@ public async Task<IActionResult> GetSuggestionStatuses()
     }
 }
 
+        [HttpGet("categories/by-department/{departmentId}")]
+public async Task<IActionResult> GetCategoriesByDepartment(int departmentId)
+{
+    var result = await _context.ComplaintCategories
+        .Where(c => c.DepartmentId == departmentId && c.IsActive)
+        .Select(c => new
+        {
+            c.ComplaintCategoryId,
+            c.CategoryName
+        })
+        .ToListAsync();
+
+    return Ok(new
+    {
+        success = true,
+        data = result
+    });
+}
+
     }
 }

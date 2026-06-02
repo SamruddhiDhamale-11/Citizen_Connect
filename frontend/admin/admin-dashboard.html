@@ -691,6 +691,8 @@
 
           <th>Department</th>
 
+          <th>Category</th>
+
           <th>Designation</th>
 
           <th>Status</th>
@@ -831,7 +833,8 @@
           </label>
 
           <select id="officerDepartment"
-                  class="sd-select">
+        class="sd-select"
+        onchange="loadCategoriesByDepartment(this.value)">   
 
             <option value="">
               Select Department
@@ -840,6 +843,25 @@
           </select>
 
         </div>
+        
+       <!-- CATEGORY -->
+
+<div class="sd-field-group">
+
+  <label class="sd-field-label">
+    Category
+  </label>
+
+  <select id="officerCategory"
+          class="sd-select">  
+
+    <option value="">
+      Select Category
+    </option>
+
+  </select>
+
+</div>  
 
         <!-- STATUS -->
 
