@@ -1,6 +1,7 @@
 ﻿using CitizenConnect.API.DTOs.DemographicDto;
 using CitizenConnect.API.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CitizenConnect.API.Controllers
 {
@@ -148,5 +149,8 @@ namespace CitizenConnect.API.Controllers
 
             return Ok(data);
         }
+
+      
+        
     }
 }

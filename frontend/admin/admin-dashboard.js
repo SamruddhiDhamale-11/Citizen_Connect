@@ -97,9 +97,11 @@ var SECTION_FORMS = {
     { key:'childrenCount',   label:'Children Count (0–14)',          type:'number',   placeholder:'e.g. 3800' },
     { key:'seniorCount',     label:'Senior Citizen Count (60+)',     type:'number',   placeholder:'e.g. 1200' },
     { key:'totalVoters',     label:'Total Voters',                   type:'number',   placeholder:'e.g. 12400' },
+    {key:'totalHouses',     label:'Total Houses',                   type:'number',   placeholder:'e.g. 4230' },
     { key:'maleLiteracy',    label:'Male Literacy Rate (%)',         type:'text',     placeholder:'e.g. 88.5' },
     { key:'femaleLiteracy',  label:'Female Literacy Rate (%)',       type:'text',     placeholder:'e.g. 79.2' },
-    { key:'overallLiteracy', label:'Overall Literacy Rate (%)',      type:'text',     placeholder:'e.g. 84.1' }
+    { key:'overallLiteracy', label:'Overall Literacy Rate (%)',      type:'text',     placeholder:'e.g. 84.1' },
+    {key:'SurveyYear',      label:'Survey Year',                    type:'number',   placeholder:'e.g. 2023'  }
   ]},
   'representatives': { icon:'&#x1F3DB;&#xFE0F;', fields:[
     { key:'members', label:'Representatives & Members', type:'members' }
