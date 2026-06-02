@@ -106,6 +106,9 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<FacilityFieldOption> FacilityFieldOptions
     => Set<FacilityFieldOption>();
 
+        public DbSet<Demographic> Demographics { get; set; }
+
+        
         // =====================================================
         // MODEL CONFIGURATION
         // =====================================================
@@ -352,6 +355,12 @@ namespace CitizenConnect.Infrastructure.Data
     .HasForeignKey(x => x.CitizenId)
     .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Demographic>()
+    .HasOne(d => d.Jurisdiction)
+    .WithMany(j => j.Demographics)
+    .HasForeignKey(d => d.JurisdictionId)
+    .OnDelete(DeleteBehavior.Restrict);
+
 
             modelBuilder.Entity<SuggestionVote>()
     .HasOne(x => x.Citizen)
@@ -427,6 +436,12 @@ namespace CitizenConnect.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(f => f.FacilityModuleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Demographic>()
+    .HasOne(d => d.Ward)
+    .WithMany(w => w.Demographics)
+    .HasForeignKey(d => d.WardId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
             // UNIQUE CONSTRAINTS
@@ -803,6 +818,31 @@ namespace CitizenConnect.Infrastructure.Data
         x.OptionText
     })
     .IsUnique();
+
+
+            modelBuilder.Entity<Demographic>(entity =>
+            {
+                entity.HasKey(d => d.DemographicId);
+
+                entity.Property(d => d.MaleLiteracyRate)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(d => d.FemaleLiteracyRate)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(d => d.TotalLiteracyRate)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.HasOne(d => d.Jurisdiction)
+                    .WithMany(j => j.Demographics)
+                    .HasForeignKey(d => d.JurisdictionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Ward)
+                    .WithMany(w => w.Demographics)
+                    .HasForeignKey(d => d.WardId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }

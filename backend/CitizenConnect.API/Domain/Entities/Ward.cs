@@ -47,5 +47,10 @@ namespace CitizenConnect.Domain.Entities
         public ICollection<FacilityData> FacilityDatas
         { get; set; }
     = new List<FacilityData>();
+
+        public ICollection<Demographic> Demographics
+        {
+            get; set;
+        } = new List<Demographic>();
     }
 }
