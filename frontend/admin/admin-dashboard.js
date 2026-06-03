@@ -2534,51 +2534,45 @@ function renderOfficerTable(data) {
 
   let html = '';
 
-  data.forEach(officer => {
+ data.forEach(officer => {
 
-    const statusClass =
-      officer.isAvailable
-        ? 'active'
-        : 'inactive';
+  const statusClass = officer.isAvailable ? 'active' : 'inactive';
+  const statusLabel = officer.isAvailable ? 'Available' : 'Unavailable';
 
-    const statusLabel =
-      officer.isAvailable
-        ? 'Available'
-        : 'Unavailable';
+  const categories = officer.categoryNames && officer.categoryNames.length
+    ? officer.categoryNames.join(', ')
+    : '—';
 
-    html += `
-      <tr>
-        <td>${officer.fullName}</td>
-        <td>${officer.email}</td>
-        <td>${officer.mobileNumber}</td>
-        <td>${officer.departmentName}</td>
-        <td>${officer.designation}</td>
+  html += `
+    <tr>
+      <td>${officer.fullName}</td>
+      <td>${officer.email}</td>
+      <td>${officer.mobileNumber}</td>
+      <td>${officer.departmentName}</td>
 
-        <td>
-          <span class="staff-status ${statusClass}">
-            ${statusLabel}
-          </span>
-        </td>
+      <!-- CATEGORY FIX -->
+      <td>${categories}</td>
 
-        <td>
-          <div class="staff-actions">
+      <td>${officer.designation}</td>
 
-            <button class="staff-btn edit"
-                    onclick="editOfficer(${officer.officerId})">
-              ✏️
-            </button>
+      <td>
+        <span class="staff-status ${statusClass}">
+          ${statusLabel}
+        </span>
+      </td>
 
-            <button class="staff-btn delete"
-                    onclick="deleteOfficer(${officer.officerId})">
-              🗑️
-            </button>
+      <td>
+        <div class="staff-actions">
+          <button class="staff-btn edit"
+            onclick="editOfficer(${officer.officerId})">✏️</button>
 
-          </div>
-        </td>
-
-      </tr>
-    `;
-  });
+          <button class="staff-btn delete"
+            onclick="deleteOfficer(${officer.officerId})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `;
+});
 
   tableBody.innerHTML = html;
 }
@@ -2717,21 +2711,38 @@ async function saveOfficer() {
       );
     }
 
+    // ✅ ERROR HANDLING (fixed)
     if (!response.ok) {
-      throw new Error('Failed to save officer.');
+
+      let errorMessage = 'Failed to save officer.';
+
+      try {
+        const errorData = await response.json();
+        errorMessage =
+          errorData?.message ||
+          errorData?.title ||
+          JSON.stringify(errorData);
+      } catch (e) {
+        errorMessage = await response.text();
+      }
+
+      throw new Error(errorMessage);
     }
 
+    // ✅ SUCCESS FLOW
     showToast('Officer saved successfully.', 'success');
 
     closeOfficerModal();
     loadOfficers();
+
+    selectedOfficerId = null;
 
   } catch (error) {
 
     console.error(error);
 
     showToast(
-      'Unable to save officer.',
+      error.message || 'Unable to save officer.',
       'error'
     );
   }
@@ -2826,7 +2837,7 @@ function filterOfficers() {
    APPLY FILTERS
    ============================================================ */
 
-function applyOfficerFilters() {
+function applyOfficerFilters() {    
 
   const search = document.getElementById('officerSearch').value.toLowerCase();
   const department = document.getElementById('departmentFilter').value;
@@ -2838,7 +2849,7 @@ function applyOfficerFilters() {
       officer.fullName.toLowerCase().includes(search);
 
     const matchesDepartment =
-      department === 'all' ||
+      department === 'all' || 
       officer.departmentName === department;
 
     const matchesStatus =

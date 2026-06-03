@@ -24,4 +24,7 @@ public class ComplaintCategory : BaseEntity
     public ICollection<Complaint> Complaints
     { get; set; }
         = new List<Complaint>();
+
+    public ICollection<OfficerCategoryMapping> OfficerCategoryMappings { get; set; }
+    = new List<OfficerCategoryMapping>();
 }

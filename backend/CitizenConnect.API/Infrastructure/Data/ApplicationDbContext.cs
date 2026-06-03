@@ -89,6 +89,7 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<ComplaintStatusMaster>
             ComplaintStatusMasters
                 => Set<ComplaintStatusMaster>();
+        public DbSet<OfficerCategoryMapping> OfficerCategoryMappings { get; set; }
 
         // =====================================================
         // DYNAMIC FACILITY SYSTEM
@@ -333,6 +334,16 @@ namespace CitizenConnect.Infrastructure.Data
                 .WithMany(x => x.WardDepartments)
                 .HasForeignKey(x => x.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OfficerCategoryMapping>()
+    .HasOne(x => x.Officer)
+    .WithMany(o => o.OfficerCategoryMappings)
+    .HasForeignKey(x => x.OfficerId);
+
+modelBuilder.Entity<OfficerCategoryMapping>()
+    .HasOne(x => x.ComplaintCategory)
+    .WithMany(c => c.OfficerCategoryMappings)
+    .HasForeignKey(x => x.ComplaintCategoryId);
 
             // =====================================================
             // SUGGESTION STATUS MASTER
