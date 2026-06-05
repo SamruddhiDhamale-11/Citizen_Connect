@@ -43,12 +43,37 @@ namespace CitizenConnect.Application.Services
                 await _context.Officers
                     .AnyAsync(x =>
                         x.Email == dto.Email);
+if (emailExists)
+{
+    return new OfficerResponseDto
+    {
+        OfficerId = 0,
+        FullName = "",
+        Email = "EMAIL_EXISTS",
+        MobileNumber = "",
+        Designation = "",
+        DepartmentId = 0,
+        DepartmentName = "",
+        IsAvailable = false
+    };
+}
+           var exists = await _context.Officers
+    .AnyAsync(o => o.MobileNumber == dto.MobileNumber);
 
-            if (emailExists)
-            {
-                throw new Exception(
-                    "Officer email already exists.");
-            }
+if (exists)
+{
+    return new OfficerResponseDto
+    {
+        OfficerId = 0,
+        FullName = "",
+        Email = "MOBILE_EXISTS",
+        MobileNumber = "",
+        Designation = "",
+        DepartmentId = 0,
+        DepartmentName = "",
+        IsAvailable = false
+    };
+}
 
             var officer = new Officer
             {
@@ -105,36 +130,27 @@ namespace CitizenConnect.Application.Services
         public async Task<List<OfficerResponseDto>>
             GetAllOfficersAsync()
         {
-            return await _context.Officers
-                .Include(x => x.Department)
-                .Select(x =>
-                    new OfficerResponseDto
-                    {
-                        OfficerId = x.OfficerId,
+           return await _context.Officers
+    .Include(x => x.Department)
+    .Include(x => x.OfficerCategoryMappings)
+        .ThenInclude(m => m.ComplaintCategory)
+    .Select(x => new OfficerResponseDto
+    {
+        OfficerId = x.OfficerId,
+        FullName = x.FirstName + " " + x.LastName,
+        Email = x.Email,
+        MobileNumber = x.MobileNumber,
+        Designation = x.Designation,
+        DepartmentId = x.DepartmentId,
+        DepartmentName = x.Department.DepartmentName,
+        IsAvailable = x.IsAvailable,
 
-                        FullName =
-                            x.FirstName
-                            + " "
-                            + x.LastName,
-
-                        Email = x.Email,
-
-                        MobileNumber =
-                            x.MobileNumber,
-
-                        Designation =
-                            x.Designation,
-
-                        DepartmentId =
-                            x.DepartmentId,
-
-                        DepartmentName =
-                            x.Department.DepartmentName,
-
-                        IsAvailable =
-                            x.IsAvailable
-                    })
-                .ToListAsync();
+        CategoryNames = x.OfficerCategoryMappings
+            .Where(m => m.IsActive)
+            .Select(m => m.ComplaintCategory.CategoryName)
+            .ToList()
+    })
+    .ToListAsync();
         }
 
         /// <summary>
