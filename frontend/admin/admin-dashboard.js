@@ -581,7 +581,7 @@ function resetAreaData() {
    ============================================================ */
 function logout() {
   showConfirm('Logout', 'Are you sure you want to logout?', function() {
-    window.location.href = '../login/login.html';
+    window.location.href = "../home/login/admin/admin-login.html";
   });
 }
 
@@ -1184,7 +1184,7 @@ function requireAdminSession() {
   var userId = localStorage.getItem('userId');
   var role = localStorage.getItem('role');
   if (!userId || role !== 'Admin') {
-    window.location.href = '../login/login.html';
+   window.location.href = "../home/login/admin/admin-login.html";
     return false;
   }
   return true;
