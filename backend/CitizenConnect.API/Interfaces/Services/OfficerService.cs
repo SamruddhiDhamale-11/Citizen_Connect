@@ -90,6 +90,17 @@ if (exists)
 
             await _context.SaveChangesAsync();
 
+            var mapping = new OfficerCategoryMapping
+            {
+                OfficerId = officer.OfficerId,
+                ComplaintCategoryId = dto.CategoryId,
+                IsActive = true
+            };
+
+            _context.OfficerCategoryMappings.Add(mapping);
+
+            await _context.SaveChangesAsync();
+
             var department =
                 await _context.Departments
                     .FirstAsync(x =>
@@ -145,10 +156,15 @@ if (exists)
         DepartmentName = x.Department.DepartmentName,
         IsAvailable = x.IsAvailable,
 
+        CategoryId = x.OfficerCategoryMappings
+    .Where(m => m.IsActive)
+    .Select(m => (int?)m.ComplaintCategoryId)
+    .FirstOrDefault(),
+
         CategoryNames = x.OfficerCategoryMappings
-            .Where(m => m.IsActive)
-            .Select(m => m.ComplaintCategory.CategoryName)
-            .ToList()
+    .Where(m => m.IsActive)
+    .Select(m => m.ComplaintCategory.CategoryName)
+    .ToList()
     })
     .ToListAsync();
         }
@@ -161,35 +177,38 @@ if (exists)
         {
             return await _context.Officers
                 .Include(x => x.Department)
+.Include(x => x.OfficerCategoryMappings)
+.ThenInclude(x => x.ComplaintCategory)
                 .Where(x =>
                     x.OfficerId == officerId)
-                .Select(x =>
-                    new OfficerResponseDto
-                    {
-                        OfficerId = x.OfficerId,
+                .Select(x => new OfficerResponseDto
+                {
+                    OfficerId = x.OfficerId,
 
-                        FullName =
-                            x.FirstName
-                            + " "
-                            + x.LastName,
+                    FullName = x.FirstName + " " + x.LastName,
 
-                        Email = x.Email,
+                    Email = x.Email,
 
-                        MobileNumber =
-                            x.MobileNumber,
+                    MobileNumber = x.MobileNumber,
 
-                        Designation =
-                            x.Designation,
+                    Designation = x.Designation,
 
-                        DepartmentId =
-                            x.DepartmentId,
+                    DepartmentId = x.DepartmentId,
 
-                        DepartmentName =
-                            x.Department.DepartmentName,
+                    DepartmentName = x.Department.DepartmentName,
 
-                        IsAvailable =
-                            x.IsAvailable
-                    })
+                    CategoryId = x.OfficerCategoryMappings
+        .Where(m => m.IsActive)
+        .Select(m => (int?)m.ComplaintCategoryId)
+        .FirstOrDefault(),
+
+                    CategoryNames = x.OfficerCategoryMappings
+        .Where(m => m.IsActive)
+        .Select(m => m.ComplaintCategory.CategoryName)
+        .ToList(),
+
+                    IsAvailable = x.IsAvailable
+                })
                 .FirstOrDefaultAsync();
         }
 
@@ -232,6 +251,28 @@ if (exists)
 
             officer.IsAvailable =
                 dto.IsAvailable;
+
+            var existingMapping =
+    await _context.OfficerCategoryMappings
+        .FirstOrDefaultAsync(x =>
+            x.OfficerId == officerId &&
+            x.IsActive);
+
+            if (existingMapping != null)
+            {
+                existingMapping.ComplaintCategoryId =
+                    dto.CategoryId;
+            }
+            else
+            {
+                _context.OfficerCategoryMappings.Add(
+                    new OfficerCategoryMapping
+                    {
+                        OfficerId = officerId,
+                        ComplaintCategoryId = dto.CategoryId,
+                        IsActive = true
+                    });
+            }
 
             await _context.SaveChangesAsync();
 

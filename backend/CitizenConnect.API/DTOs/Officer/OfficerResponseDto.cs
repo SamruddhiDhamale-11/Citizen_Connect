@@ -21,6 +21,8 @@
         public string DepartmentName { get; set; }
             = string.Empty;
 
+        public int? CategoryId { get; set; }
+
         public List<string> CategoryNames { get; set; } = new();
 
         public bool IsAvailable { get; set; }
