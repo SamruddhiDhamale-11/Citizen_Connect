@@ -2562,7 +2562,6 @@ function renderOfficerTable(data) {
           ${statusLabel}
         </span>
       </td>
-
       <td>
         <div class="staff-actions">
           <button class="staff-btn edit"
