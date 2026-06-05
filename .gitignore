@@ -17,3 +17,11 @@ node_modules/
 
 # Environment files
 .env
+
+# Upload files
+backend/CitizenConnect.API/wwwroot/uploads/
+
+# Images
+*.png
+*.jpg
+*.jpeg
