@@ -16,7 +16,11 @@ namespace CitizenConnect.DTOs.Complaint
 
         public string Address { get; set; } = string.Empty;
 
-        public decimal Latitude { get; set; }
+    public string CategoryName { get; set; }
+
+    public int DepartmentId { get; set; }
+
+       public decimal Latitude { get; set; }
 
         public decimal Longitude { get; set; }
 
