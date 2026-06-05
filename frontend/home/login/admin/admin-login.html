@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Connect — Admin Login</title>
+  <link rel="stylesheet" href="admin-login.css" />
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-overlay"></div>
+
+  <!-- Main Wrapper -->
+  <div class="page-wrapper">
+
+    <!-- ===== LOGIN CARD ===== -->
+    <div class="card" id="loginCard">
+      <div class="card-header">
+        <div class="header-logo-row">
+          <div class="header-emblem">🏛️</div>
+          <div class="header-text-block">
+            <span class="gov-badge">Government of India</span>
+            <h1 class="portal-title">Citizen Connect</h1>
+            <p class="portal-subtitle">Admin Portal</p>
+          </div>
+        </div>
+        <div class="divider"></div>
+      </div>
+
+      <div class="card-body">
+        <form id="loginForm" novalidate>
+
+          <div class="form-section">
+            <div class="form-section-title">Access Credentials</div>
+
+            <div class="form-group">
+              <label for="loginEmail"><strong>Email Address or Mobile Number</strong> <span class="req">*</span></label>
+              <input type="text" id="loginEmail" placeholder="Enter email or 10-digit mobile" required />
+            </div>
+
+            <div class="form-group">
+              <label for="loginPassword"><strong>Password</strong> <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <input type="password" id="loginPassword" placeholder="Enter your password" required />
+                <span class="toggle-pw" onclick="togglePassword('loginPassword', this)">🗡</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin notice -->
+          <div class="admin-notice">
+            🔒 Admin accounts are created by system authority. Self-registration is not available for this role.
+          </div>
+
+          <!-- ===== CAPTCHA SECTION ===== -->
+          <div class="captcha-section">
+            <div class="captcha-section-title">Security Verification</div>
+
+            <div class="captcha-display-row">
+              <div class="captcha-box" id="captchaBox" aria-label="Captcha code">
+                <canvas id="captchaCanvas" width="180" height="48" aria-hidden="true"></canvas>
+              </div>
+              <button type="button" class="captcha-refresh-btn" onclick="generateCaptcha()" title="Refresh captcha" aria-label="Refresh captcha">
+                <span class="captcha-refresh-icon">&#x21BB;</span>
+              </button>
+            </div>
+
+            <div class="form-group" style="margin-top:10px;">
+              <label for="captchaInput"><strong>Enter Captcha</strong> <span class="req">*</span></label>
+              <input type="text" id="captchaInput" placeholder="Type the code shown above" autocomplete="off" maxlength="6" />
+            </div>
+          </div>
+
+          <div class="form-row-between">
+            <label class="checkbox-label">
+              <input type="checkbox" id="rememberMe" />
+              Remember Me
+            </label>
+            <a href="#" class="link-text">Forgot Password?</a>
+          </div>
+
+          <div class="error-msg" id="loginError"></div>
+
+          <button type="submit" class="btn-primary">Login to Portal</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      &copy; 2026 Citizen Connect &mdash; Smart Governance Portal &nbsp;|&nbsp; All Rights Reserved
+    </div>
+
+  </div><!-- end page-wrapper -->
+
+  <script src="admin-login.js"></script>
+</body>
+</html>

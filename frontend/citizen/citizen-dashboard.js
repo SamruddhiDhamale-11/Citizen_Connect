@@ -31,7 +31,7 @@ function requireCitizenSession() {
   const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
   if (!userId || role !== "Citizen") {
-    window.location.href = "../login/login.html";
+    window.location.href = "../home/login/citizen/citizen-login.html";
     return false;
   }
   return true;
@@ -422,7 +422,7 @@ function logout() {
     localStorage.removeItem("userId");
     localStorage.removeItem("role");
     localStorage.removeItem("citizenId");
-    window.location.href = "../login/login.html";
+   window.location.href = "../home/login/citizen/citizen-login.html";
   }
 }
 

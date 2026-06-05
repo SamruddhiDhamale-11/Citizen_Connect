@@ -52,7 +52,7 @@ function closeSidebar() {
 
 function logout() {
   if (confirm("Are you sure you want to logout?")) {
-    window.location.href = "../login/login.html";
+    window.location.href = "../home/login/politician/politician-login.html";
   }
 }
 

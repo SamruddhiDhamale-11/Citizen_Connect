@@ -1,0 +1,595 @@
+/* ============================================================
+   CITIZEN CONNECT — Admin Login Stylesheet
+   Primary:   #C21807  (Cherry Red)
+   Secondary: #FDECEA  (Light Cherry)
+   Text:      #1F1F1F
+   Border:    #E0E0E0
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --red:        #C21807;
+  --red-dark:   #9B1405;
+  --red-deeper: #7A1004;
+  --red-light:  #FDECEA;
+  --red-glow:   rgba(194, 24, 7, 0.10);
+  --white:      #FFFFFF;
+  --text:       #1F1F1F;
+  --text-mid:   #4A4A4A;
+  --text-muted: #7A7A7A;
+  --border:     #E0E0E0;
+  --border-focus: #C21807;
+  --bg-section: #F9F9F9;
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.09), 0 1px 4px rgba(0,0,0,0.05);
+  --radius-card: 12px;
+  --radius-input: 7px;
+  --radius-btn: 8px;
+  --radius-section: 8px;
+  --transition: 0.2s ease;
+}
+
+html {
+  font-size: 15px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?fm=jpg&q=100&w=1920&auto=format&fit=crop');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 0;
+}
+
+.bg-overlay { display: none; }
+
+/* ================================================================
+   PAGE WRAPPER
+   ================================================================ */
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 52px 16px 40px;
+}
+
+/* ================================================================
+   CARD
+   ================================================================ */
+.card {
+  background: var(--white);
+  width: 700px;
+  max-width: 95%;
+  padding: 0;
+  border-radius: var(--radius-card);
+  border: 1px solid #eee;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  animation: fadeUpCard 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes fadeUpCard {
+  from { opacity: 0; transform: translateY(28px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+.hidden { display: none !important; }
+
+/* ================================================================
+   CARD HEADER
+   ================================================================ */
+.card-header {
+  background: var(--white);
+  border-bottom: 3px solid var(--red);
+  padding: 32px 40px 26px;
+  text-align: center;
+  position: relative;
+}
+
+.header-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.header-emblem {
+  width: 48px;
+  height: 48px;
+  background: var(--red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(194,24,7,0.25);
+}
+
+.header-text-block { text-align: left; }
+
+.gov-badge {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.portal-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--red);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.portal-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.divider { display: none; }
+
+/* ================================================================
+   CARD BODY
+   ================================================================ */
+.card-body { padding: 32px 40px 36px; }
+
+/* ================================================================
+   SECTION BLOCKS
+   ================================================================ */
+.form-section {
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-section);
+  padding: 22px 24px 18px;
+  margin-bottom: 20px;
+}
+
+.form-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E8E8E8;
+}
+
+/* ================================================================
+   FORM GROUPS
+   ================================================================ */
+.form-group { margin-bottom: 16px; }
+.form-group:last-child { margin-bottom: 0; }
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+.req { color: var(--red); margin-left: 1px; }
+
+/* ================================================================
+   INPUTS & SELECTS
+   ================================================================ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--white);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1.5;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="tel"]:hover,
+select:hover { border-color: #bbb; }
+
+input:focus,
+select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+  background: #fff;
+}
+
+input::placeholder { color: #b0b0b0; font-size: 0.87rem; }
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+  cursor: pointer;
+}
+
+/* ================================================================
+   REMEMBER ME / FORGOT ROW
+   ================================================================ */
+.form-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ================================================================
+   CHECKBOX
+   ================================================================ */
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 0.84rem;
+  color: var(--text-mid);
+  cursor: pointer;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--red);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ================================================================
+   PASSWORD TOGGLE
+   ================================================================ */
+.input-icon-wrap { position: relative; }
+.input-icon-wrap input { padding-right: 46px; }
+
+.toggle-pw {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  user-select: none;
+  line-height: 1;
+  transition: color var(--transition);
+}
+.toggle-pw:hover { color: var(--red); }
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.btn-primary {
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background var(--transition), box-shadow var(--transition), transform 0.12s ease;
+  box-shadow: 0 2px 8px rgba(194, 24, 7, 0.22);
+}
+
+.btn-primary:hover {
+  background: var(--red-dark);
+  box-shadow: 0 4px 16px rgba(194, 24, 7, 0.32);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  background: var(--red-deeper);
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(194, 24, 7, 0.18);
+}
+
+.btn-row { margin-top: 10px; }
+
+/* ================================================================
+   LINKS
+   ================================================================ */
+.link-text {
+  color: var(--red);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.84rem;
+  transition: color var(--transition);
+}
+.link-text:hover { color: var(--red-dark); text-decoration: underline; }
+
+/* ================================================================
+   ERROR MESSAGE
+   ================================================================ */
+.error-msg {
+  font-size: 0.81rem;
+  color: #b91c1c;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-left: 3px solid #C21807;
+  padding: 9px 13px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  display: none;
+  line-height: 1.5;
+}
+
+.error-msg.visible {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  animation: fadeUpCard 0.22s ease both;
+}
+
+.error-msg.visible::before {
+  content: '⚠';
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ================================================================
+   ADMIN NOTICE
+   ================================================================ */
+.admin-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+  border-left: 3px solid #F59E0B;
+  color: #7A5C00;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+/* ================================================================
+   CAPTCHA SECTION
+   ================================================================ */
+.captcha-section {
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-section);
+  padding: 18px 20px 16px;
+  margin-bottom: 20px;
+}
+
+.captcha-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.captcha-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E8E8E8;
+}
+
+.captcha-display-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.captcha-box {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-input);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+  line-height: 0;
+}
+
+.captcha-box canvas {
+  display: block;
+  width: 100%;
+  height: 48px;
+}
+
+.captcha-refresh-btn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 48px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), border-color var(--transition), transform 0.2s ease;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.captcha-refresh-btn:hover {
+  background: var(--red-light);
+  border-color: var(--red);
+  color: var(--red);
+  transform: rotate(180deg);
+}
+
+.captcha-refresh-icon { display: block; line-height: 1; }
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+.page-footer {
+  margin-top: 28px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.48);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 991px) {
+  .card { width: 600px; }
+  .card-header { padding: 28px 32px 22px; }
+  .card-body { padding: 28px 32px 32px; }
+  .portal-title { font-size: 1.6rem; }
+}
+
+@media (max-width: 767px) {
+  html { font-size: 14px; }
+  .page-wrapper { padding: 24px 12px 32px; }
+  .card { width: 100%; max-width: 540px; border-radius: 10px; }
+  .card-header { padding: 22px 24px 18px; }
+  .card-body { padding: 22px 20px 26px; }
+  .header-logo-row { gap: 10px; }
+  .header-emblem { width: 42px; height: 42px; font-size: 1.2rem; }
+  .portal-title { font-size: 1.45rem; }
+  .gov-badge { font-size: 0.62rem; }
+  .portal-subtitle { font-size: 0.72rem; }
+  .form-section { padding: 16px 14px 14px; margin-bottom: 16px; }
+  .captcha-section { padding: 14px 14px 12px; }
+  .captcha-box canvas { height: 44px; }
+  .page-footer { font-size: 0.68rem; margin-top: 20px; }
+}
+
+@media (max-width: 575px) {
+  html { font-size: 13.5px; }
+  .page-wrapper { padding: 16px 8px 24px; }
+  .card { border-radius: 8px; margin-left: 0; margin-right: 0; }
+  .card-header { padding: 18px 16px 14px; }
+  .card-body { padding: 18px 14px 22px; }
+  .header-logo-row { flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .header-text-block { text-align: center; }
+  .portal-title { font-size: 1.3rem; }
+  .gov-badge { font-size: 0.6rem; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { font-size: 0.76rem; }
+  input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select {
+    font-size: 0.88rem; padding: 10px 12px;
+  }
+  select { padding-right: 34px; background-position: right 10px center; }
+  .checkbox-label { font-size: 0.8rem; gap: 8px; }
+  .checkbox-label input[type="checkbox"] { width: 17px; height: 17px; }
+  .btn-primary { padding: 12px 16px; font-size: 0.84rem; }
+  .toggle-pw { right: 10px; font-size: 0.88rem; }
+  .input-icon-wrap input { padding-right: 40px; }
+  .error-msg { font-size: 0.77rem; padding: 8px 11px; }
+  .admin-notice { font-size: 0.78rem; padding: 9px 12px; }
+  .form-row-between { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+  .captcha-section { padding: 12px 12px 10px; }
+  .captcha-display-row { gap: 8px; }
+  .captcha-box canvas { height: 42px; }
+  .captcha-refresh-btn { width: 38px; height: 42px; font-size: 1.05rem; }
+  .page-footer { font-size: 0.64rem; margin-top: 16px; padding: 0 8px; }
+}
+
+@media (max-width: 399px) {
+  html { font-size: 13px; }
+  .page-wrapper { padding: 12px 4px 20px; }
+  .card { border-radius: 6px; }
+  .card-header { padding: 14px 12px 12px; }
+  .card-body { padding: 14px 10px 18px; }
+  .portal-title { font-size: 1.2rem; }
+  .header-emblem { width: 36px; height: 36px; font-size: 1rem; }
+  .form-section { padding: 12px 10px 10px; }
+  .btn-primary { padding: 11px 14px; font-size: 0.82rem; }
+  .captcha-box canvas { height: 40px; }
+  .captcha-refresh-btn { width: 36px; height: 40px; }
+  .admin-notice, .error-msg { max-width: 100%; overflow-wrap: break-word; word-break: break-word; }
+}
+
+@media (min-width: 1200px) {
+  .card { width: 720px; }
+  .card-header { padding: 36px 48px 28px; }
+  .card-body { padding: 36px 48px 40px; }
+  .portal-title { font-size: 1.9rem; }
+}
+
+html, body { max-width: 100%; overflow-x: hidden; }
+
+.page-wrapper, .card, .card-body, .card-header,
+.form-section, .captcha-section {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+canvas { max-width: 100%; display: block; }
+input, select, textarea, button { max-width: 100%; box-sizing: border-box; }
+
+@media (hover: none) and (pointer: coarse) {
+  .checkbox-label { min-height: 44px; align-items: center; }
+  .btn-primary { min-height: 48px; }
+  .captcha-refresh-btn { min-height: 48px; min-width: 48px; }
+  .btn-primary:hover { transform: none; }
+}
