@@ -239,6 +239,7 @@
               </label>
             </div>
 
+
             <div class="error-msg-dash hidden" id="complaintError"></div>
 
             <div class="form-actions">
@@ -449,6 +450,43 @@
     <span class="toast-icon" id="toastIcon">✅</span>
     <span id="toastMsg">Submitted successfully!</span>
   </div>
+
+  <div id="officerModal"
+     class="hidden">
+
+  <div class="profile-card">
+
+    <h2>Assigned Officer</h2>
+
+    <p>
+      <strong>Name:</strong>
+      <span id="officerName"></span>
+    </p>
+
+    <p>
+      <strong>Designation:</strong>
+      <span id="officerDesignation"></span>
+    </p>
+
+    <p>
+      <strong>Mobile:</strong>
+      <span id="officerMobile"></span>
+    </p>
+
+    <p>
+      <strong>Email:</strong>
+      <span id="officerEmail"></span>
+    </p>
+
+    <button
+      class="btn-submit"
+      onclick="closeOfficerModal()">
+      Close
+    </button>
+
+  </div>
+
+</div>
 
   <script src="citizen-dashboard.js"></script>
 </body>

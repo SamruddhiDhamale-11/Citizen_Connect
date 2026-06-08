@@ -43,6 +43,8 @@ public List<ComplaintStatusHistoryDto> StatusHistory { get; set; }
         public string OfficerMobileNumber { get; set; }
             = string.Empty;
 
+        public string OfficerEmail { get; set; }
+    = string.Empty;
         public int SLAHours { get; set; }
 
         public DateTime? ExpectedResolutionTime

@@ -9,7 +9,7 @@ const COMPLAINT_API_BASE = "http://localhost:5079/api/Complaint";
 const SUGGESTION_API_BASE = "http://localhost:5079/api/suggestions";
 
 const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
-
+let complaintData = [];
 
 // ---- Init ----
 document.addEventListener("DOMContentLoaded", function () {
@@ -155,6 +155,7 @@ async function loadCitizenComplaints() {
     const list = Array.isArray(data)
       ? data.map(mapApiComplaintToCard)
       : [];
+    complaintData = list;
     renderComplaints(list);
     updateComplaintStats(list);
   } catch (_) {
@@ -235,6 +236,10 @@ function mapApiComplaintToCard(c) {
     title: c.title || "",
     category: c.categoryName || "",
     desc: c.description || "",
+    officerName: c.officerName,
+    officerMobile: c.officerMobileNumber,
+    officerEmail: c.officerEmail,
+    officerDesignation: c.officerDesignation,
     location: c.address || "",
     date: formatDate(new Date(c.createdAt)),
     status: normalizeComplaintStatus(c.status),
@@ -910,10 +915,27 @@ function renderComplaints(data) {
       '</div>' +
       '<div class="item-card-desc">' + escHtml(c.desc) + '</div>' +
       '<div class="item-card-footer">' +
-        '<span class="item-card-date"> ' + c.date + '</span>' +
-        '<span class="item-card-date"> ' + escHtml(c.location) + '</span>' +
-        '<span class="priority-pill ' + c.priority + '">' + c.priority.toUpperCase() + '</span>' +
-      '</div>' +
+
+    '<span class="item-card-date"> ' + c.date + '</span>' +
+
+    '<span class="item-card-date"> ' + escHtml(c.location) + '</span>' +
+
+    '<span class="priority-pill ' + c.priority + '">' +
+        c.priority.toUpperCase() +
+    '</span>' +
+
+    (
+        c.status === "inprogress" ||
+        c.status === "resolved"
+    ?
+    '<button class="btn-outline officer-btn" ' +
+    'onclick="showOfficerDetails(\'' + c.id + '\')">' +
+    '👮 View Officer' +
+    '</button>'
+    : ''
+    ) +
+
+'</div>'+
     '</div>';
   }).join("");
 }
@@ -985,6 +1007,40 @@ function showToast(icon, msg) {
   setTimeout(function () { toast.classList.add("hidden"); }, 4000);
 }
 
+function showOfficerDetails(complaintId)
+{
+    const complaint =
+        complaintData.find(
+            x => x.id === complaintId
+        );
+
+    if (!complaint)
+    {
+        alert("Officer details not available.");
+        return;
+    }
+
+    document.getElementById("officerName").textContent =
+        complaint.officerName || "Not Assigned";
+
+    document.getElementById("officerDesignation").textContent =
+        complaint.officerDesignation || "-";
+
+    document.getElementById("officerMobile").textContent =
+        complaint.officerMobile || "-";
+
+    document.getElementById("officerEmail").textContent =
+        complaint.officerEmail || "-";
+
+    document.getElementById("officerModal")
+        .classList.remove("hidden");
+}
+
+function closeOfficerModal()
+{
+    document.getElementById("officerModal")
+        .classList.add("hidden");
+}
 
 window.showPanel = showPanel;
 window.logout = logout;
@@ -994,3 +1050,5 @@ window.submitComplaint = submitComplaint;
 window.submitSuggestion = submitSuggestion;
 window.filterItems = filterItems;
 window.searchItems = searchItems;
+window.showOfficerDetails = showOfficerDetails;
+window.closeOfficerModal = closeOfficerModal;

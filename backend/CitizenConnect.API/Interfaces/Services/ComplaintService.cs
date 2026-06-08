@@ -85,22 +85,37 @@
                         "Complaint category not found.");
                 }
 
-                // =========================================
-                // FIND AVAILABLE OFFICER
-                // =========================================
+            // =========================================
+            // FIND AVAILABLE OFFICER
+            // =========================================
+            // FIND AVAILABLE OFFICER
+            // Load balancing based on least assigned complaints
 
-                var officer = await _context.Officers
-                    .FirstOrDefaultAsync(x =>
-                        x.DepartmentId
-                        == category.DepartmentId
-                        &&
-                        x.IsAvailable);
+            var officer = await _context.OfficerCategoryMappings
 
-                // =========================================
-                // GENERATE COMPLAINT NUMBER
-                // =========================================
+                .Include(x => x.Officer)
+                    .ThenInclude(o => o.Complaints)
 
-                string complaintNumber =
+                .Where(x =>
+                    x.ComplaintCategoryId ==
+                        dto.ComplaintCategoryId
+                    &&
+                    x.IsActive
+                    &&
+                    x.Officer.IsAvailable)
+
+                .OrderBy(x =>
+                    x.Officer.Complaints.Count)
+
+                .Select(x => x.Officer)
+
+                .FirstOrDefaultAsync();
+
+            // =========================================
+            // GENERATE COMPLAINT NUMBER
+            // =========================================
+
+            string complaintNumber =
                     $"CC-{DateTime.UtcNow:yyyyMMddHHmmss}";
 
                 // =========================================
@@ -149,14 +164,35 @@
                     : 1
                 };
 
-                await _context.Complaints
-                    .AddAsync(complaint);
+            await _context.Complaints
+ .AddAsync(complaint);
+
+            await _context.SaveChangesAsync();
+
+            if (officer != null)
+            {
+                var history =
+                    new ComplaintStatusHistory
+                    {
+                        ComplaintId =
+                            complaint.ComplaintId,
+
+                       // ComplaintStatusMaster = 2,
+
+                        Remarks =
+                            "Complaint auto-assigned to officer."
+                    };
+
+                await _context
+                    .ComplaintStatusHistories
+                    .AddAsync(history);
 
                 await _context.SaveChangesAsync();
+            }
 
-                // =========================================
-                // FILE UPLOAD
-                // =========================================
+            // =========================================
+            // FILE UPLOAD
+            // =========================================
 
             if (dto.Files != null && dto.Files.Any())
     {
@@ -241,51 +277,92 @@
 
                     OfficerMobileNumber =
                         officer?.MobileNumber
-                        ?? ""
+                        ?? "",
+                    OfficerEmail =
+                        officer?.Email ?? ""
                 };
             }
 
-            // =========================================
-            // GET CITIZEN COMPLAINTS
-            // =========================================
+        // =========================================
+        // GET CITIZEN COMPLAINTS
+        // =========================================
 
-            public async Task<List<ComplaintResponseDto>>
-                GetCitizenComplaintsAsync(int citizenId)
-            {
-                return await _context.Complaints
-                    .Include(c => c.ComplaintCategory)
-                    .Where(c => c.CitizenId == citizenId)
-                    .Select(c => new ComplaintResponseDto
-                    {
-                        ComplaintId = c.ComplaintId,
+        public async Task<List<ComplaintResponseDto>>
+GetCitizenComplaintsAsync(int citizenId)
+        {
+            return await _context.Complaints
 
-                        ComplaintNumber = c.ComplaintNumber,
+                .Include(c => c.ComplaintCategory)
 
-                        CategoryName =
-                            c.ComplaintCategory.CategoryName,
+                .Include(c => c.AssignedOfficer)
 
-                        Title = c.Title,
+                .Include(c => c.ComplaintStatusMaster)
 
-                        Description = c.Description,
+                .Where(c => c.CitizenId == citizenId)
 
-                        Address = c.Address,
+                .Select(c => new ComplaintResponseDto
+                {
+                    ComplaintId =
+                        c.ComplaintId,
 
-                        Status = c.ComplaintStatusMaster.StatusName,
+                    ComplaintNumber =
+                        c.ComplaintNumber,
 
-                        Priority = c.Priority,
+                    CategoryName =
+                        c.ComplaintCategory.CategoryName,
 
-                        CreatedAt = c.CreatedAt
-                    })
-                    .OrderByDescending(c => c.CreatedAt)
-                    .ToListAsync();
-            }
+                    Title =
+                        c.Title,
+
+                    Description =
+                        c.Description,
+
+                    Address =
+                        c.Address,
+
+                    Status =
+                        c.ComplaintStatusMaster.StatusName,
+
+                    Priority =
+                        c.Priority,
+
+                    CreatedAt =
+                        c.CreatedAt,
+
+                    OfficerName =
+                        c.AssignedOfficer != null
+                            ? c.AssignedOfficer.FirstName
+                              + " "
+                              + c.AssignedOfficer.LastName
+                            : "",
+
+                    OfficerDesignation =
+                        c.AssignedOfficer != null
+                            ? c.AssignedOfficer.Designation
+                            : "",
+
+                    OfficerMobileNumber =
+                        c.AssignedOfficer != null
+                            ? c.AssignedOfficer.MobileNumber
+                            : "",
+
+                    OfficerEmail =
+                        c.AssignedOfficer != null
+                            ? c.AssignedOfficer.Email
+                            : ""
+                })
+
+                .OrderByDescending(x => x.CreatedAt)
+
+                .ToListAsync();
+        }
 
 
-            // =========================================
-            // GET COMPLAINT DETAILS
-            // =========================================
+        // =========================================
+        // GET COMPLAINT DETAILS
+        // =========================================
 
-            public async Task<ComplaintDetailsDto?>
+        public async Task<ComplaintDetailsDto?>
         GetComplaintDetailsAsync(int complaintId)
             {
                 var complaint =
@@ -298,6 +375,8 @@
         .ThenInclude(cit => cit.User)
     .Include(c => c.ComplaintImages)
     .Include(c => c.ComplaintStatusMaster)
+
+.Include(c => c.AssignedOfficer)
     .Include(c => c.ComplaintStatusHistories)
 
                     .FirstOrDefaultAsync(c =>
@@ -363,7 +442,25 @@
                 .Select(i => i.ImagePath)
                 .Where(p => !string.IsNullOrWhiteSpace(p))
                 .ToList()
-            : new List<string>()
+            : new List<string>(),
+                    OfficerName =
+    complaint.AssignedOfficer != null
+    ? complaint.AssignedOfficer.FirstName
+      + " "
+      + complaint.AssignedOfficer.LastName
+    : "",
+
+                    OfficerDesignation =
+    complaint.AssignedOfficer?.Designation
+    ?? "",
+
+                    OfficerMobileNumber =
+    complaint.AssignedOfficer?.MobileNumber
+    ?? "",
+
+                    OfficerEmail =
+    complaint.AssignedOfficer?.Email
+    ?? "",
 
                 };
             }
