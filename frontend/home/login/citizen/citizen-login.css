@@ -925,6 +925,9 @@ select {
 }
 .vg-start-btn:hover { background: var(--red-light); box-shadow: 0 2px 10px rgba(194,24,7,0.15); transform: translateY(-1px); }
 .vg-start-btn:active { transform: translateY(0); }
+.vg-start-btn--active { background: var(--red) !important; color: #fff !important; box-shadow: 0 2px 10px rgba(194,24,7,0.25); transform: translateY(0); }
+
+.vg-login-btn-row { display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
 
 .vg-bar {
   display: flex;

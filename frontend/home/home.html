@@ -75,6 +75,15 @@
 
             <li><a href="#contact">Contact</a></li>
 
+            <li>
+                <a href="#listen" class="nav-listen-link">
+                    <span class="nav-listen-icon">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                    </span>
+                    Listen to our application
+                </a>
+            </li>
+
         </ul>
 
         <div class="nav-actions">
@@ -641,6 +650,79 @@
 
     </section>
 
+    <!-- LISTEN TO OUR APPLICATION -->
+
+    <section id="listen" class="section listen-section">
+
+        <div class="container">
+
+            <div class="section-header">
+
+                <span>AUDIO GUIDE</span>
+
+                <h2>Listen to Our Application</h2>
+
+                <p>
+                    Hear a quick voice overview of Citizen Connect —
+                    what it does, who it serves, and how it works.
+                </p>
+
+            </div>
+
+            <div class="listen-card">
+
+                <div class="listen-icon-wrap">
+                    <div class="listen-pulse"></div>
+                    <i class="fa-solid fa-microphone-lines listen-main-icon"></i>
+                </div>
+
+                <div class="listen-content">
+
+                    <h3>Citizen Connect — Voice Introduction</h3>
+
+                    <p>
+                        A brief audio guide covering registration,
+                        complaint submission, tracking, and connecting
+                        with your local representatives.
+                    </p>
+
+                    <div class="listen-audio-wrap">
+
+                        <div class="listen-lang-row">
+                            <label for="listenLangSelect" class="listen-lang-label">
+                                <i class="fa-solid fa-language"></i> Language:
+                            </label>
+                            <select id="listenLangSelect" class="listen-lang-select" onchange="switchListenLang(this.value)">
+                                <option value="english" selected>English</option>
+                                <option value="hindi">Hindi</option>
+                                <option value="marathi">Marathi</option>
+                            </select>
+                        </div>
+
+                        <audio controls class="listen-audio" id="listenAudio">
+                            <source id="listenAudioSrc" src="shared/Citizen_Connect_VoiceClip  (English).m4a" type="audio/mp4" />
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="listen-audio-note">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Click play to hear a voice introduction to Citizen Connect.
+                        </p>
+                    </div>
+
+                    <div class="listen-tags">
+                        <span><i class="fa-solid fa-clock"></i> ~2 min</span>
+                        <span id="listenLangTag"><i class="fa-solid fa-language"></i> English</span>
+                        <span><i class="fa-solid fa-volume-high"></i> Voice Overview</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
     <!-- TESTIMONIALS -->
 
     <section class="section testimonial-section">
@@ -831,6 +913,36 @@
 </div>
 
     <script src="home.js"></script>
+    <script>
+    /* ---- Listen section language switcher ---- */
+    var _listenClips = {
+        english: "shared/Citizen_Connect_VoiceClip  (English).m4a",
+        hindi:   "shared/Citizen_Connect_VoiceClip  (Hindi).m4a",
+        marathi: "shared/Citizen_Connect_VoiceClip  (Marathi).m4a"
+    };
+    var _listenLangLabels = {
+        english: "English",
+        hindi:   "Hindi",
+        marathi: "Marathi"
+    };
+    function switchListenLang(lang) {
+        var audio  = document.getElementById("listenAudio");
+        var src    = document.getElementById("listenAudioSrc");
+        var tag    = document.getElementById("listenLangTag");
+        if (!audio || !src) return;
+        var wasPlaying = !audio.paused;
+        var currentTime = audio.currentTime;
+        src.src = _listenClips[lang] || _listenClips.english;
+        audio.load();
+        if (wasPlaying) {
+            audio.currentTime = 0;
+            audio.play();
+        }
+        if (tag) {
+            tag.innerHTML = '<i class="fa-solid fa-language"></i> ' + (_listenLangLabels[lang] || "English");
+        }
+    }
+    </script>
 
 </body>
 </html>

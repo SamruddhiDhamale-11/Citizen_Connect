@@ -603,32 +603,73 @@
   function init() {
     injectGuideButtons();
     injectSelectionMics();
+    /* Hide all mic buttons by default — only shown when Voice Guide is active */
+    hideMicButtons();
+  }
+
+  /* Show / hide all standalone mic buttons (.vs-mic-btn) */
+  function showMicButtons() {
+    document.querySelectorAll(".vs-mic-btn").forEach(function(b) { b.style.display = ""; });
+  }
+  function hideMicButtons() {
+    document.querySelectorAll(".vs-mic-btn").forEach(function(b) { b.style.display = "none"; });
   }
 
   /* ================================================================
      INJECT GUIDE BUTTONS (after step-heading in each panel)
   ================================================================ */
   function injectGuideButtons() {
-    var panels = [
-      { id:"step1-citizen",    key:"c1" },
-      { id:"step2-citizen",    key:"c2" },
-      { id:"step1-politician", key:"p1" },
-      { id:"step2-politician", key:"p2" }
-    ];
+    /* Each page only has the panels relevant to its role.
+       Citizen pages have step1/step2 with citizen fields (c1/c2).
+       Politician pages have step1/step2 with politician fields (p1/p2).
+       We detect which page we're on by checking for a citizen-only
+       or politician-only field ID, then assign the correct key.      */
+    var isCitizen    = !!document.getElementById("c-firstName");
+    var isPolitician = !!document.getElementById("p-firstName");
+
+    var panels = [];
+    if (isCitizen) {
+      panels.push({ id:"step1", key:"c1" });
+      panels.push({ id:"step2", key:"c2" });
+    } else if (isPolitician) {
+      panels.push({ id:"step1", key:"p1" });
+      panels.push({ id:"step2", key:"p2" });
+    }
     panels.forEach(function(p) {
       var panel = document.getElementById(p.id);
       if (!panel || panel.querySelector(".vg-start-btn")) return;
       var btn = document.createElement("button");
       btn.type      = "button";
       btn.className = "vg-start-btn";
-      btn.innerHTML = "&#x1F399;&#xFE0F; Start Voice Guide";
+      btn.innerHTML = "&#x1F399;&#xFE0F; Start with Voice Guide";
       btn.setAttribute("aria-label", "Start voice guide for this step");
-      btn.addEventListener("click", function() { startGuide(p.key); });
+      btn.addEventListener("click", function() {
+        document.querySelectorAll(".vg-start-btn").forEach(function(b) { b.classList.remove("vg-start-btn--active"); });
+        btn.classList.add("vg-start-btn--active");
+        showMicButtons();
+        startGuide(p.key);
+      });
+
+      var btnText = document.createElement("button");
+      btnText.type      = "button";
+      btnText.className = "vg-start-btn";
+      btnText.style.marginLeft = "10px";
+      btnText.innerHTML = "&#x1F399;&#xFE0F; Start with Text";
+      btnText.setAttribute("aria-label", "Start with text for this step");
+      btnText.addEventListener("click", function() {
+        document.querySelectorAll(".vg-start-btn").forEach(function(b) { b.classList.remove("vg-start-btn--active"); });
+        btnText.classList.add("vg-start-btn--active");
+        hideMicButtons();
+        if (guideActive) stopGuide();
+      });
+
       var heading = panel.querySelector(".step-heading");
       if (heading) {
         panel.insertBefore(btn, heading.nextElementSibling || null);
+        panel.insertBefore(btnText, btn.nextElementSibling || null);
       } else {
         panel.insertBefore(btn, panel.firstChild);
+        panel.insertBefore(btnText, btn.nextElementSibling || null);
       }
     });
   }

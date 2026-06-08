@@ -985,6 +985,215 @@ section{
 }
 
 /* ==========================================================
+   NAV LISTEN LINK
+   ========================================================== */
+
+.nav-listen-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary) !important;
+    font-weight: 600;
+    border: 1.5px solid var(--primary);
+    border-radius: 50px;
+    padding: 6px 14px;
+    transition: background var(--transition), color var(--transition);
+    white-space: nowrap;
+}
+
+.nav-listen-link:hover {
+    background: var(--primary);
+    color: #fff !important;
+}
+
+.nav-listen-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: background var(--transition);
+}
+
+.nav-listen-link:hover .nav-listen-icon {
+    background: #fff;
+    color: var(--primary);
+}
+
+/* ==========================================================
+   LISTEN TO OUR APPLICATION SECTION
+   ========================================================== */
+
+.listen-section {
+    background: var(--secondary);
+    padding: 100px 0;
+}
+
+.listen-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 48px;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 48px;
+    max-width: 900px;
+    margin: 0 auto;
+    transition: box-shadow var(--transition);
+}
+
+.listen-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.listen-icon-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listen-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(198, 40, 40, 0.12);
+    animation: listenPulse 2s ease-in-out infinite;
+}
+
+@keyframes listenPulse {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%       { transform: scale(1.25); opacity: 0.5; }
+}
+
+.listen-main-icon {
+    font-size: 48px;
+    color: var(--primary);
+    position: relative;
+    z-index: 1;
+}
+
+.listen-content {
+    flex: 1;
+}
+
+.listen-content h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+.listen-content > p {
+    color: var(--text-light);
+    line-height: 1.8;
+    margin-bottom: 24px;
+}
+
+.listen-audio-wrap {
+    margin-bottom: 20px;
+}
+
+.listen-lang-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.listen-lang-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.listen-lang-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C62828' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 12px center;
+    background-size: 10px;
+    border: 1.5px solid rgba(198,40,40,0.35);
+    border-radius: 50px;
+    padding: 6px 34px 6px 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.listen-lang-select:hover,
+.listen-lang-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(198,40,40,0.12);
+}
+
+.listen-audio {
+    width: 100%;
+    border-radius: 50px;
+    accent-color: var(--primary);
+    outline: none;
+}
+
+.listen-audio-note {
+    font-size: 0.82rem;
+    color: #999;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.listen-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.listen-tags span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--secondary);
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 50px;
+    border: 1px solid rgba(198,40,40,0.15);
+}
+
+@media (max-width: 768px) {
+    .listen-card {
+        flex-direction: column;
+        align-items: center;
+        padding: 32px 20px;
+        gap: 28px;
+        text-align: center;
+    }
+    .listen-tags {
+        justify-content: center;
+    }
+    .nav-listen-link {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+}
+
+/* ==========================================================
    TESTIMONIALS
    ========================================================== */
 
