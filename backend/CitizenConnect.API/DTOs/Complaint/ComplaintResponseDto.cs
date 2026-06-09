@@ -5,6 +5,8 @@ namespace CitizenConnect.DTOs.Complaint
     {
         public int ComplaintId { get; set; }
 
+        public int ComplaintCategoryId { get; set; }
+
         public string ComplaintNumber { get; set; } = string.Empty;
 
         public string CategoryName { get; set; } = string.Empty;

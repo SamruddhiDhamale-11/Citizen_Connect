@@ -72,6 +72,7 @@ public async Task<List<object>> GetAllCitizensAsync()
             return new ComplaintResponseDto
             {
                 ComplaintId = c.ComplaintId,
+                ComplaintCategoryId = c.ComplaintCategoryId,
                 ComplaintNumber = c.ComplaintNumber,
                 CategoryName = c.ComplaintCategory?.CategoryName ?? string.Empty,
                 Title = c.Title,
@@ -94,6 +95,7 @@ StatusHistory = c.ComplaintStatusHistories
         NewStatus = h.NewStatus,
         ChangedBy = "Admin",
         Remarks = h.Remarks,
+        AssignedOfficerName = h.AssignedOfficerName,
         ChangedAt = h.ChangedAt
     })
     .ToList()
@@ -127,6 +129,15 @@ StatusHistory = c.ComplaintStatusHistories
             UpdateComplaintStatusAsync(
                 UpdateComplaintStatusDto dto)
         {
+
+            Console.WriteLine(
+    $"DTO AssignedOfficerId = {dto.AssignedOfficerId}"
+);
+
+Console.WriteLine(
+    $"Assigned Officer Id = {dto.AssignedOfficerId}"
+);
+
           
           var complaint = await _context.Complaints
     .FirstOrDefaultAsync(c => c.ComplaintId == dto.ComplaintId);
@@ -161,31 +172,54 @@ var oldStatus = await _context.ComplaintStatusMasters
     .Where(x => x.ComplaintStatusMasterId == complaint.ComplaintStatusMasterId)
     .Select(x => x.StatusName)
     .FirstOrDefaultAsync();
-    complaint.ComplaintStatusMasterId = dto.ComplaintStatusMasterId;
-            if (newStatus == "Resolved")
-            {
-                complaint.ResolvedAt = DateTime.UtcNow;
-            }
+  complaint.ComplaintStatusMasterId =
+    dto.ComplaintStatusMasterId;
 
+string? assignedOfficerName = null;
 
+if (newStatus == "Assigned")
+{
+    complaint.AssignedOfficerId =
+        dto.AssignedOfficerId;
+
+    complaint.AssignedAt =
+        DateTime.UtcNow;
+
+    assignedOfficerName = await _context.Officers
+        .Where(o => o.OfficerId == dto.AssignedOfficerId)
+        .Select(o => o.FirstName + " " + o.LastName)
+        .FirstOrDefaultAsync();
+}
+
+if (newStatus == "Resolved")
+{
+    complaint.ResolvedAt =
+        DateTime.UtcNow;
+}
             // SAVE STATUS HISTORY  
             var history = new ComplaintStatusHistory
-            {
-                ComplaintId = complaint.ComplaintId,
+{
+    ComplaintId = complaint.ComplaintId,
 
-                OldStatus =
-    oldStatus ?? string.Empty,
+    OldStatus = oldStatus ?? string.Empty,
 
-                NewStatus =
-    newStatus ?? string.Empty,
+    NewStatus = newStatus ?? string.Empty,
 
-                Remarks = dto.Remarks,
+    Remarks = dto.Remarks,
 
-                ChangedAt = DateTime.UtcNow
-            };
+    AssignedOfficerName = assignedOfficerName,
+
+    ChangedAt = DateTime.UtcNow
+};
 
             await _context.ComplaintStatusHistories
                 .AddAsync(history);
+
+
+Console.WriteLine(
+    $"Before SaveChanges = {complaint.AssignedOfficerId}"
+);
+
 
             await _context.SaveChangesAsync();
 
@@ -205,21 +239,19 @@ var oldStatus = await _context.ComplaintStatusMasters
         .Where(h => h.ComplaintId == complaintId)
 
         .Select(h => new ComplaintStatusHistoryDto
-        {
-            OldStatus =
-                h.OldStatus.ToString(),
+{
+    OldStatus = h.OldStatus.ToString(),
 
-            NewStatus =
-                h.NewStatus.ToString(),
+    NewStatus = h.NewStatus.ToString(),
 
-            ChangedBy = "Admin",
+    ChangedBy = "Admin",
 
-            Remarks =
-                h.Remarks,
+    Remarks = h.Remarks,
 
+    AssignedOfficerName = h.AssignedOfficerName,
 
-                    ChangedAt = h.ChangedAt
-                })
+    ChangedAt = h.ChangedAt
+})
                 .OrderByDescending(h => h.ChangedAt)
                 .ToListAsync();
         }

@@ -10,6 +10,8 @@ namespace CitizenConnect.DTOs.Admin
         public int ComplaintStatusMasterId
         { get; set; }
 
+        public int? AssignedOfficerId { get; set; }
+
         public string? Remarks { get; set; }
     }
 }
