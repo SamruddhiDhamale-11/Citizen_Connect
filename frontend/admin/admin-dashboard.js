@@ -1534,7 +1534,7 @@ function normalizeSuggestionStatus(status) {
         return "review";
 
     if (s === "approved")
-        return "accepted";
+        return "approved";
 
     if (s === "implemented")
         return "implemented";
@@ -1968,11 +1968,15 @@ async function openAdminSuggestionDetail(suggestionId) {
   if (status === '1' || status === 'pending')
     statusClass = 'pending';
 
-  else if (status === '2' || status === 'approved')
-    statusClass = 'resolved';
-
-  else if (status === '3' || status === 'rejected')
+  else if (status === '2' || status === 'under review')
+    statusClass = 'under review';
+  else if (status === '3' || status === 'approved')
+    statusClass = 'approved';
+  else if (status === '4' || status === 'rejected')
     statusClass = 'rejected';
+
+  else if (status === '5' || status === 'implemented')
+    statusClass = 'implemented';
 
   var bodyHtml =
 

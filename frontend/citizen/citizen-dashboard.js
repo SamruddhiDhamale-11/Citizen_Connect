@@ -289,22 +289,22 @@ function closeSuggestionHistory() {
   document .getElementById( "suggestionHistoryModal" ) .classList .add("hidden"); 
 }
 
-function normalizeSuggestionStatus(status) {
-
+function normalizeSuggestionStatus(status)
+{
     if (!status)
-        return "review";
+        return "pending";
 
     const s =
         String(status).toLowerCase();
 
     if (s === "pending")
-        return "review";
+        return "pending";
 
     if (s === "under review")
-        return "review";
+        return "pending";
 
     if (s === "approved")
-        return "accepted";
+        return "approved";
 
     if (s === "implemented")
         return "implemented";
@@ -312,7 +312,7 @@ function normalizeSuggestionStatus(status) {
     if (s === "rejected")
         return "rejected";
 
-    return "review";
+    return "pending";
 }
 
 function mapApiComplaintToCard(c) {
@@ -1078,12 +1078,8 @@ function renderSuggestions(data) {
                         ${escHtml(s.desc)}
                     </div>
 
-                    ${s.remark ? `
-                    <div class="suggestion-remark">
-                        <strong>Admin Remark:</strong>
-                        ${escHtml(s.remark)}
-                    </div>
-                    ` : ''}
+              
+                   
 
                     <div class="item-card-footer">
 
