@@ -1519,15 +1519,30 @@ function mapAdminSuggestionToCard(s) {
 }
 
 function normalizeSuggestionStatus(status) {
-  if (!status) return 'pending';
 
-  var s = String(status).toLowerCase().replace(/\s+/g, '');
+    if (!status)
+        return "review";
 
-  if (s === 'pending') return 'pending';
-  if (s === 'approved') return 'approved';
-  if (s === 'rejected') return 'rejected';
+    const s =
+        String(status).toLowerCase();
 
-  return s;
+    if (s === "pending")
+        return "review";
+      
+
+    if (s === "under review")
+        return "review";
+
+    if (s === "approved")
+        return "accepted";
+
+    if (s === "implemented")
+        return "implemented";
+
+    if (s === "rejected")
+        return "rejected";
+
+    return "review";
 }
 
 function resolveComplaintImageUrl(path) {
@@ -2916,4 +2931,32 @@ async function loadCategoriesByDepartment(departmentId) {
     } catch (err) {
         console.error("Error loading categories:", err);
     }
+}
+
+async function updateSuggestionStatus() {
+
+    const request = {
+        suggestionId: selectedSuggestionId,
+        suggestionStatusMasterId:
+            parseInt(
+                document.getElementById("status").value
+            ),
+        remarks:
+            document.getElementById("remarks").value
+    };
+
+    const response = await fetch(
+        "http://localhost:5079/api/suggestions/status",
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(request)
+        }
+    );
+
+    const result = await response.json();
+
+    alert(result.message);
 }

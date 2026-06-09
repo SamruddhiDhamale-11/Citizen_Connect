@@ -27,5 +27,7 @@ namespace CitizenConnect.Application.DTOs.Suggestion
     = string.Empty;
         public DateTime CreatedDate
         { get; set; }
+
+        public string? LatestRemark { get; set; }
     }
 }

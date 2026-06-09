@@ -1,9 +1,10 @@
 ﻿
 using CitizenConnect.API.DTOs.Suggestion;
+using CitizenConnect.Application.DTOs.Suggestion;
+using CitizenConnect.Application.Interfaces.Services;
+using CitizenConnect.DTOs.Admin;
 using CitizenConnect.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
-using CitizenConnect.Application.Interfaces.Services;
-using CitizenConnect.Application.DTOs.Suggestion;
 
 namespace CitizenConnect.API.Controllers
 {
@@ -58,11 +59,14 @@ public class SuggestionController : ControllerBase
          */
 
        [HttpPost]
-public async Task<IActionResult> CreateSuggestion(
-    [FromForm] CreateSuggestionRequestDto request)
+        [HttpPost]
+        public async Task<IActionResult> CreateSuggestion(
+    [FromBody] CreateSuggestionRequestDto request)
         {
             try
             {
+                Console.WriteLine($"CategoryId = {request.SuggestionCategoryId}");
+
                 var result =
                     await _suggestionService
                     .CreateSuggestionAsync(
@@ -73,10 +77,7 @@ public async Task<IActionResult> CreateSuggestion(
                 return Ok(new
                 {
                     success = true,
-
-                    message =
-                        "Suggestion submitted successfully.",
-
+                    message = "Suggestion submitted successfully.",
                     data = result
                 });
             }
@@ -85,12 +86,10 @@ public async Task<IActionResult> CreateSuggestion(
                 return StatusCode(500, new
                 {
                     success = false,
-
                     message = ex.Message
                 });
             }
         }
-
 
         /**
          * =====================================================
@@ -202,6 +201,35 @@ public async Task<IActionResult> GetSuggestionHistory(int suggestionId)
         });
     }
 }
+
+        // =====================================================
+        // UPDATE SUGGESTION STATUS
+        // =====================================================
+
+        [HttpPut("status")]
+        public async Task<IActionResult> UpdateSuggestionStatus(
+            [FromBody] UpdateSuggestionStatusDto request)
+        {
+            try
+            {
+                await _suggestionService
+                    .UpdateSuggestionStatusAsync(request);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Suggestion status updated successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
 
     }
 }

@@ -21,9 +21,12 @@ document.addEventListener("DOMContentLoaded", function () {
   loadComplaintCategories();
   loadSuggestionCategories();
 
-  loadCitizenProfile().then(function () {
-    return loadCitizenComplaints();
-  });
+  loadCitizenProfile().then(async function () {
+
+    await loadCitizenComplaints();
+
+    await loadCitizenSuggestions();
+});
 
 });
 
@@ -189,19 +192,22 @@ async function loadCitizenSuggestions() {
 
     // map API → UI format
     const mapped = list.map(function (s) {
-      return {
-        id: s.suggestionNumber,
-        title: s.title,
-        category: s.categoryName || "",   // if not returned, ok
-        desc: s.description,
-        benefit: s.expectedBenefit,
-        date: formatDate(new Date(s.createdDate)),
-        status: normalizeSuggestionStatus(s.status),
-        scope: s.scope || "Ward"
-      };
-    });
+  return {
+    suggestionId: s.suggestionId,
+    id: s.suggestionNumber,
+    title: s.title,
+    category: s.categoryName || "",
+    desc: s.description,
+    benefit: s.expectedBenefit,
+    date: formatDate(new Date(s.createdDate)),
+    status: normalizeSuggestionStatus(s.statusName),
+    remark: s.latestRemark || "",
+    scope: s.scope || "Ward"
+  };
+});
 
     renderSuggestions(mapped);
+
 
   } catch (err) {
     console.error(err);
@@ -209,25 +215,104 @@ async function loadCitizenSuggestions() {
   }
 }
 
+async function viewSuggestionHistory(suggestionId)
+{
+    try
+    {
+        const response =
+            await fetch(
+                `http://localhost:5079/api/suggestions/history/${suggestionId}`
+            );
+
+        const result = await response.json();
+
+        const history = result.data || [];
+
+        const body =
+            document.getElementById(
+                "suggestionHistoryBody"
+            );
+
+        body.innerHTML =
+            history.map(h => `
+
+                <div class="history-item">
+
+                    <div class="history-dot"></div>
+
+                    <div class="history-content">
+
+                        <div class="history-status">
+
+                            ${h.oldStatus}
+
+                            <span class="arrow">→</span>
+
+                            ${h.newStatus}
+
+                        </div>
+
+                        <div class="history-date">
+
+                            ${new Date(
+                                h.changedAt
+                            ).toLocaleDateString()}
+
+                        </div>
+
+                        <div class="history-remarks">
+
+                            ${h.remarks || ""}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `).join("");
+
+        document
+            .getElementById(
+                "suggestionHistoryModal"
+            )
+            .classList
+            .remove("hidden");
+    }
+    catch (e)
+    {
+        console.error(e);
+    }
+}
+
+function closeSuggestionHistory() { 
+  document .getElementById( "suggestionHistoryModal" ) .classList .add("hidden"); 
+}
+
 function normalizeSuggestionStatus(status) {
-  if (status === null || status === undefined) return "review";
 
-  // if backend sends number (enum)
-  if (typeof status === "number") {
-    if (status === 0) return "review";
-    if (status === 1) return "accepted";
-    if (status === 2) return "rejected";
+    if (!status)
+        return "review";
+
+    const s =
+        String(status).toLowerCase();
+
+    if (s === "pending")
+        return "review";
+
+    if (s === "under review")
+        return "review";
+
+    if (s === "approved")
+        return "accepted";
+
+    if (s === "implemented")
+        return "implemented";
+
+    if (s === "rejected")
+        return "rejected";
+
     return "review";
-  }
-
-  // if backend sends string
-  const s = String(status).toLowerCase();
-
-  if (s === "pending") return "review";
-  if (s === "approved") return "accepted";
-  if (s === "rejected") return "rejected";
-
-  return s;
 }
 
 function mapApiComplaintToCard(c) {
@@ -942,26 +1027,89 @@ function renderComplaints(data) {
 
 // ---- Render suggestions ----
 function renderSuggestions(data) {
-  const list = document.getElementById("suggestionsList");
-  if (!list) return;
-  if (!data.length) {
-    list.innerHTML = '<div class="item-empty"><div class="item-empty-icon"></div><div>No suggestions found.</div></div>';
-    return;
-  }
-  list.innerHTML = data.map(function (s) {
-    return '<div class="item-card" data-status="' + s.status + '" data-title="' + s.title.toLowerCase() + '">' +
-      '<div class="item-card-top">' +
-        '<div><div class="item-card-title">' + escHtml(s.title) + '</div>' +
-        '<div class="item-card-cat">' + escHtml(s.category) + ' &nbsp;&nbsp; ' + escHtml(s.id) + '</div></div>' +
-        '<span class="status-pill ' + s.status + '">' + statusLabel(s.status) + '</span>' +
-      '</div>' +
-      '<div class="item-card-desc">' + escHtml(s.desc) + '</div>' +
-      '<div class="item-card-footer">' +
-        '<span class="item-card-date"> ' + s.date + '</span>' +
-        '<span class="item-card-date"> Scope: ' + escHtml(s.scope) + '</span>' +
-      '</div>' +
-    '</div>';
-  }).join("");
+
+    const list =
+        document.getElementById("suggestionsList");
+
+    if (!list) return;
+
+    if (!data.length) {
+
+        list.innerHTML =
+            `<div class="item-empty">
+                <div class="item-empty-icon"></div>
+                <div>No suggestions found.</div>
+            </div>`;
+
+        return;
+    }
+
+    list.innerHTML =
+        data.map(function (s) {
+
+            return `
+                <div class="item-card"
+                     data-status="${s.status}"
+                     data-title="${s.title.toLowerCase()}">
+
+                    <div class="item-card-top">
+
+                        <div>
+
+                            <div class="item-card-title">
+                                ${escHtml(s.title)}
+                            </div>
+
+                            <div class="item-card-cat">
+                                ${escHtml(s.category)}
+                                &nbsp;&nbsp;
+                                ${escHtml(s.id)}
+                            </div>
+
+                        </div>
+
+                        <span class="status-pill ${s.status}">
+                            ${statusLabel(s.status)}
+                        </span>
+
+                    </div>
+
+                    <div class="item-card-desc">
+                        ${escHtml(s.desc)}
+                    </div>
+
+                    ${s.remark ? `
+                    <div class="suggestion-remark">
+                        <strong>Admin Remark:</strong>
+                        ${escHtml(s.remark)}
+                    </div>
+                    ` : ''}
+
+                    <div class="item-card-footer">
+
+                        <span class="item-card-date">
+                            ${s.date}
+                        </span>
+
+                        <span class="item-card-date">
+                            Scope: ${escHtml(s.scope)}
+                        </span>
+
+                        <button
+                            type="button"
+                            class="btn-outline"
+                            onclick="viewSuggestionHistory(${s.suggestionId})">
+
+                            Status History
+
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
 }
 
 // ---- Filter ----
@@ -990,6 +1138,7 @@ function statusLabel(s) {
   const map = { pending: "Pending", inprogress: "In Progress", resolved: "Resolved", review: "Under Review", accepted: "Accepted", implemented: "Implemented", rejected: "Not Accepted" };
   return map[s] || s;
 }
+
 
 function escHtml(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");

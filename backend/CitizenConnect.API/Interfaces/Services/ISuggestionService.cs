@@ -1,4 +1,5 @@
-﻿using CitizenConnect.Application.DTOs.Suggestion;
+﻿
+using CitizenConnect.Application.DTOs.Suggestion;
 using CitizenConnect.DTOs.Admin;
 
 namespace CitizenConnect.Application.Interfaces.Services
@@ -21,5 +22,8 @@ namespace CitizenConnect.Application.Interfaces.Services
         Task<List<object>>
             GetAllSuggestionsAsync();
             Task<List<SuggestionHistoryDto>> GetSuggestionHistoryAsync(int suggestionId);
+
+        Task UpdateSuggestionStatusAsync(
+    UpdateSuggestionStatusDto request);
     }
 }

@@ -1,13 +1,12 @@
-﻿using CitizenConnect.API.Domain.Enums;
+﻿
 using CitizenConnect.Application.DTOs.Suggestion;
 using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Domain.Entities;
 using CitizenConnect.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using CitizenConnect.Application.Interfaces.Services;
+using CitizenConnect.DTOs.Admin;
+
 
 namespace CitizenConnect.Application.Services
 {
@@ -130,6 +129,11 @@ namespace CitizenConnect.Application.Services
                     Description = x.Description,
                     ExpectedBenefit = x.ExpectedBenefit,
                     StatusName = x.SuggestionStatusMaster.StatusName,
+                    LatestRemark = _context.SuggestionStatusHistories
+    .Where(h => h.SuggestionId == x.SuggestionId)
+    .OrderByDescending(h => h.ChangedAt)
+    .Select(h => h.Remarks)
+    .FirstOrDefault(),
                     CreatedDate = x.CreatedAt
                 })
                 .ToListAsync();
@@ -208,6 +212,50 @@ namespace CitizenConnect.Application.Services
     .ToListAsync();
 
 return history;
+
+
 }
+
+        public async Task UpdateSuggestionStatusAsync(
+    UpdateSuggestionStatusDto request)
+        {
+            var suggestion = await _context.Suggestions
+                .Include(x => x.SuggestionStatusMaster)
+                .FirstOrDefaultAsync(x =>
+                    x.SuggestionId == request.SuggestionId);
+
+            if (suggestion == null)
+                throw new Exception("Suggestion not found.");
+
+            var oldStatus =
+                suggestion.SuggestionStatusMaster.StatusName;
+
+            var newStatus =
+                await _context.SuggestionStatusMasters
+                .FirstOrDefaultAsync(x =>
+                    x.SuggestionStatusMasterId ==
+                    request.SuggestionStatusMasterId);
+
+            if (newStatus == null)
+                throw new Exception("Invalid status.");
+
+            suggestion.SuggestionStatusMasterId =
+                request.SuggestionStatusMasterId;
+
+            var history = new SuggestionStatusHistory
+            {
+                SuggestionId = suggestion.SuggestionId,
+                OldStatus = oldStatus,
+                NewStatus = newStatus.StatusName,
+                Remarks = request.Remarks,
+                ChangedAt = DateTime.UtcNow
+            };
+
+            _context.SuggestionStatusHistories.Add(history);
+
+            await _context.SaveChangesAsync();
+        }
+
+
     }
 }
