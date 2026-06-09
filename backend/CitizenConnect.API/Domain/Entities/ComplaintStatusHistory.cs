@@ -17,6 +17,8 @@ namespace CitizenConnect.Domain.Entities
 
         public string? Remarks { get; set; }
 
+        public string? AssignedOfficerName { get; set; }
+
         public DateTime ChangedAt { get; set; }
             = DateTime.UtcNow;
 

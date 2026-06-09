@@ -509,6 +509,12 @@ async function submitComplaint(e) {
   fd.append("WardId", wardId);
   fd.append("ComplaintCategoryId", cat);
   fd.append("Title", title);
+  const categoryName =
+    document.getElementById("complaintCategory")
+            .options[document.getElementById("complaintCategory").selectedIndex]
+            .text;
+
+fd.append("CategoryName", categoryName);
   fd.append("Description", desc);
   fd.append("Address", location);
   fd.append("Latitude", "0");

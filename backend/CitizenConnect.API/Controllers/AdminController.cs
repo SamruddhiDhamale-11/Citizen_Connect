@@ -197,5 +197,28 @@ public async Task<IActionResult> GetCategoriesByDepartment(int departmentId)
     });
 }
 
+[HttpGet("officer-by-category/{categoryId}")]
+public async Task<IActionResult> GetOfficerByCategory(int categoryId)
+{
+    var officers = await _context.OfficerCategoryMappings
+        .Where(x =>
+            x.ComplaintCategoryId == categoryId &&
+            x.IsActive)
+        .Select(x => new
+{
+    officerId = x.OfficerId,
+    officerName = x.Officer.FirstName + " " + x.Officer.LastName,
+    designation = x.Officer.Designation
+})
+        .ToListAsync();
+
+    if (officers == null || officers.Count == 0)
+    {
+        return Ok(new List<object>());
+    }
+
+    return Ok(officers);
+}
+
     }
 }

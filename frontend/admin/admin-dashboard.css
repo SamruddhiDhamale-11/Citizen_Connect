@@ -1184,3 +1184,89 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
   display: inline-block;
 }
 
+
+/* officer radio button css */
+.officer-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    background: #fff;
+}
+
+.officer-card input {
+    display: none;
+}
+
+/* tick icon hidden by default */
+.selected-tick {
+    margin-left: auto;
+    color: #22c55e;
+    font-size: 16px;
+    display: none;
+}
+
+/* when selected */
+.officer-card input:checked + .officer-info .selected-tick {
+    display: block;
+}
+
+/* hover */
+.officer-card:hover {
+    border-color: #3b82f6;
+    background: #f9fbff;
+}
+
+.officer-info {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.officer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.role-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-weight: 600;
+}
+
+/* selected state */
+.officer-card input:checked ~ .officer-info {
+    border-left: 4px solid #3b82f6;
+}
+
+/* stronger selected highlight */
+.officer-card input:checked + .officer-info {
+    background: #eff6ff;
+}
+
+.officer-card {
+    transition: all 0.2s ease;
+}
+
+/* full card clickable feel */
+.officer-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* selected state enhancement */
+.officer-card input:checked ~ .officer-info {
+    background: #eff6ff;
+}
+
+.officer-card input:checked {
+    accent-color: #3b82f6;
+}

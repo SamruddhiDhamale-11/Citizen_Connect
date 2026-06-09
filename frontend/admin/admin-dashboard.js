@@ -1490,6 +1490,10 @@ function pickComplaintField(obj, camelKey, pascalKey) {
 
     return {
       complaintId: c.complaintId != null ? c.complaintId : c.ComplaintId,
+      complaintCategoryId:
+    c.complaintCategoryId != null
+        ? c.complaintCategoryId
+        : c.ComplaintCategoryId,
       id: pickComplaintField(c, 'complaintNumber', 'ComplaintNumber') || ('CMP-' + (c.complaintId || c.ComplaintId)),
       title: pickComplaintField(c, 'title', 'Title'),
       category: pickComplaintField(c, 'categoryName', 'CategoryName'),
@@ -1707,13 +1711,22 @@ function renderStatusHistory(history, type) {
 
         <div class="history-content">
 
-          <div class="history-status">
-            ${statusText}
-          </div>
+         <div class="history-status">
+  ${statusText}
+</div>
 
-          <div class="history-date">
-            ${formatDate(h.createdAt || h.changedAt)}
-          </div>
+${h.assignedOfficerName
+  ? `
+    <div class="history-assigned-officer">
+      Assigned to :- ${h.assignedOfficerName}
+    </div>
+  `
+  : ''
+}
+
+<div class="history-date">
+  ${formatDate(h.createdAt || h.changedAt)}
+</div>
 
           ${h.remarks
             ? `<div class="history-remarks">📝 ${h.remarks}</div>`
@@ -1817,9 +1830,13 @@ if (visibleCount === 0) {
 async function openAdminComplaintDetail(event, complaintId) {
   if (event) event.stopPropagation();
   var complaint = adminComplaints.find(function(c) { return c.complaintId === complaintId; });
+  console.log("COMPLAINT OBJECT", complaint);
   if (!complaint) return;
 
   activeComplaintId = complaintId;
+
+window.currentComplaintCategoryId =
+    complaint.complaintCategoryId;
 
   try {
     var detailRes = await fetch('http://localhost:5079/api/Complaint/' + encodeURIComponent(complaintId));
@@ -1862,6 +1879,7 @@ async function openAdminComplaintDetail(event, complaintId) {
     '<div class="complaint-status-form">' +
   '<div class="modal-section-label">Update Status</div>' +
   '<select id="adminStatusSelect"></select>' +
+  '<div id="assignedOfficerBox" style="display:none;margin-top:10px;"></div>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
       '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
     '</div>';
@@ -1900,10 +1918,106 @@ async function loadComplaintStatuses(selectedStatus) {
 
       select.appendChild(opt);
     });
+    select.addEventListener('change', handleAssignedStatusChange);
 
   } catch (err) {
     console.error('Error loading complaint statuses:', err);
   }
+}
+
+async function handleAssignedStatusChange() {
+
+    var select = document.getElementById('adminStatusSelect');
+    var box = document.getElementById('assignedOfficerBox');
+
+    if (!select || !box) return;
+
+    var selectedText =
+        select.options[select.selectedIndex].text;
+
+    if (selectedText.toLowerCase() !== 'assigned') {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+    }
+
+    try {
+
+        var res = await fetch(
+            'http://localhost:5079/api/Admin/officer-by-category/' +
+            window.currentComplaintCategoryId
+        );
+
+        var officers = await res.json();
+
+        box.style.display = 'block';
+
+        if (!officers || officers.length === 0) {
+            box.innerHTML = 'No officers assigned';
+            return;
+        }
+
+        var html = `
+    <div class="modal-section-label">Assign Officer</div>
+    <div class="assigned-officer-list">
+`;
+
+officers.forEach((o) => {
+
+    const isOnlyOne = officers.length === 1;
+    const checked = isOnlyOne ? 'checked' : '';
+
+    html += `
+        <label class="officer-card">
+
+            <input type="radio"
+                   name="assignedOfficer"
+                   value="${o.officerId}"
+                   ${checked} />
+
+            <div class="officer-info">
+
+                <div class="officer-top">
+                    <div class="officer-name">${o.officerName}</div>
+
+                    <div class="role-badge">
+                        ${o.designation ? o.designation : 'Officer'}
+                    </div>
+                </div>
+
+                <div class="selected-tick">✔</div>
+
+            </div>
+        </label>
+    `;
+});
+
+html += `</div>`;
+box.innerHTML = html;
+
+    } catch (err) {
+
+        console.error(err);
+
+        box.style.display = 'block';
+        box.innerHTML = 'Unable to load officer details';
+    }
+
+    setTimeout(() => {
+
+    document.querySelectorAll('.officer-card').forEach(card => {
+
+        card.addEventListener('click', function (e) {
+
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+        });
+
+    });
+
+}, 0);
 }
 
 async function loadSuggestionStatuses() {
@@ -2250,13 +2364,29 @@ async function submitAdminStatusUpdate() {
   var newStatus = statusEl ? statusEl.value : 'Pending';
   var remarks = remarksEl ? remarksEl.value.trim() : '';
 
+  var selectedOfficer =
+    document.querySelector(
+        'input[name="assignedOfficer"]:checked'
+    );
+
+var assignedOfficerId =
+    selectedOfficer
+        ? parseInt(selectedOfficer.value, 10)
+        : null;
+
+console.log(
+    'Selected Officer Id:',
+    assignedOfficerId
+);
+
   try {
     var response = await fetch('http://localhost:5079/api/Admin' + '/update-status', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+     body: JSON.stringify({
   complaintId: activeComplaintId,
   complaintStatusMasterId: parseInt(newStatus, 10),
+  assignedOfficerId: assignedOfficerId,
   remarks: remarks || null
 })
     });
