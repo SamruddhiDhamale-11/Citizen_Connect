@@ -1689,6 +1689,7 @@ async function loadComplaintHistoryInline(complaintId, containerId) {
 );
 
     const history = await res.json();
+    console.log("COMPLAINT HISTORY API RESPONSE:", history);
 
     const container = document.getElementById(containerId);
 
@@ -1703,21 +1704,58 @@ async function loadComplaintHistoryInline(complaintId, containerId) {
 
 function renderStatusHistory(history, type) {
 
-  if (!history || history.length === 0) {
-    return `
-  <div class="item-empty">
-    <div class="item-empty-icon">📜</div>
-    <div>No status history found</div>
-  </div>
-`;
-  }
+if (!history || history.length === 0) {
+  return `
+    <div class="item-empty">
+      <div class="item-empty-icon">📜</div>
+      <div>No status history found</div>
+    </div>
+  `;
+}
 
-  return history.map(function(h){
+var createdEntry = history.find(function(h) {
+  return !h.oldStatus;
+});
 
-    var statusText =
-      h.oldStatus
-        ? getComplaintStatusLabel(h.oldStatus) + ' → ' + getComplaintStatusLabel(h.newStatus)
-        : (type === 'complaint' ? 'Complaint Created' : 'Suggestion Created');
+var otherEntries = history.filter(function(h) {
+  return h.oldStatus;
+});
+
+var orderedHistory = [];
+
+if (createdEntry) {
+  orderedHistory.push(createdEntry);
+}
+
+orderedHistory = orderedHistory.concat(otherEntries);
+
+if (!createdEntry && orderedHistory.length > 0) {
+
+  orderedHistory.unshift({
+    oldStatus: null,
+    newStatus: null,
+    remarks: null,
+    createdAt: orderedHistory[0].createdAt || orderedHistory[0].changedAt
+  });
+
+}
+
+return orderedHistory.map(function(h){
+
+var isCreated = !h.oldStatus || h.oldStatus === null || h.oldStatus === undefined || h.oldStatus === '';
+
+var fromStatus = getComplaintStatusLabel(h.oldStatus);
+var toStatus = getComplaintStatusLabel(h.newStatus);
+
+var eventTitle = (!isCreated && fromStatus && toStatus)
+  ? (fromStatus + ' → ' + toStatus)
+  : null;
+
+
+var createdLabel =
+  isCreated
+    ? (type === 'complaint' ? 'Complaint Created' : 'Suggestion Created')
+    : null;
 
     return `
       <div class="history-item">
@@ -1726,9 +1764,10 @@ function renderStatusHistory(history, type) {
 
         <div class="history-content">
 
-         <div class="history-status">
-  ${statusText}
-</div>
+        ${isCreated
+  ? `<div class="history-status created">${createdLabel}</div>`
+  : `<div class="history-status">${eventTitle}</div>`
+}
 
 ${h.assignedOfficerName
   ? `

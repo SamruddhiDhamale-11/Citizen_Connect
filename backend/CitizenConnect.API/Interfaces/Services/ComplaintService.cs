@@ -171,17 +171,19 @@
 
             if (officer != null)
             {
-                var history =
-                    new ComplaintStatusHistory
-                    {
-                        ComplaintId =
-                            complaint.ComplaintId,
+               var history =
+    new ComplaintStatusHistory
+    {
+        ComplaintId =
+            complaint.ComplaintId,
 
-                       // ComplaintStatusMaster = 2,
+        OldStatus = "Pending",
 
-                        Remarks =
-                            "Complaint auto-assigned to officer."
-                    };
+        NewStatus = "Assigned",
+
+        Remarks =
+            "Complaint auto-assigned to officer."
+    };
 
                 await _context
                     .ComplaintStatusHistories
