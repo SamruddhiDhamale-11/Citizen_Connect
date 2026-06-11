@@ -61,7 +61,7 @@ public class SuggestionController : ControllerBase
        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> CreateSuggestion(
-    [FromBody] CreateSuggestionRequestDto request)
+    [FromForm] CreateSuggestionRequestDto request)
         {
             try
             {

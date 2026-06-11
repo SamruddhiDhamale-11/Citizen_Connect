@@ -1270,3 +1270,21 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 .officer-card input:checked {
     accent-color: #3b82f6;
 }
+
+.suggestion-card-image {
+    margin-top: 12px;
+}
+
+.suggestion-list-image {
+    width: 180px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.suggestion-list-image:hover {
+    transform: scale(1.03);
+}

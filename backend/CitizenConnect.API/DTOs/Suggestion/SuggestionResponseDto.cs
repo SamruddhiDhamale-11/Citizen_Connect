@@ -29,5 +29,7 @@ namespace CitizenConnect.Application.DTOs.Suggestion
         { get; set; }
 
         public string? LatestRemark { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

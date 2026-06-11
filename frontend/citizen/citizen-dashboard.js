@@ -191,19 +191,49 @@ async function loadCitizenSuggestions() {
     const list = data.data || [];
 
     // map API → UI format
-    const mapped = list.map(function (s) {
-  return {
-    suggestionId: s.suggestionId,
-    id: s.suggestionNumber,
-    title: s.title,
-    category: s.categoryName || "",
-    desc: s.description,
-    benefit: s.expectedBenefit,
-    date: formatDate(new Date(s.createdDate)),
-    status: normalizeSuggestionStatus(s.statusName),
-    remark: s.latestRemark || "",
-    scope: s.scope || "Ward"
-  };
+ const mapped = list.map(function (s) {
+
+    return {
+
+        suggestionId:
+            s.suggestionId,
+
+        id:
+            s.suggestionNumber,
+
+        title:
+            s.title,
+
+        category:
+            s.categoryName || "",
+
+        desc:
+            s.description,
+
+        imageUrl:
+            s.imageUrl,
+
+        benefit:
+            s.expectedBenefit,
+
+        date:
+            formatDate(
+                new Date(
+                    s.createdDate
+                )
+            ),
+
+        status:
+            normalizeSuggestionStatus(
+                s.statusName
+            ),
+
+        remark:
+            s.latestRemark || "",
+
+        scope:
+            s.scope || "Ward"
+    };
 });
 
     renderSuggestions(mapped);
@@ -681,7 +711,7 @@ async function submitSuggestion(e) {
     return;
   }
 
-  const fileInput = document.getElementById("complaintFile");
+  const fileInput = document.getElementById("suggestionFile");
   if (fileInput && fileInput.files && fileInput.files.length > 0) {
     const file = fileInput.files[0];
     const allowed = ["image/jpeg", "image/jpg", "image/png"];
@@ -697,7 +727,7 @@ async function submitSuggestion(e) {
     }
   }
 
-  const form = document.getElementById("complaintForm");
+  const form = document.getElementById("suggestionForm");
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
   if (submitBtn) {
     submitBtn.disabled = true;
@@ -838,137 +868,175 @@ function resetSuggestionForm() {
 
 // ---- Submit Suggestion ----
 async function submitSuggestion(e) {
-  e.preventDefault();
 
-  const errEl = document.getElementById("suggestionError");
-  errEl.classList.add("hidden");
+    e.preventDefault();
 
-  const categoryId =
-    document.getElementById("suggestionCategory").value;
+    const errEl =
+        document.getElementById(
+            "suggestionError"
+        );
 
-  const scope =
-    document.getElementById("suggestionScope").value;
+    errEl.classList.add("hidden");
 
-  const title =
-    document.getElementById("suggestionTitle").value.trim();
+    const citizenId =
+        localStorage.getItem("citizenId") ||
+        citizenProfile.citizenId;
 
-  const desc =
-    document.getElementById("suggestionDesc").value.trim();
+    const wardId =
+        citizenProfile.wardId;
 
-  const benefit =
-    document.getElementById("suggestionBenefit").value.trim();
+    const categoryId =
+        document.getElementById(
+            "suggestionCategory"
+        ).value;
 
-  // Validation
-  if (!categoryId || !scope || !title || !desc || !benefit) {
-    errEl.textContent =
-      "Please fill all required fields.";
+    const title =
+        document.getElementById(
+            "suggestionTitle"
+        ).value.trim();
 
-    errEl.classList.remove("hidden");
-    return;
-  }
+    const description =
+        document.getElementById(
+            "suggestionDesc"
+        ).value.trim();
 
-  const citizenId =
-    localStorage.getItem("citizenId") ||
-    citizenProfile.citizenId;
+    const benefit =
+        document.getElementById(
+            "suggestionBenefit"
+        ).value.trim();
 
-  const wardId =
-    citizenProfile.wardId;
+    const scope =
+        document.getElementById(
+            "suggestionScope"
+        ).value;
 
-  if (!citizenId || !wardId) {
-    errEl.textContent =
-      "Citizen profile not found. Please login again.";
+    if (
+        !categoryId ||
+        !title ||
+        !description ||
+        !benefit
+    ) {
+        errEl.textContent =
+            "Please fill all required fields.";
 
-    errEl.classList.remove("hidden");
-    return;
-  }
+        errEl.classList.remove(
+            "hidden"
+        );
 
-  // Convert scope string to enum number
-  let benefitScope = 0;
-
-  if (scope === "street") {
-    benefitScope = 0;
-  }
-  else if (scope === "ward") {
-    benefitScope = 1;
-  }
-  else if (scope === "city") {
-    benefitScope = 2;
-  }
-
-  // Create request object
-  const requestBody = {
-    citizenId: parseInt(citizenId),
-    wardId: parseInt(wardId),
-    suggestionCategoryId: parseInt(categoryId),
-    title: title,
-    description: desc,
-    expectedBenefit: benefit,
-    benefitScope: benefitScope,
-    isAnonymous: document.getElementById("suggestionAnon").checked
-  };
-
-  try {
-
-    const response = await fetch(
-      "http://localhost:5079/api/suggestions",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(requestBody)
-      });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        result.message ||
-        "Suggestion submission failed."
-      );
+        return;
     }
 
-    // Success
-    document.getElementById("suggestionForm").reset();
+    let benefitScope = 0;
 
-    document.getElementById(
-      "suggestionTitleCount"
-    ).textContent = "0";
+    if (scope === "ward")
+        benefitScope = 1;
 
-    document.getElementById(
-      "suggestionDescCount"
-    ).textContent = "0";
+    if (scope === "city")
+        benefitScope = 2;
 
-    document.getElementById(
-      "suggestionBenefitCount"
-    ).textContent = "0";
+    const formData =
+        new FormData();
 
-    document.getElementById(
-      "suggestionFileName"
-    ).classList.add("hidden");
-
-    showToast(
-      "✅",
-      "Suggestion submitted successfully!"
+    formData.append(
+        "CitizenId",
+        citizenId
     );
 
-    showPanel(
-      "mysuggestions",
-      document.querySelector(
-        "[onclick*=mysuggestions]"
-      )
+    formData.append(
+        "WardId",
+        wardId
     );
 
-  } catch (err) {
+    formData.append(
+        "SuggestionCategoryId",
+        categoryId
+    );
 
-    errEl.textContent =
-      err.message ||
-      "Unable to submit suggestion.";
+    formData.append(
+        "Title",
+        title
+    );
 
-    errEl.classList.remove("hidden");
-  }
+    formData.append(
+        "Description",
+        description
+    );
+
+    formData.append(
+        "ExpectedBenefit",
+        benefit
+    );
+
+    formData.append(
+        "BenefitScope",
+        benefitScope
+    );
+
+    formData.append(
+        "IsAnonymous",
+        document.getElementById(
+            "suggestionAnon"
+        ).checked
+    );
+
+    const file =
+        document.getElementById(
+            "suggestionFile"
+        ).files[0];
+
+    if (file) {
+        formData.append(
+            "Attachment",
+            file
+        );
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:5079/api/suggestions",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.message
+            );
+        }
+
+        resetSuggestionForm();
+
+        await loadCitizenSuggestions();
+
+        showToast(
+            "✅",
+            "Suggestion submitted successfully"
+        );
+
+        showPanel(
+            "mysuggestions",
+            document.querySelector(
+                "[onclick*=mysuggestions]"
+            )
+        );
+
+    }
+    catch (err) {
+
+        errEl.textContent =
+            err.message;
+
+        errEl.classList.remove(
+            "hidden"
+        );
+    }
 }
 
 // ---- Reset form ----
@@ -1083,7 +1151,15 @@ function renderSuggestions(data) {
                     <div class="item-card-desc">
                         ${escHtml(s.desc)}
                     </div>
+${s.imageUrl ? `
+<div class="suggestion-image">
 
+    <img
+        src="${s.imageUrl}"
+        alt="Suggestion">
+
+</div>
+` : ''}
               
                    
 

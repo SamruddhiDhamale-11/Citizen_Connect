@@ -115,26 +115,58 @@ namespace CitizenConnect.Application.Services
         // =====================================================
         // GET CITIZEN SUGGESTIONS
         // =====================================================
-        public async Task<List<SuggestionResponseDto>> GetCitizenSuggestionsAsync(int citizenId)
+        public async Task<List<SuggestionResponseDto>>
+GetCitizenSuggestionsAsync(
+    int citizenId)
         {
             return await _context.Suggestions
                 .Include(x => x.SuggestionStatusMaster)
+                .Include(x => x.SuggestionAttachments)
+
                 .Where(x => x.CitizenId == citizenId)
+
                 .OrderByDescending(x => x.CreatedAt)
+
                 .Select(x => new SuggestionResponseDto
                 {
                     SuggestionId = x.SuggestionId,
-                    SuggestionNumber = x.SuggestionNumber,
-                    Title = x.Title,
-                    Description = x.Description,
-                    ExpectedBenefit = x.ExpectedBenefit,
-                    StatusName = x.SuggestionStatusMaster.StatusName,
-                    LatestRemark = _context.SuggestionStatusHistories
-    .Where(h => h.SuggestionId == x.SuggestionId)
-    .OrderByDescending(h => h.ChangedAt)
-    .Select(h => h.Remarks)
-    .FirstOrDefault(),
-                    CreatedDate = x.CreatedAt
+
+                    SuggestionNumber =
+                        x.SuggestionNumber,
+
+                    Title =
+                        x.Title,
+
+                    Description =
+                        x.Description,
+
+                    ExpectedBenefit =
+                        x.ExpectedBenefit,
+
+                    StatusName =
+                        x.SuggestionStatusMaster
+                            .StatusName,
+
+                    ImageUrl =
+                        x.SuggestionAttachments
+                            .Where(a => a.IsActive)
+                            .Select(a => a.FilePath)
+                            .FirstOrDefault(),
+
+                    LatestRemark =
+                        _context
+                        .SuggestionStatusHistories
+                        .Where(h =>
+                            h.SuggestionId ==
+                            x.SuggestionId)
+                        .OrderByDescending(h =>
+                            h.ChangedAt)
+                        .Select(h =>
+                            h.Remarks)
+                        .FirstOrDefault(),
+
+                    CreatedDate =
+                        x.CreatedAt
                 })
                 .ToListAsync();
         }

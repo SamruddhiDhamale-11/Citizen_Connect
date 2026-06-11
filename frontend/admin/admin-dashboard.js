@@ -1314,9 +1314,24 @@ if (!data || data.length === 0) {
 
         </div>
 
-        <div class="item-card-desc">
-          ${s.description || '—'}
-        </div>
+       <div class="item-card-desc">
+  ${s.description || '—'}
+</div>
+
+${
+  s.images && s.images.length > 0
+  ?
+  `
+  <div class="suggestion-card-image">
+      <img
+          src="${s.images[0]}"
+          alt="Suggestion Image"
+          class="suggestion-list-image"
+      />
+  </div>
+  `
+  : ''
+}
 
         <div class="item-card-footer">
 
@@ -2099,20 +2114,21 @@ async function loadSuggestionStatuses() {
 
 async function openAdminSuggestionDetail(suggestionId) {
 
-  console.log("FUNCTION CALLED");
-  console.log("ID =", suggestionId);
-  console.log("DATA =", allSuggestions);
+    console.log("FUNCTION CALLED");
+console.log("ID =", suggestionId);
 
-  var suggestion = allSuggestions.find(function(s) {
-    return String(s.suggestionId) === String(suggestionId);
-  });
+var suggestion = allSuggestions.find(function(s) {
+    return Number(s.suggestionId) === Number(suggestionId);
+});
 
-  console.log("Anonymous Value =", suggestion.isAnonymous);
-
-  if (!suggestion) {
-    console.log("Suggestion not found");
+if (!suggestion) {
+    console.error("Suggestion Not Found");
     return;
-  }
+}
+
+console.log("FULL SUGGESTION =", suggestion);
+console.log("IMAGES =", suggestion.images);
+console.log(JSON.stringify(suggestion, null, 2));
 
   var statusClass = '';
 
@@ -2184,15 +2200,26 @@ async function openAdminSuggestionDetail(suggestionId) {
     escHtml(formatComplaintDate(suggestion.createdAt)) +
   '</div>' +
 
-  '<div class="modal-section-label">Attachment</div>' +
+'<div class="modal-section-label">Attachment</div>' +
 
-  (
-    suggestion.imageUrl
-      ? '<img class="complaint-detail-img" src="' +
-          escHtml(suggestion.imageUrl) +
-        '" alt="Suggestion attachment" />'
-      : '<div class="modal-value">No image attached</div>'
-  ) +
+(
+    Array.isArray(suggestion.images) &&
+    suggestion.images.length > 0
+
+        ? `
+            <div class="modal-value">
+
+                <img
+                    src="${suggestion.images[0]}"
+                    alt="Suggestion Attachment"
+                    class="complaint-detail-img"
+                />
+
+            </div>
+          `
+
+        : '<div class="modal-value">No image attached</div>'
+) +
 
   '<div class="complaint-status-form">' +
 
