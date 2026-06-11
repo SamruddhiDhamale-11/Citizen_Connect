@@ -26,12 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-  <ProjectReference Include="..\CitizenConnect.Application\CitizenConnect.Application.csproj" />
-  <ProjectReference Include="..\CitizenConnect.Infrastructure\CitizenConnect.Infrastructure.csproj" />
-  <ProjectReference Include="..\CitizenConnect.Domain\CitizenConnect.Domain.csproj" />
-</ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\uploads\complaints\" />
   </ItemGroup>
 
