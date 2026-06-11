@@ -11,6 +11,7 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="CloudinaryDotNet" Version="1.29.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +24,12 @@
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
+
+  <ItemGroup>
+  <ProjectReference Include="..\CitizenConnect.Application\CitizenConnect.Application.csproj" />
+  <ProjectReference Include="..\CitizenConnect.Infrastructure\CitizenConnect.Infrastructure.csproj" />
+  <ProjectReference Include="..\CitizenConnect.Domain\CitizenConnect.Domain.csproj" />
+</ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\uploads\complaints\" />

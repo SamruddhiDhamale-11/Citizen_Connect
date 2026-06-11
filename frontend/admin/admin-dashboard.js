@@ -1626,9 +1626,19 @@ function renderAdminComplaints(data) {
 
   '</div>' +
 
-  '<div class="complaint-history-link" onclick="event.stopPropagation(); openComplaintHistoryPopup(' + c.complaintId + ')">' +
-    'Status History' +
-  '</div>' +
+'<div class="complaint-actions">' +
+
+'<div class="complaint-action-chip officer-chip" onclick="event.stopPropagation(); openAssignedOfficerPopup(' + c.complaintId + ')">' +
+  '<i class="fa-solid fa-address-card"></i>' +
+  '<span>Assigned Officer</span>' +
+'</div>' +
+
+'<div class="complaint-action-chip history-chip" onclick="event.stopPropagation(); openComplaintHistoryPopup(' + c.complaintId + ')">' +
+  '<i class="fa-solid fa-chart-line"></i>' +
+  '<span>Status History</span>' +
+'</div>' +
+
+'</div>' +
 
 '</div></div></div>'
   }).join('');
@@ -1642,17 +1652,42 @@ function openComplaintHistoryPopup(complaintId) {
 
   if (!complaint) return;
 
-  const historyHtml = `
-    <div class="modal-section-label">Complaint</div>
-    <div class="modal-value">
+const historyHtml = `
+
+<div class="history-popup-card">
+
+  <div class="history-popup-item">
+
+    <div class="history-popup-label">
+      <i class="fa-solid fa-file-circle-exclamation"></i>
+      Complaint
+    </div>
+
+    <div class="history-popup-value">
       ${escHtml(complaint.title || '—')}
     </div>
 
-    <div class="modal-section-label">Status History</div>
-    <div id="complaint-history-container">
-      <div class="modal-value">Loading history...</div>
+  </div>
+
+  <div class="history-popup-item">
+
+    <div class="history-popup-label">
+      <i class="fa-solid fa-chart-line"></i>
+      Status Journey
     </div>
-  `;
+
+    <div id="complaint-history-container">
+
+      <div class="history-loading">
+        Loading history...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+`;
 
   document.getElementById('modalTitle').textContent =
     'Complaint Status History';
@@ -1667,6 +1702,83 @@ function openComplaintHistoryPopup(complaintId) {
     complaintId,
     'complaint-history-container'
   );
+}
+
+async function openAssignedOfficerPopup(complaintId) {
+
+  try {
+
+    const res = await fetch(
+      'http://localhost:5079/api/Complaint/' + complaintId
+    );
+
+    if (!res.ok) return;
+
+    const detail = await res.json();
+
+   const officerHtml = `
+
+<div class="officer-popup-card">
+
+  <div class="officer-popup-item">
+    <div class="officer-popup-label">
+      <i class="fa-solid fa-id-badge"></i>
+      Officer Name
+    </div>
+
+    <div class="officer-popup-value">
+      ${escHtml(detail.officerName || 'Not Assigned')}
+    </div>
+  </div>
+
+  <div class="officer-popup-item">
+    <div class="officer-popup-label">
+      <i class="fa-solid fa-briefcase"></i>
+      Designation
+    </div>
+
+    <div class="officer-popup-value">
+      ${escHtml(detail.officerDesignation || '—')}
+    </div>
+  </div>
+
+  <div class="officer-popup-item">
+    <div class="officer-popup-label">
+      <i class="fa-solid fa-phone"></i>
+      Mobile Number
+    </div>
+
+    <div class="officer-popup-value">
+      ${escHtml(detail.officerMobileNumber || '—')}
+    </div>
+  </div>
+
+  <div class="officer-popup-item">
+    <div class="officer-popup-label">
+      <i class="fa-solid fa-envelope"></i>
+      Email Address
+    </div>
+
+    <div class="officer-popup-value">
+      ${escHtml(detail.officerEmail || '—')}
+    </div>
+  </div>
+
+</div>
+`;
+
+    document.getElementById('modalTitle').textContent =
+      'Assigned Officer Details';
+
+    document.getElementById('modalBody').innerHTML =
+      officerHtml;
+
+    document.getElementById('modalOverlay')
+      .classList.remove('hidden');
+
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function closeComplaintHistoryModal() {
@@ -1772,8 +1884,12 @@ var createdLabel =
 ${h.assignedOfficerName
   ? `
     <div class="history-assigned-officer">
-      Assigned to :- ${h.assignedOfficerName}
-    </div>
+  <i class="fa-solid fa-user-check"></i>
+  Assigned to:
+  <span class="history-officer-name">
+    ${h.assignedOfficerName}
+  </span>
+</div>
   `
   : ''
 }
@@ -1896,6 +2012,11 @@ window.currentComplaintCategoryId =
     var detailRes = await fetch('http://localhost:5079/api/Complaint/' + encodeURIComponent(complaintId));
     if (detailRes.ok) {
       var detail = await detailRes.json();
+      console.log("Officer Name =", detail.officerName);
+console.log("Officer Designation =", detail.officerDesignation);
+console.log("Officer Mobile =", detail.officerMobileNumber);
+console.log("Officer Email =", detail.officerEmail);
+console.log("FULL DETAIL =", detail);
       complaint.desc = pickComplaintField(detail, 'description', 'Description') || complaint.desc;
       complaint.location = pickComplaintField(detail, 'address', 'Address') || complaint.location;
       complaint.citizen = pickComplaintField(detail, 'citizenName', 'CitizenName') || complaint.citizen;

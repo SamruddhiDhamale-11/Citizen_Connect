@@ -54,6 +54,7 @@ namespace CitizenConnect.Domain.Entities
 
         public DateTime? AssignedAt { get; set; }
 
+    public bool IsAssignedEmailSent { get; set; } = false;
 
         public Department? Department { get; set; }
 

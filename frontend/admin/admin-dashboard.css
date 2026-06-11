@@ -1270,3 +1270,243 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 .officer-card input:checked {
     accent-color: #3b82f6;
 }
+
+.complaint-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.complaint-action-chip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:7px 12px;
+
+  border-radius:999px;
+
+  cursor:pointer;
+
+  font-size:12px;
+  font-weight:600;
+
+  transition:all .25s ease;
+
+  border:1px solid rgba(0,0,0,.08);
+
+  background:#fff;
+}
+
+.complaint-action-chip i{
+  font-size:13px;
+}
+
+.officer-chip{
+  color:#8b5cf6;
+}
+
+.history-chip{
+  color:#2563eb;
+}
+
+.complaint-action-chip:hover{
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.officer-chip:hover{
+  background:#f3e8ff;
+}
+
+.history-chip:hover{
+  background:#eff6ff;
+}
+
+.officer-popup-card{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.officer-popup-item{
+  padding:14px;
+  border-radius:12px;
+
+  background:#fff;
+
+  border:1px solid rgba(0,0,0,.08);
+
+  transition:all .25s ease;
+}
+
+.officer-popup-item:hover{
+  transform:translateY(-2px);
+
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
+}
+
+.officer-popup-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  font-size:12px;
+  font-weight:700;
+
+  color:#6b7280;
+
+  text-transform:uppercase;
+
+  margin-bottom:6px;
+}
+
+.officer-popup-label i{
+  color:#8b5cf6;
+}
+
+.officer-popup-value{
+  font-size:15px;
+  font-weight:600;
+  color:#111827;
+
+  word-break:break-word;
+}
+
+.history-popup-card{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.history-popup-item{
+  position:relative;
+
+  padding:18px;
+
+  border-radius:16px;
+
+  background:linear-gradient(
+    180deg,
+    #ffffff,
+    #fafbfc
+  );
+
+  border:1px solid rgba(0,0,0,.08);
+
+  transition:all .25s ease;
+
+  overflow:hidden;
+}
+
+.history-popup-item::before{
+  content:'';
+
+  position:absolute;
+
+  left:0;
+  top:0;
+  bottom:0;
+
+  width:4px;
+
+  background:linear-gradient(
+    180deg,
+    var(--red-primary),
+    var(--red-dark)
+  );
+}
+
+.history-popup-item:hover{
+  transform:translateY(-3px);
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.08);
+}
+
+.history-popup-label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  font-size:11px;
+  font-weight:800;
+
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
+
+  color:#6b7280;
+
+  margin-bottom:10px;
+}
+
+.history-popup-label i{
+  width:32px;
+  height:32px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  background:rgba(220,38,38,.08);
+
+  color:var(--red-primary);
+
+  font-size:14px;
+}
+
+.history-popup-value{
+  font-size:15px;
+
+  font-weight:600;
+
+  color:#111827;
+
+  line-height:1.6;
+}
+
+.history-loading{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  color:#6b7280;
+
+  font-size:14px;
+}
+
+.history-loading::before{
+  content:'⏳';
+  font-size:16px;
+}
+
+.history-assigned-officer{
+  margin-top:6px;
+
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  font-size:13px;
+  color:#64748b;
+}
+
+.history-assigned-officer i{
+  color:#3b82f6;
+}
+
+.history-officer-name{
+  font-weight:700;
+
+  color:#2563eb;
+
+  background:#eff6ff;
+
+  padding:3px 8px;
+
+  border-radius:999px;
+}
