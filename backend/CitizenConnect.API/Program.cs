@@ -1,6 +1,5 @@
 using CitizenConnect.API.Configurations;
 using CitizenConnect.API.Interfaces.Services;
-using CitizenConnect.API.Services;
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
 using CitizenConnect.Application.Services.Interfaces;
@@ -12,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("Cloudinary"));
@@ -43,29 +44,29 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
-builder.Services.AddScoped<
-    IJurisdictionService,
-    JurisdictionService>();
+// builder.Services.AddScoped<
+//     IJurisdictionService,
+//     JurisdictionService>();
 
 builder.Services.AddScoped<
     IFacilityModuleService,
     FacilityModuleService>();
 
-builder.Services.AddScoped<
-    IFacilityDataService,
-    FacilityDataService>();
+// builder.Services.AddScoped<
+//     IFacilityDataService,
+//     FacilityDataService>();
 
-builder.Services.AddScoped<
-    IFacilityFieldOptionService,
-    FacilityFieldOptionService>();
+// builder.Services.AddScoped<
+//     IFacilityFieldOptionService,
+//     FacilityFieldOptionService>();
 
 builder.Services.AddScoped<
     IFacilityFieldService,
     FacilityFieldService>();
 
-builder.Services.AddScoped<
-    IDemographicService,
-    DemographicService>();
+// builder.Services.AddScoped<
+//     IDemographicService,
+//     DemographicService>();
 
 
 builder.Services

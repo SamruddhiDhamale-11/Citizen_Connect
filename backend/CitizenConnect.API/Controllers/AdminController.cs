@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Application.Interfaces.Services;
+using CitizenConnect.Services;
 
 namespace CitizenConnect.Controllers
 {
@@ -17,16 +18,19 @@ namespace CitizenConnect.Controllers
     {
         private readonly IAdminService _adminService;
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
         /// <summary>
         /// Constructor - Injects Admin Service dependency
         /// </summary>
-        public AdminController(
+       public AdminController(
     IAdminService adminService,
-    ApplicationDbContext context)
+    ApplicationDbContext context,
+    IEmailService emailService)
 {
     _adminService = adminService;
     _context = context;
+    _emailService = emailService;
 }
 
         // =====================================================

@@ -3,6 +3,8 @@ using CitizenConnect.DTOs.Admin;
 using CitizenConnect.DTOs.Complaint;
 using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Interfaces.Services;
+using CitizenConnect.Services;
+using CitizenConnect.Interfaces.Services;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +13,13 @@ namespace CitizenConnect.Services
     public class AdminService : IAdminService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public AdminService(ApplicationDbContext context)
+        public AdminService(ApplicationDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
-
 
         // =========================================
         // GET ALL COMPLAINTS
@@ -41,25 +44,26 @@ namespace CitizenConnect.Services
         }
 
         // =========================================
-// GET ALL CITIZENS
-// =========================================
-public async Task<List<object>> GetAllCitizensAsync()
-{
-    var citizens = await _context.Citizens
-        .Include(c => c.User)
-        .ToListAsync();
+        // GET ALL CITIZENS
+        // =========================================
 
-    return citizens.Select(c => new
-    {
-        citizenId = c.CitizenId,
-        firstName = c.User.FirstName,
-        lastName = c.User.LastName,
-        email = c.User.Email,
-        mobile = c.User.MobileNo,
-        wardId = c.WardId,
-        createdAt = c.CreatedAt
-    }).ToList<object>();
-}
+        public async Task<List<object>> GetAllCitizensAsync()
+        {
+            var citizens = await _context.Citizens
+                .Include(c => c.User)
+                .ToListAsync();
+
+            return citizens.Select(c => new
+            {
+                citizenId = c.CitizenId,
+                firstName = c.User.FirstName,
+                lastName = c.User.LastName,
+                email = c.User.Email,
+                mobile = c.User.MobileNo,
+                wardId = c.WardId,
+                createdAt = c.CreatedAt
+            }).ToList<object>();
+        }
 
         private static ComplaintResponseDto MapToComplaintResponseDto(Complaint c)
         {
@@ -78,7 +82,7 @@ public async Task<List<object>> GetAllCitizensAsync()
                 Title = c.Title,
                 Description = c.Description ?? string.Empty,
                 Address = c.Address ?? string.Empty,
-                Status =c.ComplaintStatusMaster?.StatusName?? string.Empty,
+                Status = c.ComplaintStatusMaster?.StatusName ?? string.Empty,
                 Priority = c.Priority,
                 CitizenName = c.IsAnonymous
                     ? "Anonymous"
@@ -87,18 +91,18 @@ public async Task<List<object>> GetAllCitizensAsync()
                 Images = imagePaths,
                 CreatedAt = c.CreatedAt,
 
-StatusHistory = c.ComplaintStatusHistories
-    .OrderByDescending(h => h.ChangedAt)
-    .Select(h => new ComplaintStatusHistoryDto
-    {
-        OldStatus = h.OldStatus,
-        NewStatus = h.NewStatus,
-        ChangedBy = "Admin",
-        Remarks = h.Remarks,
-        AssignedOfficerName = h.AssignedOfficerName,
-        ChangedAt = h.ChangedAt
-    })
-    .ToList()
+                StatusHistory = c.ComplaintStatusHistories
+                    .OrderByDescending(h => h.ChangedAt)
+                    .Select(h => new ComplaintStatusHistoryDto
+                    {
+                        OldStatus = h.OldStatus,
+                        NewStatus = h.NewStatus,
+                        ChangedBy = "Admin",
+                        Remarks = h.Remarks,
+                        AssignedOfficerName = h.AssignedOfficerName,
+                        ChangedAt = h.ChangedAt
+                    })
+                    .ToList()
             };
         }
 
@@ -120,276 +124,168 @@ StatusHistory = c.ComplaintStatusHistories
             return string.IsNullOrEmpty(name) ? "—" : name;
         }
 
-
         // =========================================
         // UPDATE COMPLAINT STATUS
         // =========================================
 
-        public async Task<string>
-            UpdateComplaintStatusAsync(
-                UpdateComplaintStatusDto dto)
+        public async Task<string> UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto)
         {
+            var complaint = await _context.Complaints
+                .FirstOrDefaultAsync(c => c.ComplaintId == dto.ComplaintId);
 
-            Console.WriteLine(
-    $"DTO AssignedOfficerId = {dto.AssignedOfficerId}"
-);
+            if (complaint == null)
+                return "Complaint not found";
 
-Console.WriteLine(
-    $"Assigned Officer Id = {dto.AssignedOfficerId}"
-);
+            var statusExists = await _context.ComplaintStatusMasters
+                .AnyAsync(x => x.ComplaintStatusMasterId == dto.ComplaintStatusMasterId);
 
-          
-          var complaint = await _context.Complaints
-    .FirstOrDefaultAsync(c => c.ComplaintId == dto.ComplaintId);
+            if (!statusExists)
+                return "Invalid Complaint Status Id";
 
-if (complaint == null)
+            var newStatus = await _context.ComplaintStatusMasters
+                .Where(x => x.ComplaintStatusMasterId == dto.ComplaintStatusMasterId)
+                .Select(x => x.StatusName)
+                .FirstOrDefaultAsync();
+
+            var oldStatus = await _context.ComplaintStatusMasters
+                .Where(x => x.ComplaintStatusMasterId == complaint.ComplaintStatusMasterId)
+                .Select(x => x.StatusName)
+                .FirstOrDefaultAsync();
+
+            complaint.ComplaintStatusMasterId = dto.ComplaintStatusMasterId;
+
+            string? assignedOfficerName = null;
+
+            if (newStatus == "Assigned")
+            {
+                complaint.AssignedOfficerId = dto.AssignedOfficerId;
+                complaint.AssignedAt = DateTime.UtcNow;
+
+                assignedOfficerName = await _context.Officers
+                    .Where(o => o.OfficerId == dto.AssignedOfficerId)
+                    .Select(o => o.FirstName + " " + o.LastName)
+                    .FirstOrDefaultAsync();
+
+                var officer = await _context.Officers
+    .FirstOrDefaultAsync(o => o.OfficerId == dto.AssignedOfficerId);
+
+if (officer != null)
 {
-    return "Complaint not found";
-}
-
-// STEP 1: validate status FIRST
-var statusExists = await _context.ComplaintStatusMasters
-    .AnyAsync(x => x.ComplaintStatusMasterId == dto.ComplaintStatusMasterId);
-
-if (!statusExists)
-{
-    return "Invalid Complaint Status Id";
-}
-
-// new stautus
-var newStatus =
-    await _context.ComplaintStatusMasters
-    .Where(x =>
-        x.ComplaintStatusMasterId ==
-        dto.ComplaintStatusMasterId
-    )
-    .Select(x => x.StatusName)
-    .FirstOrDefaultAsync();
-
-
-// STEP 2: get old status
-var oldStatus = await _context.ComplaintStatusMasters
-    .Where(x => x.ComplaintStatusMasterId == complaint.ComplaintStatusMasterId)
-    .Select(x => x.StatusName)
-    .FirstOrDefaultAsync();
-  complaint.ComplaintStatusMasterId =
-    dto.ComplaintStatusMasterId;
-
-string? assignedOfficerName = null;
-
-if (newStatus == "Assigned")
-{
-    complaint.AssignedOfficerId =
-        dto.AssignedOfficerId;
-
-    complaint.AssignedAt =
-        DateTime.UtcNow;
-
-    assignedOfficerName = await _context.Officers
-        .Where(o => o.OfficerId == dto.AssignedOfficerId)
-        .Select(o => o.FirstName + " " + o.LastName)
+    var citizenName = await _context.Complaints
+        .Where(c => c.ComplaintId == complaint.ComplaintId)
+        .Select(c => c.Citizen.User.FirstName + " " + c.Citizen.User.LastName)
         .FirstOrDefaultAsync();
-}
 
-if (newStatus == "Resolved")
-{
-    complaint.ResolvedAt =
-        DateTime.UtcNow;
-}
-            // SAVE STATUS HISTORY  
+    var imageUrl = await _context.Complaints
+        .Where(c => c.ComplaintId == complaint.ComplaintId)
+        .SelectMany(c => c.ComplaintImages)
+        .Select(i => i.ImagePath)
+        .FirstOrDefaultAsync();
+
+    await _emailService.SendComplaintAssignedEmail(
+        officer.Email,
+        assignedOfficerName,
+        complaint.Title,
+        complaint.Description,
+        citizenName,
+        newStatus,
+        imageUrl
+    );
+
+    complaint.IsAssignedEmailSent = true;
+}         }
+
+            if (newStatus == "Resolved")
+            {
+                complaint.ResolvedAt = DateTime.UtcNow;
+            }
+
             var history = new ComplaintStatusHistory
-{
-    ComplaintId = complaint.ComplaintId,
+            {
+                ComplaintId = complaint.ComplaintId,
+                OldStatus = oldStatus ?? string.Empty,
+                NewStatus = newStatus ?? string.Empty,
+                Remarks = dto.Remarks,
+                AssignedOfficerName = assignedOfficerName,
+                ChangedAt = DateTime.UtcNow
+            };
 
-    OldStatus = oldStatus ?? string.Empty,
-
-    NewStatus = newStatus ?? string.Empty,
-
-    Remarks = dto.Remarks,
-
-    AssignedOfficerName = assignedOfficerName,
-
-    ChangedAt = DateTime.UtcNow
-};
-
-            await _context.ComplaintStatusHistories
-                .AddAsync(history);
-
-
-Console.WriteLine(
-    $"Before SaveChanges = {complaint.AssignedOfficerId}"
-);
-
-
+            await _context.ComplaintStatusHistories.AddAsync(history);
             await _context.SaveChangesAsync();
 
             return "Complaint status updated successfully";
         }
 
-
         // =========================================
         // GET COMPLAINT HISTORY
         // =========================================
 
-      public async Task<List<ComplaintStatusHistoryDto>>
-    GetComplaintHistoryAsync(int complaintId)
-{
-    return await _context.ComplaintStatusHistories
-
-        .Where(h => h.ComplaintId == complaintId)
-
-        .Select(h => new ComplaintStatusHistoryDto
-{
-    OldStatus = h.OldStatus.ToString(),
-
-    NewStatus = h.NewStatus.ToString(),
-
-    ChangedBy = "Admin",
-
-    Remarks = h.Remarks,
-
-    AssignedOfficerName = h.AssignedOfficerName,
-
-    ChangedAt = h.ChangedAt
-})
+        public async Task<List<ComplaintStatusHistoryDto>>
+            GetComplaintHistoryAsync(int complaintId)
+        {
+            return await _context.ComplaintStatusHistories
+                .Where(h => h.ComplaintId == complaintId)
+                .Select(h => new ComplaintStatusHistoryDto
+                {
+                    OldStatus = h.OldStatus.ToString(),
+                    NewStatus = h.NewStatus.ToString(),
+                    ChangedBy = "Admin",
+                    Remarks = h.Remarks,
+                    AssignedOfficerName = h.AssignedOfficerName,
+                    ChangedAt = h.ChangedAt
+                })
                 .OrderByDescending(h => h.ChangedAt)
                 .ToListAsync();
         }
 
-
-        public async Task<bool>
-            UpdateSuggestionStatusAsync(
-                int suggestionId,
-                UpdateSuggestionStatusDto request)
+        public async Task<bool> UpdateSuggestionStatusAsync(
+            int suggestionId,
+            UpdateSuggestionStatusDto request)
         {
-            var suggestion =
-                await _context.Suggestions
-
+            var suggestion = await _context.Suggestions
                 .Include(x => x.SuggestionStatusMaster)
-
-                .FirstOrDefaultAsync(x =>
-
-                    x.SuggestionId ==
-                    suggestionId);
+                .FirstOrDefaultAsync(x => x.SuggestionId == suggestionId);
 
             if (suggestion == null)
-            {
-                throw new Exception(
-                    "Suggestion not found.");
-            }
+                throw new Exception("Suggestion not found.");
 
-            /**
-             * =====================================
-             * STORE OLD STATUS NAME
-             * =====================================
-             */
+            var oldStatus = suggestion.SuggestionStatusMaster.StatusName;
 
-            var oldStatus =
-                suggestion
-                    .SuggestionStatusMaster
-                    .StatusName;
+            suggestion.SuggestionStatusMasterId = request.SuggestionStatusMasterId;
+            suggestion.AdminRemarks = request.Remarks;
+            suggestion.ReviewedAt = DateTime.UtcNow;
 
-
-            /**
-             * =====================================
-             * UPDATE STATUS
-             * =====================================
-             */
-
-            suggestion.SuggestionStatusMasterId =
-                request.SuggestionStatusMasterId;
-
-            suggestion.AdminRemarks =
-                request.Remarks;
-
-            suggestion.ReviewedAt =
-                DateTime.UtcNow;
-
-
-            /**
-             * =====================================
-             * GET NEW STATUS NAME
-             * =====================================
-             */
-
-            var newStatus =
-                await _context
-                .SuggestionStatusMasters
-
-                .Where(x =>
-
-                    x.SuggestionStatusMasterId ==
-                    request.SuggestionStatusMasterId
-                )
-
+            var newStatus = await _context.SuggestionStatusMasters
+                .Where(x => x.SuggestionStatusMasterId == request.SuggestionStatusMasterId)
                 .Select(x => x.StatusName)
-
                 .FirstOrDefaultAsync();
 
+            var history = new SuggestionStatusHistory
+            {
+                SuggestionId = suggestion.SuggestionId,
+                OldStatus = oldStatus,
+                NewStatus = newStatus ?? string.Empty,
+                Remarks = request.Remarks,
+                ChangedAt = DateTime.UtcNow
+            };
 
-            /**
-             * =====================================
-             * SAVE HISTORY
-             * =====================================
-             */
-
-            var history =
-                new SuggestionStatusHistory
-                {
-                    SuggestionId =
-                        suggestion.SuggestionId,
-
-                    OldStatus =
-                        oldStatus,
-
-                    NewStatus =
-                        newStatus ?? string.Empty,
-
-                    Remarks =
-                        request.Remarks,
-
-                    ChangedAt =
-                        DateTime.UtcNow
-                };
-
-            _context
-                .SuggestionStatusHistories
-                .Add(history);
-
+            _context.SuggestionStatusHistories.Add(history);
             await _context.SaveChangesAsync();
 
             return true;
         }
-        /*    Task<string> IAdminService.UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto)
-            {
-                throw new NotImplementedException();
-            }
 
-            Task<List<ComplaintStatusHistoryDto>> IAdminService.GetComplaintHistoryAsync(int complaintId)
-            {
-                throw new NotImplementedException();
-            }
-
-            Task<bool> IAdminService.UpdateSuggestionStatusAsync(int suggestionId, UpdateSuggestionStatusDto request)
-            {
-                throw new NotImplementedException();
-
-
-            }
-          */
-
-          public async Task<List<ComplaintStatusDto>> GetComplaintStatusesAsync()
-{
-    return await _context.ComplaintStatusMasters
-        .Where(x => x.IsActive)
-        .OrderBy(x => x.DisplayOrder)
-        .Select(x => new ComplaintStatusDto
+        public async Task<List<ComplaintStatusDto>> GetComplaintStatusesAsync()
         {
-            ComplaintStatusMasterId = x.ComplaintStatusMasterId,
-            StatusName = x.StatusName
-        })
-        .ToListAsync();
-}
+            return await _context.ComplaintStatusMasters
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.DisplayOrder)
+                .Select(x => new ComplaintStatusDto
+                {
+                    ComplaintStatusMasterId = x.ComplaintStatusMasterId,
+                    StatusName = x.StatusName
+                })
+                .ToListAsync();
+        }
     }
 }
-            
