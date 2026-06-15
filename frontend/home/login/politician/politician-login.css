@@ -941,3 +941,114 @@ input, select, textarea, button { max-width: 100%; box-sizing: border-box; }
   .vs-mic-btn.vs-active .vs-mic-icon { animation: none; }
   .vg-field-active { outline-width: 2px; }
 }
+
+/* ================================================================
+   BACK TO HOME — shown at the top of login & register cards
+================================================================ */
+.back-to-home-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.back-to-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 22px;
+  background: var(--white);
+  color: var(--red);
+  border: 1.5px solid var(--red);
+  border-radius: 50px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  transition: background var(--transition), color var(--transition),
+              box-shadow var(--transition), transform 0.12s ease;
+}
+
+.back-to-home-btn:hover {
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(194, 24, 7, 0.28);
+  transform: translateY(-1px);
+}
+
+.back-to-home-btn:active {
+  transform: translateY(0);
+}
+
+.back-home-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* text-mode button spacing */
+.vg-start-btn--text-offset {
+  margin-left: 10px;
+}
+
+/* ================================================================
+   MODE SELECTION — heading + form lock until voice/text chosen
+   ================================================================ */
+.vg-mode-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vg-mode-heading::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 13px;
+  background: var(--red);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.form-body-lock {
+  position: relative;
+}
+
+.form-body-lock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.60);
+  border-radius: var(--radius-section);
+  z-index: 10;
+  cursor: not-allowed;
+  pointer-events: all;
+  transition: opacity 0.25s ease;
+}
+
+.form-body-lock.unlocked::after {
+  display: none;
+}
+
+.form-body-lock input,
+.form-body-lock select,
+.form-body-lock textarea,
+.form-body-lock button:not(.vg-start-btn),
+.form-body-lock .toggle-pw,
+.form-body-lock .captcha-refresh-btn {
+  pointer-events: none;
+}
+
+.form-body-lock.unlocked input,
+.form-body-lock.unlocked select,
+.form-body-lock.unlocked textarea,
+.form-body-lock.unlocked button:not(.vg-start-btn),
+.form-body-lock.unlocked .toggle-pw,
+.form-body-lock.unlocked .captcha-refresh-btn {
+  pointer-events: auto;
+}

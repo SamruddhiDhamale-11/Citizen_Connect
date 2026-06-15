@@ -29,17 +29,31 @@
       </div>
 
       <div class="card-body">
+
+        <!-- Back to Home -->
+        <div class="back-to-home-wrap">
+          <a href="../../home.html" class="back-to-home-btn">
+            <span class="back-home-icon">🏠</span> Back to Home
+          </a>
+        </div>
+
         <form id="loginForm" novalidate>
+
+          <!-- ===== MODE SELECTION HEADING ===== -->
+          <p class="vg-mode-heading">Choose one option to continue</p>
 
           <!-- ===== LOGIN VOICE / TEXT TOGGLE ===== -->
           <div class="vg-login-btn-row">
             <button type="button" id="loginBtnVoice" class="vg-start-btn" onclick="loginSetMode('voice')" aria-label="Login with voice guide">
               &#x1F399;&#xFE0F; Login with Voice Guide
             </button>
-            <button type="button" id="loginBtnText" class="vg-start-btn" style="margin-left:10px;" onclick="loginSetMode('text')" aria-label="Login with text">
+            <button type="button" id="loginBtnText" class="vg-start-btn vg-start-btn--text-offset" onclick="loginSetMode('text')" aria-label="Login with text">
               &#x1F399;&#xFE0F; Login with Text
             </button>
           </div>
+
+          <!-- form-body-lock: disabled until voice/text is chosen -->
+          <div class="form-body-lock" id="loginFormBody">
 
           <div class="form-section">
             <div class="form-section-title">Access Credentials</div>
@@ -110,243 +124,13 @@
 
           <button type="submit" class="btn-primary">Login to Portal</button>
 
-          <p class="switch-text" id="registerLink">New user? <a href="#" class="link-text" onclick="showRegister()">Register here</a></p>
+          </div><!-- end form-body-lock -->
+
         </form>
       </div>
     </div>
 
-    <!-- ===== REGISTER CARD ===== -->
-    <div class="card hidden" id="registerCard">
-      <div class="card-header">
-        <div class="header-logo-row">
-          <div class="header-emblem">🏛️</div>
-          <div class="header-text-block">
-            <span class="gov-badge">Government of India</span>
-            <h1 class="portal-title">Citizen Connect</h1>
-            <p class="portal-subtitle">Citizen Registration</p>
-          </div>
-        </div>
-        <div class="divider"></div>
-      </div>
-
-      <div class="card-body">
-
-        <!-- Role Banner — static, always shown -->
-        <div class="role-banner" id="roleBanner">
-          <div class="role-banner-left">
-            <span class="role-banner-icon">👤</span>
-            <div>
-              <div class="role-banner-label">Registering as</div>
-              <div class="role-banner-name">Citizen</div>
-            </div>
-          </div>
-          <a href="#" class="role-banner-change link-text" onclick="showLogin(); return false;">Back to Login</a>
-        </div>
-
-        <!-- Step Indicator -->
-        <div class="step-indicator">
-          <div class="step active" id="stepDot1">
-            <div class="step-circle" id="stepCircle1">1</div>
-            <div class="step-label" id="stepLabel1">Name &amp; Location</div>
-          </div>
-          <div class="step-line" id="stepLine1"></div>
-          <div class="step inactive" id="stepDot2">
-            <div class="step-circle" id="stepCircle2">2</div>
-            <div class="step-label" id="stepLabel2">Personal Details</div>
-          </div>
-          <div class="step-line" id="stepLine2"></div>
-          <div class="step inactive" id="stepDot3">
-            <div class="step-circle" id="stepCircle3">3</div>
-            <div class="step-label" id="stepLabel3">Security</div>
-          </div>
-        </div>
-
-        <!-- ================================================================
-             STEP 1 — Name & Location Details
-             ================================================================ -->
-        <div class="step-panel" id="step1">
-          <h3 class="step-heading">Step 1 — Name &amp; Location Details</h3>
-
-          <div class="form-section">
-            <div class="form-section-title">Name</div>
-            <div class="form-row-two">
-              <div class="form-group">
-                <label for="c-firstName"><strong>First Name</strong> <span class="req">*</span></label>
-                <input type="text" id="c-firstName" placeholder="First name" />
-              </div>
-              <div class="form-group">
-                <label for="c-middleName"><strong>Middle / Father's Name</strong></label>
-                <input type="text" id="c-middleName" placeholder="Middle or father's name" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="c-lastName"><strong>Last Name</strong> <span class="req">*</span></label>
-              <input type="text" id="c-lastName" placeholder="Last name / surname" />
-            </div>
-          </div>
-
-          <div class="form-section">
-            <div class="form-section-title">Location</div>
-
-            <div class="form-group">
-              <label><strong>Are you from this ward?</strong> <span class="req">*</span></label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="wardConfirm" value="yes" /> Yes, I belong to this ward
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="wardConfirm" value="no" /> No, I am not from this ward
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label><strong>Residency Type</strong> <span class="req">*</span></label>
-              <div class="radio-group">
-                <label class="radio-label"><input type="radio" name="residentType" value="1" /> Resident</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="2" /> Working Here</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="3" /> Business Owner</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="4" /> Property Owner (Rent)</label>
-                <label class="radio-label"><input type="radio" name="residentType" value="5" /> Other</label>
-              </div>
-            </div>
-
-            <div class="form-group" id="voterQuestionGroup">
-              <label><strong>Are you a registered voter?</strong> <span class="req">*</span></label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="isVoter" value="yes" /> Yes
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="isVoter" value="no" /> No
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div class="error-msg" id="step1Error"></div>
-          <div class="btn-row">
-            <button type="button" class="btn-primary" onclick="nextStep(1)">Next &rarr;</button>
-          </div>
-          <p class="switch-text">Already registered? <a href="#" class="link-text" onclick="showLogin()">Login here</a></p>
-        </div>
-
-        <!-- ================================================================
-             STEP 2 — Personal Details
-             ================================================================ -->
-        <div class="step-panel hidden" id="step2">
-          <h3 class="step-heading">Step 2 — Personal Details</h3>
-
-          <div class="form-section">
-            <div class="form-section-title">Identity</div>
-            <div class="form-row-two">
-              <div class="form-group">
-                <label for="c-dob"><strong>Date of Birth</strong> <span class="req">*</span></label>
-                <input type="date" id="c-dob" />
-              </div>
-              <div class="form-group">
-                <label for="c-gender"><strong>Gender</strong> <span class="req">*</span></label>
-                <select id="c-gender">
-                  <option value="">— Select —</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer_not">Prefer not to say</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <div class="form-section-title">Contact Details</div>
-
-            <div class="form-group">
-              <label for="c-mobile"><strong>Mobile Number</strong> <span class="req">*</span></label>
-              <input type="tel" id="c-mobile" placeholder="10-digit mobile number" maxlength="10" />
-            </div>
-
-            <div class="form-group">
-              <label for="c-whatsapp"><strong>WhatsApp Number</strong></label>
-              <input type="tel" id="c-whatsapp" placeholder="10-digit WhatsApp number" maxlength="10" />
-              <label class="checkbox-label" style="margin-top:8px;">
-                <input type="checkbox" id="c-sameAsMobile" onchange="syncWhatsApp(this)" />
-                Same as Mobile Number
-              </label>
-            </div>
-
-            <div class="form-group">
-              <label for="c-email"><strong>Email Address</strong> <span class="req">*</span></label>
-              <input type="email" id="c-email" placeholder="Enter your email address" />
-            </div>
-          </div>
-
-          <div class="error-msg" id="step2Error"></div>
-          <div class="btn-row two-btns">
-            <button type="button" class="btn-secondary" onclick="prevStep(2)">&larr; Back</button>
-            <button type="button" class="btn-primary" onclick="nextStep(2)">Next &rarr;</button>
-          </div>
-        </div>
-
-        <!-- ================================================================
-             STEP 3 — Security Setup
-             ================================================================ -->
-        <div class="step-panel hidden" id="step3">
-          <h3 class="step-heading">Step 3 — Set Password</h3>
-
-          <div class="form-section">
-            <div class="form-section-title">Security Setup</div>
-            <div class="form-group">
-              <label for="c-password"><strong>Password</strong> <span class="req">*</span></label>
-              <div class="input-icon-wrap">
-                <input type="password" id="c-password" placeholder="Minimum 6 characters" />
-                <span class="toggle-pw" onclick="togglePassword('c-password', this)">🗡</span>
-              </div>
-              <div class="password-strength" id="pwStrength"></div>
-            </div>
-            <div class="form-group">
-              <label for="c-confirmPassword"><strong>Confirm Password</strong> <span class="req">*</span></label>
-              <div class="input-icon-wrap">
-                <input type="password" id="c-confirmPassword" placeholder="Re-enter your password" />
-                <span class="toggle-pw" onclick="togglePassword('c-confirmPassword', this)">🗡</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Registration CAPTCHA -->
-          <div class="captcha-section">
-            <div class="captcha-section-title">Security Verification</div>
-            <div class="captcha-display-row">
-              <div class="captcha-box" aria-label="Captcha code">
-                <canvas id="regCaptchaCanvas" width="180" height="48" aria-hidden="true"></canvas>
-              </div>
-              <button type="button" class="captcha-refresh-btn" onclick="generateRegCaptcha()" title="Refresh captcha" aria-label="Refresh captcha">
-                <span class="captcha-refresh-icon">&#x21BB;</span>
-              </button>
-            </div>
-            <div class="form-group" style="margin-top:10px;">
-              <label for="regCaptchaInput"><strong>Enter Captcha</strong> <span class="req">*</span></label>
-              <input type="text" id="regCaptchaInput" placeholder="Type the code shown above" autocomplete="off" maxlength="6" />
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top:4px;">
-            <label class="checkbox-label">
-              <input type="checkbox" id="c-acceptTerms" />
-              I accept the <a href="#" class="link-text">Terms &amp; Conditions</a> and <a href="#" class="link-text">Privacy Policy</a>
-            </label>
-          </div>
-
-          <div class="error-msg" id="step3Error"></div>
-          <div class="btn-row two-btns">
-            <button type="button" class="btn-secondary" onclick="prevStep(3)">&larr; Back</button>
-            <button type="button" class="btn-primary" onclick="submitRegistration()">Register</button>
-          </div>
-        </div>
-
-      </div><!-- end card-body -->
-    </div>
-
-    <!-- ===== SUCCESS CARD ===== -->
+    <!-- ===== SUCCESS CARD (used by JS after login) ===== -->
     <div class="card hidden" id="successCard">
       <div class="card-header">
         <div class="header-logo-row">
@@ -354,21 +138,24 @@
           <div class="header-text-block">
             <span class="gov-badge">Government of India</span>
             <h1 class="portal-title">Citizen Connect</h1>
-            <p class="portal-subtitle">Registration Complete</p>
+            <p class="portal-subtitle">Login Complete</p>
           </div>
         </div>
         <div class="divider"></div>
       </div>
       <div class="success-content">
         <div class="success-check">✔</div>
-        <h2 class="success-title">Registration Successful</h2>
-        <p class="success-sub">Your account has been created successfully.</p>
+        <h2 class="success-title">Login Successful</h2>
+        <p class="success-sub">Welcome back to Citizen Connect.</p>
         <p class="success-redirect">Redirecting to dashboard<span class="dots"></span></p>
         <div class="progress-bar-wrap">
           <div class="progress-bar" id="progressBar"></div>
         </div>
       </div>
     </div>
+
+    <!-- ===== REGISTER CARD (hidden — kept so JS doesn't break) ===== -->
+    <div class="card hidden" id="registerCard"></div>
 
     <!-- Footer -->
     <div class="page-footer">
@@ -379,217 +166,5 @@
 
   <script src="citizen-login.js"></script>
   <script src="../../shared/voice-assistant.js"></script>
-  <script>
-  /* ================================================================
-     LOGIN VOICE — mode switching, mic fields, captcha speaker
-  ================================================================ */
-
-  var _loginMode = null; /* null | 'voice' | 'text' */
-  var _loginGuideRecog = null;
-  var _loginGuideActive = false;
-
-  function loginSetMode(mode) {
-    _loginMode = mode;
-    var btnVoice = document.getElementById('loginBtnVoice');
-    var btnText  = document.getElementById('loginBtnText');
-    btnVoice.classList.toggle('vg-start-btn--active', mode === 'voice');
-    btnText.classList.toggle('vg-start-btn--active',  mode === 'text');
-
-    var mics = document.querySelectorAll('.login-mic');
-    mics.forEach(function(b) {
-      b.style.display = (mode === 'voice') ? '' : 'none';
-    });
-
-    if (mode === 'text') {
-      loginStopGuide();
-    } else if (mode === 'voice') {
-      loginStartGuide();
-    }
-  }
-
-  /* ---- Voice guide: auto-walk through all three fields ---- */
-  function loginStartGuide() {
-    loginStopGuide();
-    _loginGuideActive = true;
-    _loginAskField(
-      'loginEmail',
-      'Please say your Email Address or Mobile Number.',
-      'email-or-mobile',
-      function() {
-        if (!_loginGuideActive) return;
-        _loginAskField(
-          'loginPassword',
-          'Please say your Password. Or say skip to leave it blank.',
-          'password',
-          function() {
-            if (!_loginGuideActive) return;
-            var code = (typeof window.getLoginCaptcha === 'function') ? window.getLoginCaptcha() : '';
-            var spoken = code ? code.split('').join('  ') : '';
-            var prompt = code
-              ? 'Security verification. The captcha code is: ' + spoken + '. Please say the captcha.'
-              : 'Please say the captcha code shown on screen.';
-            _loginAskField('captchaInput', prompt, 'captcha', function() {
-              if (!_loginGuideActive) return;
-              _loginSpeak('All fields filled. Please click Login to Portal.');
-            });
-          }
-        );
-      }
-    );
-  }
-
-  function loginStopGuide() {
-    _loginGuideActive = false;
-    if (_loginGuideRecog) {
-      try { _loginGuideRecog.stop(); } catch(e) {}
-      _loginGuideRecog = null;
-    }
-    if (window.speechSynthesis && window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    document.querySelectorAll('.vg-field-active').forEach(function(e) {
-      e.classList.remove('vg-field-active');
-    });
-  }
-
-  function _loginSpeak(text, onEnd) {
-    var SS = window.speechSynthesis;
-    if (!SS) { if (onEnd) onEnd(); return; }
-    if (SS.speaking) SS.cancel();
-    setTimeout(function() {
-      var utt = new SpeechSynthesisUtterance(text);
-      utt.lang  = 'en-IN'; utt.rate = 0.92; utt.pitch = 1.0;
-      utt.onend   = function() { if (onEnd) onEnd(); };
-      utt.onerror = function() { if (onEnd) onEnd(); };
-      SS.speak(utt);
-    }, 200);
-  }
-
-  function _loginHighlight(fieldId) {
-    document.querySelectorAll('.vg-field-active').forEach(function(e) { e.classList.remove('vg-field-active'); });
-    var inp = document.getElementById(fieldId);
-    if (inp) {
-      var fg = inp.closest('.form-group') || inp.parentElement;
-      if (fg) fg.classList.add('vg-field-active');
-      inp.focus();
-    }
-  }
-
-  function _loginAskField(fieldId, prompt, type, onDone) {
-    if (!_loginGuideActive) return;
-    _loginHighlight(fieldId);
-    _loginSpeak(prompt, function() {
-      if (!_loginGuideActive) return;
-      _loginListenField(fieldId, type, onDone, 1);
-    });
-  }
-
-  function _loginListenField(fieldId, type, onDone, attempt) {
-    if (!_loginGuideActive) return;
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { if (onDone) onDone(); return; }
-
-    var inp = document.getElementById(fieldId);
-    var recog = new SR();
-    recog.lang = 'en-IN'; recog.continuous = false;
-    recog.interimResults = false; recog.maxAlternatives = 3;
-    _loginGuideRecog = recog;
-
-    var timer = setTimeout(function() {
-      if (!_loginGuideActive) return;
-      try { recog.stop(); } catch(e) {}
-      if (attempt >= 3) { if (onDone) onDone(); return; }
-      _loginSpeak('I did not hear you. Please try again.', function() {
-        if (_loginGuideActive) _loginListenField(fieldId, type, onDone, attempt + 1);
-      });
-    }, 15000);
-
-    recog.onresult = function(ev) {
-      clearTimeout(timer);
-      var t = ev.results[0][0].transcript.trim();
-      _loginFillField(inp, type, t);
-      inp.classList.add('vg-field-success');
-      setTimeout(function() { inp.classList.remove('vg-field-success'); }, 1500);
-      if (onDone) onDone();
-    };
-
-    recog.onerror = function(ev) {
-      clearTimeout(timer);
-      if (ev.error === 'no-speech' && attempt < 3) {
-        _loginSpeak('I did not hear you. Please try again.', function() {
-          if (_loginGuideActive) _loginListenField(fieldId, type, onDone, attempt + 1);
-        });
-      } else { if (onDone) onDone(); }
-    };
-
-    recog.onend = function() { _loginGuideRecog = null; };
-    try { recog.start(); } catch(e) { clearTimeout(timer); if (onDone) onDone(); }
-  }
-
-  function _loginFillField(inp, type, transcript) {
-    if (type === 'password') {
-      if (transcript.toLowerCase() === 'skip') { inp.value = ''; return; }
-      inp.value = transcript;
-      return;
-    }
-    if (type === 'captcha') {
-      inp.value = transcript.replace(/\s+/g, '').toUpperCase();
-      return;
-    }
-    /* email-or-mobile */
-    var digitsOnly = transcript.replace(/\D/g, '');
-    if (digitsOnly.length >= 8) {
-      inp.value = digitsOnly.slice(0, 10);
-    } else {
-      /* basic spoken-email parse */
-      var t = transcript.toLowerCase()
-        .replace(/\bat the rate\b|\bat\b/g, '@')
-        .replace(/\bdot\b|\bpoint\b/g, '.')
-        .replace(/\s+/g, '');
-      inp.value = t;
-    }
-  }
-
-  /* ---- Standalone mic button handler (onclick="loginMicField(...)") ---- */
-  function loginMicField(fieldId, type, btn) {
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
-    var statusEl = btn.querySelector('.vs-mic-status');
-    btn.classList.add('vs-active');
-    if (statusEl) statusEl.textContent = 'Listening\u2026';
-
-    var inp = document.getElementById(fieldId);
-    var recog = new SR();
-    recog.lang = 'en-IN'; recog.continuous = false;
-    recog.interimResults = false; recog.maxAlternatives = 3;
-
-    recog.onresult = function(ev) {
-      btn.classList.remove('vs-active');
-      var t = ev.results[0][0].transcript.trim();
-      _loginFillField(inp, type, t);
-      inp.classList.add('vg-field-success');
-      setTimeout(function() { inp.classList.remove('vg-field-success'); }, 1500);
-      if (statusEl) { statusEl.textContent = 'Got it'; setTimeout(function() { statusEl.textContent = ''; }, 1500); }
-    };
-    recog.onerror = function() {
-      btn.classList.remove('vs-active');
-      if (statusEl) { statusEl.textContent = 'Try again'; setTimeout(function() { statusEl.textContent = ''; }, 1500); }
-    };
-    recog.onend = function() { btn.classList.remove('vs-active'); };
-    try { recog.start(); } catch(e) { btn.classList.remove('vs-active'); }
-  }
-
-  /* ---- Speaker: reads captcha aloud ---- */
-  function loginSpeakCaptcha(btn) {
-    var code = (typeof window.getLoginCaptcha === 'function') ? window.getLoginCaptcha() : '';
-    var statusEl = btn.querySelector('.vs-mic-status');
-    if (!code) { if (statusEl) statusEl.textContent = 'Not ready'; setTimeout(function() { if(statusEl) statusEl.textContent=''; }, 1500); return; }
-    var spoken = code.split('').join('  ');
-    if (statusEl) statusEl.textContent = 'Reading\u2026';
-    _loginSpeak('The captcha code is: ' + spoken, function() {
-      if (statusEl) statusEl.textContent = '';
-    });
-  }
-  </script>
 </body>
 </html>

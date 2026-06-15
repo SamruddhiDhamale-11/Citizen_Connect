@@ -88,13 +88,13 @@
 
         <div class="nav-actions">
 
-            <a href="#stakeholders" class="btn btn-outline">
-    Login
-</a>
+            <a href="#" onclick="openRolePopup('officials'); return false;" class="btn btn-outline">
+                Login for Officials
+            </a>
 
-<a href="#stakeholders" class="btn btn-primary">
-    Register
-</a>
+            <a href="#" onclick="openRolePopup('citizen'); return false;" class="btn btn-primary">
+                Register as a Citizen
+            </a>
 
         </div>
 
@@ -143,13 +143,14 @@
 
             <div class="hero-buttons">
 
-                <a href="#stakeholders" class="btn btn-primary">
-    Login
-</a>
+                <a href="#" onclick="openRolePopup('officials'); return false;" class="btn btn-primary">
+                    Login for Officials
+                </a>
 
-<a href="#stakeholders" class="btn btn-secondary">
-    Register
-</a>
+                <a href="#" onclick="openRolePopup('citizen'); return false;" class="btn btn-secondary">
+                    Register as a Citizen
+                </a>
+
                 <a href="#features" class="btn btn-glass">
 
                     Explore Features
@@ -805,10 +806,10 @@
 
 </a>
 
-<a href="#stakeholders"
+<a href="#" onclick="openRolePopup('officials'); return false;"
    class="btn btn-secondary">
 
-    Login
+    Login for Officials
 
 </a>
 
@@ -912,6 +913,35 @@
 
 </div>
 
+<!-- NESTED POPUP (Politician Portal from Officials flow) -->
+
+<div class="role-popup-overlay nested-popup-overlay" id="nestedPopup">
+
+    <div class="role-popup">
+
+        <span class="close-popup"
+              onclick="closeNestedPopup()">
+            &times;
+        </span>
+
+        <h2 id="nestedPopupTitle">
+            Politician Portal
+        </h2>
+
+        <div id="nestedPopupContent">
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- GO TO HOME FLOATING BUTTON -->
+    <button id="goToHomeBtn" aria-label="Go to top of page" onclick="scrollToHome()">
+        <i class="fa-solid fa-house"></i>
+        <span>Go to Home</span>
+    </button>
+
     <script src="home.js"></script>
     <script>
     /* ---- Listen section language switcher ---- */
@@ -942,6 +972,27 @@
             tag.innerHTML = '<i class="fa-solid fa-language"></i> ' + (_listenLangLabels[lang] || "English");
         }
     }
+    </script>
+    <!-- GO TO HOME: scroll visibility + smooth scroll -->
+    <script>
+    (function () {
+        var btn = document.getElementById('goToHomeBtn');
+        // Show after user scrolls past ~80% of the viewport height
+        var threshold = window.innerHeight * 0.8;
+
+        window.addEventListener('scroll', function () {
+            threshold = window.innerHeight * 0.8; // recalc on resize too
+            if (window.scrollY > threshold) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        window.scrollToHome = function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    })();
     </script>
 
 </body>

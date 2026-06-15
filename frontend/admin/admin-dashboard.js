@@ -1322,7 +1322,7 @@ ${
   s.images && s.images.length > 0
   ?
   `
-  <div class="suggestion-card-image">
+  <div class="item-card-thumb-wrap">
       <img
           src="${s.images[0]}"
           alt="Suggestion Image"
@@ -1348,15 +1348,17 @@ ${
             <span class="item-card-date">Votes: ${s.totalVotes || 0}</span>
           </div>
 
-        <div class="complaint-history-link"
-     onclick="event.stopPropagation(); openSuggestionHistoryPopup('${s.suggestionId}')">
-  Status History
-</div>
+       <div class="complaint-actions">
 
-<div id="history-${s.suggestionId}" class="inline-history-box" style="display:none;">
-  <div class="modal-value">Click to load history...</div>
-</div>
+  <div class="complaint-action-chip history-chip"
+       onclick="event.stopPropagation(); openSuggestionHistoryPopup('${s.suggestionId}')">
 
+      <i class="fa-solid fa-chart-line"></i>
+      <span>Status History</span>
+
+  </div>
+
+</div>
         </div>
 
       </div>
@@ -1376,21 +1378,56 @@ function openSuggestionHistoryPopup(suggestionId) {
   if (!suggestion) return;
 
   const historyHtml = `
-    <div class="modal-section-label">Suggestion</div>
-    <div class="modal-value">${escHtml(suggestion.title || '—')}</div>
 
-    <div class="modal-section-label">Status History</div>
-    <div id="suggestion-history-container">
-      <div class="modal-value">Loading history...</div>
+<div class="history-popup-card">
+
+  <div class="history-popup-item">
+
+    <div class="history-popup-label">
+      <i class="fa-solid fa-lightbulb"></i>
+      Suggestion
     </div>
-  `;
 
-  document.getElementById('modalTitle').textContent = 'Suggestion Status History';
-  document.getElementById('modalBody').innerHTML = historyHtml;
-  document.getElementById('modalOverlay').classList.remove('hidden');
+    <div class="history-popup-value">
+      ${escHtml(suggestion.title || '—')}
+    </div>
 
-  loadSuggestionHistoryInline(suggestionId, 'suggestion-history-container');
-} 
+  </div>
+
+  <div class="history-popup-item">
+
+    <div class="history-popup-label">
+      <i class="fa-solid fa-chart-line"></i>
+      Status Journey
+    </div>
+
+    <div id="suggestion-history-container">
+
+      <div class="history-loading">
+        Loading history...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+`;
+
+  document.getElementById('modalTitle').textContent =
+    'Suggestion Status History';
+
+  document.getElementById('modalBody').innerHTML =
+    historyHtml;
+
+  document.getElementById('modalOverlay')
+    .classList.remove('hidden');
+
+  loadSuggestionHistoryInline(
+    suggestionId,
+    'suggestion-history-container'
+  );
+}
 
 function getSuggestionStatusLabel(status) {
 
@@ -1731,56 +1768,93 @@ async function openAssignedOfficerPopup(complaintId) {
 
     const detail = await res.json();
 
-   const officerHtml = `
+    // ✅ CHECK if officer exists
+    const isAssigned =
+  detail.status &&
+  detail.status.toLowerCase() === "assigned";
 
-<div class="officer-popup-card">
+    let officerHtml = '';
 
-  <div class="officer-popup-item">
-    <div class="officer-popup-label">
-      <i class="fa-solid fa-id-badge"></i>
-      Officer Name
-    </div>
+    // =====================================================
+    // CASE 1: NOT ASSIGNED
+    // =====================================================
+    if (!isAssigned) {
 
-    <div class="officer-popup-value">
-      ${escHtml(detail.officerName || 'Not Assigned')}
-    </div>
-  </div>
+      officerHtml = `
+        <div class="officer-popup-card">
 
-  <div class="officer-popup-item">
-    <div class="officer-popup-label">
-      <i class="fa-solid fa-briefcase"></i>
-      Designation
-    </div>
+          <div class="officer-popup-item">
 
-    <div class="officer-popup-value">
-      ${escHtml(detail.officerDesignation || '—')}
-    </div>
-  </div>
+            <div class="officer-popup-label">
+              <i class="fa-solid fa-user-slash"></i>
+              Officer Status
+            </div>
 
-  <div class="officer-popup-item">
-    <div class="officer-popup-label">
-      <i class="fa-solid fa-phone"></i>
-      Mobile Number
-    </div>
+            <div class="officer-popup-value">
+              Not assigned to officer yet
+            </div>
 
-    <div class="officer-popup-value">
-      ${escHtml(detail.officerMobileNumber || '—')}
-    </div>
-  </div>
+          </div>
 
-  <div class="officer-popup-item">
-    <div class="officer-popup-label">
-      <i class="fa-solid fa-envelope"></i>
-      Email Address
-    </div>
+        </div>
+      `;
+    }
 
-    <div class="officer-popup-value">
-      ${escHtml(detail.officerEmail || '—')}
-    </div>
-  </div>
+    // =====================================================
+    // CASE 2: ASSIGNED
+    // =====================================================
+    else {
 
-</div>
-`;
+      officerHtml = `
+        <div class="officer-popup-card">
+
+          <div class="officer-popup-item">
+            <div class="officer-popup-label">
+              <i class="fa-solid fa-id-badge"></i>
+              Officer Name
+            </div>
+
+            <div class="officer-popup-value">
+              ${escHtml(detail.officerName)}
+            </div>
+          </div>
+
+          <div class="officer-popup-item">
+            <div class="officer-popup-label">
+              <i class="fa-solid fa-briefcase"></i>
+              Designation
+            </div>
+
+            <div class="officer-popup-value">
+              ${escHtml(detail.officerDesignation || '—')}
+            </div>
+          </div>
+
+          <div class="officer-popup-item">
+            <div class="officer-popup-label">
+              <i class="fa-solid fa-phone"></i>
+              Mobile Number
+            </div>
+
+            <div class="officer-popup-value">
+              ${escHtml(detail.officerMobileNumber || '—')}
+            </div>
+          </div>
+
+          <div class="officer-popup-item">
+            <div class="officer-popup-label">
+              <i class="fa-solid fa-envelope"></i>
+              Email Address
+            </div>
+
+            <div class="officer-popup-value">
+              ${escHtml(detail.officerEmail || '—')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
 
     document.getElementById('modalTitle').textContent =
       'Assigned Officer Details';
@@ -2429,37 +2503,50 @@ async function loadSuggestionHistoryInline(suggestionId, containerId) {
   .sort(function(a, b) {
     return new Date(a.changedAt) - new Date(b.changedAt);
   })
-  .map(function(h) {
+.map(function(h) {
 
-    return `
-  <div class="history-item">
+  return `
 
-    <div class="history-dot"></div>
+<div class="history-item">
 
-    <div class="history-content">
+  <div class="history-dot"></div>
 
-      <div class="history-status">
+  <div class="history-content">
+
+    <div class="history-status">
+
+      <span>
         ${getSuggestionStatusLabel(h.oldStatus)}
-        <span class="arrow">→</span>
+      </span>
+
+     <span class="arrow">→</span>
+
+      <span>
         ${getSuggestionStatusLabel(h.newStatus)}
-      </div>
-
-      <div class="history-date">
-        ${formatDate(h.changedAt)}
-      </div>
-
-      ${h.remarks && h.remarks.trim() !== ''
-        ? `<div class="history-remarks">
-             📝 ${escHtml(h.remarks)}
-           </div>`
-        : ''
-      }
+      </span>
 
     </div>
 
+    <div class="history-date">
+      ${formatDate(h.changedAt)}
+    </div>
+
+    ${
+      h.remarks && h.remarks.trim() !== ''
+      ? `
+      <div class="history-remarks">
+  📝 ${escHtml(h.remarks)}
+</div>
+      `
+      : ''
+    }
+
   </div>
+
+</div>
+
 `;
-  })
+})
   .join('');
 
   } catch (err) {

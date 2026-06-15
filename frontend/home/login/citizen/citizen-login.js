@@ -340,9 +340,8 @@ async function submitRegistration() {
     }
 
     generateRegCaptcha();
-    localStorage.setItem('userId', data.userId);
-    localStorage.setItem('role',   data.role);
-    showSuccess(data.message, '../../../citizen/citizen-dashboard.html');
+    // Do not auto-login after registration — redirect to login page instead
+    showSuccess(data.message, 'citizen-login.html');
 
   } catch (err) {
     showError('step3Error', err.message || 'Unable to connect to the server. Please check your connection and try again.');
@@ -680,3 +679,277 @@ function resetRegisterFormFields() {
   clearError('step3Error');
 }
 
+
+/* ================================================================
+   PAGE-LEVEL OVERRIDES
+   Loaded by both citizen-login.html and citizen-register.html.
+   Each page overrides showRegister / showLogin as needed below.
+================================================================ */
+
+/* ---- citizen-login.html: redirect "Register here" to dedicated page ---- */
+if (document.getElementById('registerCard') !== null &&
+    document.getElementById('registerCard').children.length === 0) {
+  /* loginCard is the active card — we are on citizen-login.html */
+  window.showRegister = function () {
+    window.location.href = 'citizen-register.html';
+  };
+  /* Expose captcha value for voice assistant */
+  window.getLoginCaptcha = function () {
+    return typeof _captchaValue !== 'undefined' ? _captchaValue : '';
+  };
+}
+
+/* ---- citizen-register.html: redirect "Login here" / "Back to Login" ---- */
+if (document.getElementById('loginCard') !== null &&
+    document.getElementById('loginCard').children.length === 0) {
+  /* registerCard is the active card — we are on citizen-register.html */
+  window.showLogin = function () {
+    window.location.href = 'citizen-login.html';
+  };
+  window.showRegister = function () {
+    document.getElementById('loginCard').classList.add('hidden');
+    document.getElementById('successCard').classList.add('hidden');
+    document.getElementById('registerCard').classList.remove('hidden');
+  };
+  window.getLoginCaptcha = function () { return ''; };
+}
+
+// ================================================================
+// REGISTER MODE SELECTION — unlock form + trigger existing voice/text flow
+// ================================================================
+function regSetMode(mode) {
+  var btnVoice = document.getElementById('regBtnVoice');
+  var btnText  = document.getElementById('regBtnText');
+  if (btnVoice) btnVoice.classList.toggle('vg-start-btn--active', mode === 'voice');
+  if (btnText)  btnText.classList.toggle('vg-start-btn--active',  mode === 'text');
+
+  // Unlock the registration form body
+  var formBody = document.getElementById('registerFormBody');
+  if (formBody) formBody.classList.add('unlocked');
+
+  if (mode === 'voice') {
+    // Trigger the existing voice-assistant.js guide for citizen step 1
+    if (window.VoiceGuide && typeof window.VoiceGuide.start === 'function') {
+      window.VoiceGuide.start('c1');
+    }
+    // Show standalone mic buttons (voice-assistant.js manages these)
+    document.querySelectorAll('.vs-mic-btn').forEach(function(b) { b.style.display = ''; });
+  } else {
+    // Text mode: stop guide if running, hide mic buttons
+    if (window.VoiceGuide && typeof window.VoiceGuide.stop === 'function') {
+      window.VoiceGuide.stop();
+    }
+    document.querySelectorAll('.vs-mic-btn').forEach(function(b) { b.style.display = 'none'; });
+  }
+}
+
+/* ================================================================
+   LOGIN VOICE GUIDE
+   (mode switching, guided walk-through, standalone mic buttons,
+    captcha speaker — used only on citizen-login.html)
+================================================================ */
+
+var _loginMode       = null;
+var _loginGuideRecog = null;
+var _loginGuideActive = false;
+
+function loginSetMode(mode) {
+  _loginMode = mode;
+  var btnVoice = document.getElementById('loginBtnVoice');
+  var btnText  = document.getElementById('loginBtnText');
+  if (btnVoice) btnVoice.classList.toggle('vg-start-btn--active', mode === 'voice');
+  if (btnText)  btnText.classList.toggle('vg-start-btn--active',  mode === 'text');
+
+  // Unlock the form body on first selection
+  var formBody = document.getElementById('loginFormBody');
+  if (formBody) formBody.classList.add('unlocked');
+
+  document.querySelectorAll('.login-mic').forEach(function (b) {
+    b.style.display = (mode === 'voice') ? '' : 'none';
+  });
+
+  if (mode === 'text') {
+    loginStopGuide();
+  } else if (mode === 'voice') {
+    loginStartGuide();
+  }
+}
+
+function loginStartGuide() {
+  loginStopGuide();
+  _loginGuideActive = true;
+  _loginAskField('loginEmail', 'Please say your Email Address or Mobile Number.', 'email-or-mobile', function () {
+    if (!_loginGuideActive) return;
+    _loginAskField('loginPassword', 'Please say your Password. Or say skip to leave it blank.', 'password', function () {
+      if (!_loginGuideActive) return;
+      var code   = (typeof window.getLoginCaptcha === 'function') ? window.getLoginCaptcha() : '';
+      var spoken = code ? code.split('').join('  ') : '';
+      var prompt = code
+        ? 'Security verification. The captcha code is: ' + spoken + '. Please say the captcha.'
+        : 'Please say the captcha code shown on screen.';
+      _loginAskField('captchaInput', prompt, 'captcha', function () {
+        if (!_loginGuideActive) return;
+        _loginSpeak('All fields filled. Please click Login to Portal.');
+      });
+    });
+  });
+}
+
+function loginStopGuide() {
+  _loginGuideActive = false;
+  if (_loginGuideRecog) {
+    try { _loginGuideRecog.stop(); } catch (e) {}
+    _loginGuideRecog = null;
+  }
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+  }
+  document.querySelectorAll('.vg-field-active').forEach(function (e) {
+    e.classList.remove('vg-field-active');
+  });
+}
+
+function _loginSpeak(text, onEnd) {
+  var SS = window.speechSynthesis;
+  if (!SS) { if (onEnd) onEnd(); return; }
+  if (SS.speaking) SS.cancel();
+  setTimeout(function () {
+    var utt    = new SpeechSynthesisUtterance(text);
+    utt.lang   = 'en-IN'; utt.rate = 0.92; utt.pitch = 1.0;
+    utt.onend  = function () { if (onEnd) onEnd(); };
+    utt.onerror = function () { if (onEnd) onEnd(); };
+    SS.speak(utt);
+  }, 200);
+}
+
+function _loginHighlight(fieldId) {
+  document.querySelectorAll('.vg-field-active').forEach(function (e) { e.classList.remove('vg-field-active'); });
+  var inp = document.getElementById(fieldId);
+  if (inp) {
+    var fg = inp.closest('.form-group') || inp.parentElement;
+    if (fg) fg.classList.add('vg-field-active');
+    inp.focus();
+  }
+}
+
+function _loginAskField(fieldId, prompt, type, onDone) {
+  if (!_loginGuideActive) return;
+  _loginHighlight(fieldId);
+  _loginSpeak(prompt, function () {
+    if (!_loginGuideActive) return;
+    _loginListenField(fieldId, type, onDone, 1);
+  });
+}
+
+function _loginListenField(fieldId, type, onDone, attempt) {
+  if (!_loginGuideActive) return;
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { if (onDone) onDone(); return; }
+
+  var inp   = document.getElementById(fieldId);
+  var recog = new SR();
+  recog.lang = 'en-IN'; recog.continuous = false;
+  recog.interimResults = false; recog.maxAlternatives = 3;
+  _loginGuideRecog = recog;
+
+  var timer = setTimeout(function () {
+    if (!_loginGuideActive) return;
+    try { recog.stop(); } catch (e) {}
+    if (attempt >= 3) { if (onDone) onDone(); return; }
+    _loginSpeak('I did not hear you. Please try again.', function () {
+      if (_loginGuideActive) _loginListenField(fieldId, type, onDone, attempt + 1);
+    });
+  }, 15000);
+
+  recog.onresult = function (ev) {
+    clearTimeout(timer);
+    var t = ev.results[0][0].transcript.trim();
+    _loginFillField(inp, type, t);
+    inp.classList.add('vg-field-success');
+    setTimeout(function () { inp.classList.remove('vg-field-success'); }, 1500);
+    if (onDone) onDone();
+  };
+
+  recog.onerror = function (ev) {
+    clearTimeout(timer);
+    if (ev.error === 'no-speech' && attempt < 3) {
+      _loginSpeak('I did not hear you. Please try again.', function () {
+        if (_loginGuideActive) _loginListenField(fieldId, type, onDone, attempt + 1);
+      });
+    } else { if (onDone) onDone(); }
+  };
+
+  recog.onend = function () { _loginGuideRecog = null; };
+  try { recog.start(); } catch (e) { clearTimeout(timer); if (onDone) onDone(); }
+}
+
+function _loginFillField(inp, type, transcript) {
+  if (type === 'password') {
+    inp.value = transcript.toLowerCase() === 'skip' ? '' : transcript;
+    return;
+  }
+  if (type === 'captcha') {
+    inp.value = transcript.replace(/\s+/g, '').toUpperCase();
+    return;
+  }
+  /* email-or-mobile */
+  var digitsOnly = transcript.replace(/\D/g, '');
+  if (digitsOnly.length >= 8) {
+    inp.value = digitsOnly.slice(0, 10);
+  } else {
+    inp.value = transcript.toLowerCase()
+      .replace(/\bat the rate\b|\bat\b/g, '@')
+      .replace(/\bdot\b|\bpoint\b/g, '.')
+      .replace(/\s+/g, '');
+  }
+}
+
+/* ---- Standalone mic button handler (called from onclick="loginMicField(...)") ---- */
+function loginMicField(fieldId, type, btn) {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  var statusEl = btn.querySelector('.vs-mic-status');
+  btn.classList.add('vs-active');
+  if (statusEl) statusEl.textContent = 'Listening\u2026';
+
+  var inp   = document.getElementById(fieldId);
+  var recog = new SR();
+  recog.lang = 'en-IN'; recog.continuous = false;
+  recog.interimResults = false; recog.maxAlternatives = 3;
+
+  recog.onresult = function (ev) {
+    btn.classList.remove('vs-active');
+    var t = ev.results[0][0].transcript.trim();
+    _loginFillField(inp, type, t);
+    inp.classList.add('vg-field-success');
+    setTimeout(function () { inp.classList.remove('vg-field-success'); }, 1500);
+    if (statusEl) {
+      statusEl.textContent = 'Got it';
+      setTimeout(function () { statusEl.textContent = ''; }, 1500);
+    }
+  };
+  recog.onerror = function () {
+    btn.classList.remove('vs-active');
+    if (statusEl) {
+      statusEl.textContent = 'Try again';
+      setTimeout(function () { statusEl.textContent = ''; }, 1500);
+    }
+  };
+  recog.onend = function () { btn.classList.remove('vs-active'); };
+  try { recog.start(); } catch (e) { btn.classList.remove('vs-active'); }
+}
+
+/* ---- Speaker: reads login captcha aloud ---- */
+function loginSpeakCaptcha(btn) {
+  var code     = (typeof window.getLoginCaptcha === 'function') ? window.getLoginCaptcha() : '';
+  var statusEl = btn.querySelector('.vs-mic-status');
+  if (!code) {
+    if (statusEl) { statusEl.textContent = 'Not ready'; setTimeout(function () { if (statusEl) statusEl.textContent = ''; }, 1500); }
+    return;
+  }
+  var spoken = code.split('').join('  ');
+  if (statusEl) statusEl.textContent = 'Reading\u2026';
+  _loginSpeak('The captcha code is: ' + spoken, function () {
+    if (statusEl) statusEl.textContent = '';
+  });
+}

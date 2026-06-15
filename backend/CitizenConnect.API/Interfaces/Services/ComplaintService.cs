@@ -158,10 +158,7 @@
 
                     IsAnonymous = dto.IsAnonymous,
 
-                    ComplaintStatusMasterId =
-                    officer != null
-                    ? 2
-                    : 1
+                    ComplaintStatusMasterId = 1
                 };
 
             await _context.Complaints
@@ -169,28 +166,7 @@
 
             await _context.SaveChangesAsync();
 
-            if (officer != null)
-            {
-               var history =
-    new ComplaintStatusHistory
-    {
-        ComplaintId =
-            complaint.ComplaintId,
-
-        OldStatus = "Pending",
-
-        NewStatus = "Assigned",
-
-        Remarks =
-            "Complaint auto-assigned to officer."
-    };
-
-                await _context
-                    .ComplaintStatusHistories
-                    .AddAsync(history);
-
-                await _context.SaveChangesAsync();
-            }
+            
 
             // =========================================
             // FILE UPLOAD
@@ -251,10 +227,7 @@
                     Address =
                         complaint.Address,
 
-                    Status =
-        officer != null
-            ? "Assigned"
-            : "Pending",
+                    Status = "Pending",
 
                     Priority =
                         complaint.Priority,

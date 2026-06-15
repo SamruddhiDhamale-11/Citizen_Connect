@@ -1276,11 +1276,11 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 }
 
 .suggestion-list-image {
-    width: 180px;
-    height: 120px;
+    max-width: 120px;
+    max-height: 80px;
     object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
     cursor: pointer;
     transition: 0.3s;
 }

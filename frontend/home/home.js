@@ -447,20 +447,16 @@ function openRolePopup(role) {
     title.innerHTML = 'Citizen Portal';
 
     content.innerHTML = `
-        <p>Are you a new citizen?</p>
-
-        <a href="./login/citizen/citizen-login.html?mode=register"
+        <a href="./login/citizen/citizen-register.html"
            class="popup-btn primary">
-           Register Here
+           New Citizen Registration
         </a>
 
         <br><br>
 
-        <p>Already registered?</p>
-
-        <a href="./login/citizen/citizen-login.html?mode=login"
+        <a href="./login/citizen/citizen-login.html"
            class="popup-btn secondary">
-           Login Here
+           Already Registered
         </a>
     `;
 }
@@ -479,25 +475,40 @@ function openRolePopup(role) {
         `;
     }
 
+    else if (role === 'officials') {
+
+        title.innerHTML = 'Officials Login';
+
+        content.innerHTML = `
+            <a href="./login/admin/admin-login.html?mode=login"
+               class="popup-btn primary">
+                <i class="fa-solid fa-user-tie"></i>&nbsp; Login as Admin
+            </a>
+
+            <br><br>
+
+            <a href="#" onclick="openNestedPopup(); return false;"
+               class="popup-btn secondary">
+                <i class="fa-solid fa-landmark"></i>&nbsp; Login as Politician
+            </a>
+        `;
+    }
+
     else if (role === 'politician') {
 
         title.innerHTML = 'Politician Portal';
 
         content.innerHTML = `
-        <p>Are you a new Politician?</p>
-
-        <a href="./login/politician/politician-login.html?mode=register"
+        <a href="./login/politician/politician-register.html"
            class="popup-btn primary">
-           Register Here
+           New Politician Registration
         </a>
 
         <br><br>
 
-        <p>Already registered?</p>
-
-        <a href="./login/politician/politician-login.html?mode=login"
+        <a href="./login/politician/politician-login.html"
            class="popup-btn secondary">
-           Login Here
+           Already Registered
         </a>
     `;
     }
@@ -511,6 +522,53 @@ function closeRolePopup() {
         .getElementById('rolePopup')
         .classList.remove('show');
 }
+
+/* ==========================================================
+   NESTED POPUP — Politician Portal (from Officials flow)
+   ========================================================== */
+
+function openNestedPopup() {
+
+    const nested  = document.getElementById('nestedPopup');
+    const title   = document.getElementById('nestedPopupTitle');
+    const content = document.getElementById('nestedPopupContent');
+
+    title.innerHTML = 'Politician Portal';
+
+    content.innerHTML = `
+        <a href="./login/politician/politician-register.html"
+           class="popup-btn primary">
+           New Politician Registration
+        </a>
+
+        <br><br>
+
+        <a href="./login/politician/politician-login.html"
+           class="popup-btn secondary">
+           Already Registered
+        </a>
+    `;
+
+    nested.classList.add('show');
+}
+
+function closeNestedPopup() {
+
+    document
+        .getElementById('nestedPopup')
+        .classList.remove('show');
+}
+
+// Click outside nested popup → close only nested popup
+window.addEventListener('click', function (e) {
+
+    const nested = document.getElementById('nestedPopup');
+
+    if (e.target === nested) {
+        closeNestedPopup();
+    }
+
+});
 
 window.addEventListener('click', function(e){
 

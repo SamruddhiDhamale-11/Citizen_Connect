@@ -1770,3 +1770,132 @@ html {
     box-shadow:
         0 30px 70px rgba(0,0,0,.28);
 }
+
+/* ==========================================================
+   GO TO HOME – FLOATING BUTTON
+   ========================================================== */
+
+#goToHomeBtn {
+    position: fixed;
+    bottom: 36px;
+    right: 36px;
+    z-index: 9998;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+
+    background: var(--primary);
+    color: #fff;
+
+    box-shadow:
+        0 8px 24px rgba(198, 40, 40, 0.45),
+        0 2px 8px rgba(0, 0, 0, 0.12);
+
+    cursor: pointer;
+    border: none;
+    outline: none;
+
+    /* hidden by default */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.85);
+
+    transition:
+        opacity 0.35s ease,
+        visibility 0.35s ease,
+        transform 0.35s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+#goToHomeBtn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+#goToHomeBtn i {
+    font-size: 22px;
+    line-height: 1;
+}
+
+#goToHomeBtn span {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Hover */
+#goToHomeBtn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-5px) scale(1.08);
+    box-shadow:
+        0 16px 36px rgba(198, 40, 40, 0.55),
+        0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Active press */
+#goToHomeBtn:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* Pulse ring */
+#goToHomeBtn::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(198, 40, 40, 0.4);
+    animation: gthPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes gthPulse {
+    0%, 100% { transform: scale(1);   opacity: 0.8; }
+    50%       { transform: scale(1.18); opacity: 0;   }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #goToHomeBtn {
+        bottom: 24px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+    }
+    #goToHomeBtn i {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 500px) {
+    #goToHomeBtn {
+        bottom: 18px;
+        right: 16px;
+        width: 54px;
+        height: 54px;
+    }
+    #goToHomeBtn span {
+        font-size: 8px;
+    }
+}
+
+/* ==========================================================
+   NESTED POPUP (sits above the Officials popup)
+   ========================================================== */
+
+.nested-popup-overlay {
+    z-index: 999999; /* one layer above #rolePopup's 99999 */
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+}
