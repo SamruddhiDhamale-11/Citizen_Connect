@@ -1,4 +1,5 @@
-﻿using CitizenConnect.Domain.Common;
+﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.Domain.Entities
 {

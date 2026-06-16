@@ -41,9 +41,14 @@ builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IOfficerService,OfficerService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-
+builder.Services
+.AddScoped<IDashboardService,
+DashboardService>();
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
+builder.Services.AddScoped<
+    IWardService,
+    WardService>();
 // builder.Services.AddScoped<
 //     IJurisdictionService,
 //     JurisdictionService>();

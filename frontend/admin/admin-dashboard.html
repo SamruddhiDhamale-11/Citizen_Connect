@@ -428,16 +428,200 @@
            ============================================================ -->
       <div class="panel" id="panel-ward-management">
         <div class="page-header">
-          <div>
-            <h1 class="page-title">Ward / Village Management</h1>
-            <p class="page-subtitle">Manage all wards and villages under your jurisdiction</p>
-          </div>
+    <div>
+        <h1 class="page-title">
+            Ward / Village Management
+        </h1>
+
+        <p class="page-subtitle">
+            Manage wards and localities under your jurisdiction
+        </p>
+    </div>
+
+    <button
+        class="btn-action btn-primary"
+        onclick="openAddWardModal()">
+        + Add Ward
+    </button>
+</div>
+
+<div class="section-cards-grid">
+
+    <div class="section-card completed">
+
+        <div class="section-card-top">
+
+            <div class="section-card-header">
+
+                <div class="section-card-name">
+                    🏘️ Ward Management
+                </div>
+
+                <span
+                    class="section-card-status completed">
+                    Active
+                </span>
+
+            </div>
+
+            <div class="section-card-desc">
+                Create, update and manage wards.
+            </div>
+
+            <div class="section-card-meta">
+
+                <div class="section-meta-item">
+                    <span class="meta-label">
+                        Total Wards:
+                    </span>
+
+                    <span
+                        class="meta-count"
+                        id="totalWards">
+                        0
+                    </span>
+                </div>
+
+            </div>
+
         </div>
-        <div class="placeholder-panel">
-          <div class="placeholder-icon">&#x1F3D8;&#xFE0F;</div>
-          <div class="placeholder-title">Ward / Village Management</div>
-          <div class="placeholder-desc">This module is under development. Ward and village data management will be available here.</div>
+
+        <div class="section-card-divider"></div>
+
+        <div class="section-card-actions">
+
+            <button
+                class="section-card-btn"
+                onclick="loadWards()">
+                Open Module
+            </button>
+
+            <button
+                class="section-card-btn"
+                onclick="quickViewWard()">
+                Quick View
+            </button>
+
         </div>
+
+    </div>
+
+    <div class="section-card partial">
+
+        <div class="section-card-top">
+
+            <div class="section-card-header">
+
+                <div class="section-card-name">
+                    📍 Locality Management
+                </div>
+
+                <span
+                    class="section-card-status partial">
+                    Active
+                </span>
+
+            </div>
+
+            <div class="section-card-desc">
+                Manage localities inside wards.
+            </div>
+
+            <div class="section-card-meta">
+
+                <div class="section-meta-item">
+
+                    <span class="meta-label">
+                        Total Localities:
+                    </span>
+
+                    <span
+                        class="meta-count"
+                        id="totalLocalities">
+                        0
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div
+id="wardModal"
+class="modal-overlay hidden">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <div class="modal-title">
+                Add Ward
+            </div>
+
+        </div>
+
+        <div class="modal-body">
+
+            <input
+                id="wardNumber"
+                placeholder="Ward Number">
+
+            <input
+                id="wardName"
+                placeholder="Ward Name">
+
+            <input
+                id="areaName"
+                placeholder="Area Name">
+
+            <input
+                id="pincode"
+                placeholder="Pincode">
+
+            <textarea
+                id="description">
+            </textarea>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-action btn-primary"
+                onclick="saveWard()">
+                Save
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <div class="section-card-divider"></div>
+
+        <div class="section-card-actions">
+
+            <button
+                class="section-card-btn"
+                onclick="loadLocalities()">
+                Open Module
+            </button>
+
+            <button
+                class="section-card-btn"
+                onclick="quickViewLocality()">
+                Quick View
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="wardContainer"></div>
       </div>
 
       <!-- ============================================================

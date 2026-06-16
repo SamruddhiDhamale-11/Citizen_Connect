@@ -115,8 +115,8 @@ namespace CitizenConnect.Infrastructure.Seed
                         WardName = "Ward 1",
                         AreaName = "Ambale East",
                         Pincode = "412206",
-                        JurisdictionTypeId =
-    jurisdiction.JurisdictionTypeId,
+                        JurisdictionId =
+    jurisdiction.JurisdictionId,
 
                         Latitude = 18.520430m,
                         Longitude = 73.856743m
@@ -128,8 +128,8 @@ namespace CitizenConnect.Infrastructure.Seed
                         WardName = "Ward 2",
                         AreaName = "Ambale West",
                         Pincode = "412206",
-                        JurisdictionTypeId =
-    jurisdiction.JurisdictionTypeId,
+                        JurisdictionId =
+    jurisdiction.JurisdictionId,
 
                         Latitude = 18.520430m,
                         Longitude = 73.856743m
@@ -141,8 +141,8 @@ namespace CitizenConnect.Infrastructure.Seed
                         WardName = "Ward 3",
                         AreaName = "Ambale Center",
                         Pincode = "412206",
-                        JurisdictionTypeId =
-    jurisdiction.JurisdictionTypeId,
+                        JurisdictionId =
+    jurisdiction.JurisdictionId,
 
                         Latitude = 18.520430m,
                         Longitude = 73.856743m

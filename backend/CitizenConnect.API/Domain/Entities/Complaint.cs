@@ -1,4 +1,5 @@
-﻿using CitizenConnect.API.Domain.Enums;
+﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.API.Domain.Enums;
 using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.Domain.Entities
@@ -20,6 +21,9 @@ namespace CitizenConnect.Domain.Entities
         public string Description { get; set; } = string.Empty;
 
         public string Address { get; set; } = string.Empty;
+        public int LocalityId { get; set; }
+
+        public Locality Locality { get; set; }
 
         public decimal Latitude { get; set; }
 
