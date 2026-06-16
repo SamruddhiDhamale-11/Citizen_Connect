@@ -427,201 +427,139 @@
            PANEL: WARD / VILLAGE MANAGEMENT
            ============================================================ -->
       <div class="panel" id="panel-ward-management">
+
+        <!-- Page Header -->
         <div class="page-header">
-    <div>
-        <h1 class="page-title">
-            Ward / Village Management
-        </h1>
+          <div>
+            <h1 class="page-title">Ward / Village Management</h1>
+            <p class="page-subtitle">Configure and manage complete ward and village information for your jurisdiction</p>
+          </div>
+          <div class="area-action-buttons">
+            <button class="btn-action btn-ghost"        onclick="resetWardData()">&#x21BA; Reset Data</button>
+            <button class="btn-action btn-outline-red"  onclick="saveWardDraftTop()">&#x1F4BE; Save Draft</button>
+            <button class="btn-action btn-outline-red"  onclick="updateWardInfo()">&#x270F;&#xFE0F; Update Information</button>
+            <button class="btn-action btn-primary"      onclick="publishWard()">&#x1F4E4; Publish</button>
+          </div>
+        </div>
 
-        <p class="page-subtitle">
-            Manage wards and localities under your jurisdiction
-        </p>
-    </div>
+        <!-- Ward Information Summary -->
+        <div class="area-info-card">
+          <div class="area-info-grid">
+            <div class="area-info-item">
+              <div class="area-info-label">Ward / Village Name</div>
+              <div class="area-info-value" id="wardSummaryName">Not Added</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Ward Type</div>
+              <div class="area-info-value" id="wardSummaryType">Not Added</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Parent Authority</div>
+              <div class="area-info-value" id="wardSummaryAuthority">Not Added</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Last Updated</div>
+              <div class="area-info-value" id="wardSummaryLastUpdated">Not Updated</div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Status</div>
+              <div class="area-info-value">
+                <span class="area-status-badge draft" id="wardStatusBadge">Draft</span>
+              </div>
+            </div>
+            <div class="area-info-item">
+              <div class="area-info-label">Completion</div>
+              <div class="area-info-value completion-value" id="wardCompletion">0%</div>
+            </div>
+          </div>
+        </div>
 
-    <button
-        class="btn-action btn-primary"
-        onclick="openAddWardModal()">
-        + Add Ward
-    </button>
-</div>
+        <!-- Hidden progress tracking -->
+        <span id="wardCompletedCount" style="display:none">0</span>
+        <span id="wardPartialCount"   style="display:none">0</span>
+        <span id="wardEmptyCount"     style="display:none">0</span>
 
-<div class="section-cards-grid">
+        <!-- Section Cards Grid -->
+        <div class="section-title">Ward Sections</div>
+        <div class="section-cards-grid" id="wardSectionCardsGrid">
+          <!-- Populated by JS -->
+        </div>
 
-    <div class="section-card completed">
+      </div>
 
-        <div class="section-card-top">
+      <!-- ============================================================
+           PANEL: WARD SECTION DETAIL (dynamically populated)
+           ============================================================ -->
+      <div class="panel" id="panel-ward-section-detail">
 
-            <div class="section-card-header">
+        <!-- Top Action Bar -->
+        <div class="sd-action-bar">
+          <button class="sd-back-btn" onclick="closeWardSectionDetail()">
+            <span class="sd-back-arrow">&#x2190;</span> Back to Ward / Village Management
+          </button>
+          <div class="sd-action-right">
+            <button class="btn-action btn-ghost"        id="wsdBtnDelete"    onclick="deleteWardSectionData()">&#x1F5D1; Delete Data</button>
+            <button class="btn-action btn-ghost"        id="wsdBtnSaveDraft" onclick="saveWardSectionDraft()">&#x1F4BE; Save Draft</button>
+            <button class="btn-action btn-outline-red"  id="wsdBtnUpdate"    onclick="updateWardSectionData()">&#x270F;&#xFE0F; Update</button>
+            <!-- <button class="btn-action btn-primary"      id="wsdBtnSubmit"    onclick="submitWardSectionData()">&#x2713; Submit</button> -->
+          </div>
+        </div>
 
-                <div class="section-card-name">
-                    🏘️ Ward Management
+        <!-- Section Header -->
+        <div class="sd-header">
+          <div class="sd-header-left">
+            <div class="sd-breadcrumb">Ward / Village Management &rsaquo; <span id="wsdBreadcrumbName">Section</span></div>
+            <h1 class="sd-title"    id="wsdTitle">Section Title</h1>
+            <p  class="sd-subtitle" id="wsdSubtitle">Section description</p>
+            <div class="sd-last-saved" id="wsdLastSaved">Not saved yet</div>
+          </div>
+          <div class="sd-header-right">
+            <span class="section-card-status" id="wsdStatusBadge">Empty</span>
+            <div class="sd-progress-mini">
+              <div class="sd-progress-track">
+                <div class="sd-progress-fill" id="wsdProgressFill" style="width:0%"></div>
+              </div>
+              <span class="sd-progress-pct" id="wsdProgressPct">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-Column Layout -->
+        <div class="sd-layout">
+
+          <!-- LEFT: Data Entry Form -->
+          <div class="sd-form-col">
+            <div class="sd-form-card">
+              <div class="sd-form-card-header">
+                <span class="sd-form-card-icon" id="wsdFormIcon">&#x1F4DD;</span>
+                <div>
+                  <div class="sd-form-card-title">Enter Information</div>
+                  <div class="sd-form-card-sub">Fields can be left empty. Partial saves are allowed.</div>
                 </div>
-
-                <span
-                    class="section-card-status completed">
-                    Active
-                </span>
-
+              </div>
+              <div class="sd-form-body" id="wsdFormBody">
+                <!-- Populated by JS -->
+              </div>
             </div>
+          </div>
 
-            <div class="section-card-desc">
-                Create, update and manage wards.
-            </div>
-
-            <div class="section-card-meta">
-
-                <div class="section-meta-item">
-                    <span class="meta-label">
-                        Total Wards:
-                    </span>
-
-                    <span
-                        class="meta-count"
-                        id="totalWards">
-                        0
-                    </span>
+          <!-- RIGHT: Saved Data Preview -->
+          <div class="sd-preview-col">
+            <div class="sd-preview-card">
+              <div class="sd-preview-header">
+                <span class="sd-preview-icon">&#x1F4CB;</span>
+                <div>
+                  <div class="sd-preview-title">Saved Information</div>
+                  <div class="sd-preview-sub">Previously entered data for this section</div>
                 </div>
-
+              </div>
+              <div class="sd-preview-body" id="wsdPreviewBody">
+                <!-- Populated by JS -->
+              </div>
             </div>
+          </div>
 
         </div>
-
-        <div class="section-card-divider"></div>
-
-        <div class="section-card-actions">
-
-            <button
-                class="section-card-btn"
-                onclick="loadWards()">
-                Open Module
-            </button>
-
-            <button
-                class="section-card-btn"
-                onclick="quickViewWard()">
-                Quick View
-            </button>
-
-        </div>
-
-    </div>
-
-    <div class="section-card partial">
-
-        <div class="section-card-top">
-
-            <div class="section-card-header">
-
-                <div class="section-card-name">
-                    📍 Locality Management
-                </div>
-
-                <span
-                    class="section-card-status partial">
-                    Active
-                </span>
-
-            </div>
-
-            <div class="section-card-desc">
-                Manage localities inside wards.
-            </div>
-
-            <div class="section-card-meta">
-
-                <div class="section-meta-item">
-
-                    <span class="meta-label">
-                        Total Localities:
-                    </span>
-
-                    <span
-                        class="meta-count"
-                        id="totalLocalities">
-                        0
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div
-id="wardModal"
-class="modal-overlay hidden">
-
-    <div class="modal-card">
-
-        <div class="modal-header">
-
-            <div class="modal-title">
-                Add Ward
-            </div>
-
-        </div>
-
-        <div class="modal-body">
-
-            <input
-                id="wardNumber"
-                placeholder="Ward Number">
-
-            <input
-                id="wardName"
-                placeholder="Ward Name">
-
-            <input
-                id="areaName"
-                placeholder="Area Name">
-
-            <input
-                id="pincode"
-                placeholder="Pincode">
-
-            <textarea
-                id="description">
-            </textarea>
-
-        </div>
-
-        <div class="modal-footer">
-
-            <button
-                class="btn-action btn-primary"
-                onclick="saveWard()">
-                Save
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-        <div class="section-card-divider"></div>
-
-        <div class="section-card-actions">
-
-            <button
-                class="section-card-btn"
-                onclick="loadLocalities()">
-                Open Module
-            </button>
-
-            <button
-                class="section-card-btn"
-                onclick="quickViewLocality()">
-                Quick View
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div id="wardContainer"></div>
       </div>
 
       <!-- ============================================================
@@ -1138,6 +1076,79 @@ class="modal-overlay hidden">
       </div>
 
     </main>
+  </div>
+
+  <!-- ===== WARD QUICK VIEW MODAL ===== -->
+  <div class="modal-overlay hidden" id="wardModalOverlay" onclick="closeWardModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="wardModalTitle">Ward Section Details</div>
+        <button class="modal-close" onclick="closeWardModal()">&#x2715;</button>
+      </div>
+      <div class="modal-body" id="wardModalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== ADD NEW FACILITY MODAL ===== -->
+  <div class="modal-overlay hidden" id="facilityModalOverlay" onclick="closeFacilityModal()">
+    <div class="modal-card facility-modal-card" onclick="event.stopPropagation()">
+
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="facility-modal-icon">&#x1F3D7;&#xFE0F;</span>
+          Add New Facility
+        </div>
+        <button class="modal-close" onclick="closeFacilityModal()">&#x2715;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="facility-modal-hint">
+          Create a custom section to track any facility or data category specific to this ward. It will behave exactly like the built-in ward sections.
+        </p>
+
+        <!-- Facility Name -->
+        <div class="sd-field-group">
+          <label class="sd-field-label" for="facilityNameInput">
+            Facility Name <span class="facility-required">*</span>
+          </label>
+          <input
+            type="text"
+            id="facilityNameInput"
+            class="sd-input facility-name-input"
+            placeholder="e.g. Community Park, Bus Stop, Market Yard…"
+            maxlength="80"
+            autocomplete="off"
+          />
+          <div class="facility-name-error hidden" id="facilityNameError">
+            &#x26A0; Facility name is required.
+          </div>
+          <div class="facility-char-count" id="facilityCharCount">0 / 80</div>
+        </div>
+
+        <!-- Facility Description -->
+        <div class="sd-field-group" style="margin-top:16px;">
+          <label class="sd-field-label" for="facilityDescInput">
+            Description <span class="sd-field-optional">(optional)</span>
+          </label>
+          <textarea
+            id="facilityDescInput"
+            class="sd-textarea"
+            placeholder="Briefly describe what information will be tracked in this section…"
+            rows="3"
+            maxlength="200"
+          ></textarea>
+          <div class="facility-char-count" id="facilityDescCount">0 / 200</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-action btn-ghost"    onclick="closeFacilityModal()">Cancel</button>
+        <button class="btn-action btn-primary"  onclick="createFacility()" id="createFacilityBtn">
+          &#x2713; Create Facility
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- ===== TOAST ===== -->
