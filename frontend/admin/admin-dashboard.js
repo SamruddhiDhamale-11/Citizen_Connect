@@ -3368,3 +3368,1689 @@ async function updateSuggestionStatus() {
 
     alert(result.message);
 }
+
+
+/* ============================================================
+   WARD / VILLAGE MANAGEMENT
+   Mirrors Area Overview Setup architecture exactly.
+   Separate localStorage key, separate section metadata,
+   separate form configs, separate panel + detail panel.
+   ============================================================ */
+
+var WS_KEY = 'adminWardSectionData';  // localStorage key
+
+/* ---- WARD STATE ---- */
+var currentWardSectionId = null;      // which ward section detail is open
+var currentEditingEntryId = null;     // null = adding new entry, string = editing existing
+
+/* ============================================================
+   WARD SECTIONS METADATA
+   ============================================================ */
+var WARD_SECTIONS = [
+  { id:'w-basic',        name:'Basic Ward Information',      icon:'&#x1F3D8;&#xFE0F;', desc:'Ward name, number, type, district, PIN code and boundary details.',      status:'empty', filled:0, total:10, lastUpdated:'—', lastSaved:'—' },
+  { id:'w-contacts',     name:'Ward Administrative Contacts',icon:'&#x1F4DE;',          desc:'Ward officer, gram sevak, sarpanch and office contact details.',          status:'empty', filled:0, total:7,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-population',   name:'Population & Demographics',   icon:'&#x1F465;',          desc:'Total population, gender ratio, voter count and literacy rates.',         status:'empty', filled:0, total:9,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-elected',      name:'Elected Representatives',     icon:'&#x1F3DB;&#xFE0F;', desc:'Ward members, sarpanch, panch members and their contact details.',        status:'empty', filled:0, total:1,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-infrastructure',name:'Infrastructure Overview',    icon:'&#x1F3D7;&#xFE0F;', desc:'Roads, street lights, drainage and general civic infrastructure.',        status:'empty', filled:0, total:7,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-water',        name:'Water Supply',                icon:'&#x1F4A7;',          desc:'Water sources, tap connections, borewells and drinking water quality.',   status:'empty', filled:0, total:6,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-sanitation',   name:'Sanitation & Cleanliness',    icon:'&#x1F9F9;',          desc:'Toilets, garbage collection, drainage and waste management.',            status:'empty', filled:0, total:5,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-health',       name:'Health Facilities',           icon:'&#x1F3E5;',          desc:'Sub-centres, ASHA workers, PHC availability and emergency services.',     status:'empty', filled:0, total:6,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-education',    name:'Education Facilities',        icon:'&#x1F393;',          desc:'Schools, anganwadis, enrollment count and literacy support programs.',    status:'empty', filled:0, total:6,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-economy',      name:'Economy & Livelihoods',       icon:'&#x1F33E;',          desc:'Farmers, artisans, SHGs, primary occupations and income levels.',        status:'empty', filled:0, total:5,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-safety',       name:'Safety & Emergency',          icon:'&#x1F6A8;',          desc:'Police outpost, fire service availability and CCTV coverage.',           status:'empty', filled:0, total:4,  lastUpdated:'—', lastSaved:'—' },
+  { id:'w-social',       name:'Social & Cultural Information',icon:'&#x1F3AD;',         desc:'Religious places, festivals, cultural halls and community events.',       status:'empty', filled:0, total:4,  lastUpdated:'—', lastSaved:'—' }
+];
+
+/* ============================================================
+   WARD SECTION FORM CONFIGURATIONS
+   ============================================================ */
+var WARD_SECTION_FORMS = {
+  'w-basic': { icon:'&#x1F3D8;&#xFE0F;', fields:[
+    { key:'wardType',        label:'Ward / Village Type',            type:'select',   options:['Municipal Ward','Gram Panchayat','Nagar Panchayat','Village','Town','Revenue Village'] },
+    { key:'wardName',        label:'Ward / Village Name',            type:'text',     placeholder:'e.g. Nehru Nagar Ward 7' },
+    { key:'wardNumber',      label:'Ward Number',                    type:'text',     placeholder:'e.g. 7 or W-07' },
+    { key:'parentAuthority', label:'Parent Authority / Municipality',type:'text',     placeholder:'e.g. Pune Municipal Corporation' },
+    { key:'district',        label:'District',                       type:'text',     placeholder:'e.g. Pune' },
+    { key:'taluka',          label:'Taluka / Tehsil',                type:'text',     placeholder:'e.g. Haveli' },
+    { key:'state',           label:'State',                          type:'text',     placeholder:'e.g. Maharashtra' },
+    { key:'pinCode',         label:'PIN Code',                       type:'text',     placeholder:'e.g. 411001' },
+    { key:'geoArea',         label:'Geographical Area (sq km)',      type:'text',     placeholder:'e.g. 8.5' },
+    { key:'wardDesc',        label:'Ward Description',               type:'textarea', placeholder:'Brief description of this ward or village...' }
+  ]},
+  'w-contacts': { icon:'&#x1F4DE;', fields:[
+    { key:'wardOfficerName', label:'Ward Officer / Sarpanch Name',   type:'text',     placeholder:'e.g. Shri Ramesh Patil' },
+    { key:'wardOfficerDesig',label:'Designation',                    type:'text',     placeholder:'e.g. Ward Officer / Sarpanch' },
+    { key:'contactNumber',   label:'Contact Number',                 type:'text',     placeholder:'e.g. +91 98765 43210' },
+    { key:'emailAddress',    label:'Email Address',                  type:'text',     placeholder:'e.g. wardofficer@gov.in' },
+    { key:'gramSevak',       label:'Gram Sevak / Talathi Name',      type:'text',     placeholder:'e.g. Smt. Sunita Desai' },
+    { key:'officeContact',   label:'Office Contact Number',          type:'text',     placeholder:'e.g. 020-12345678' },
+    { key:'officeAddress',   label:'Office Address',                 type:'textarea', placeholder:'Full ward office address...' }
+  ]},
+  'w-population': { icon:'&#x1F465;', fields:[
+    { key:'totalPop',        label:'Total Population',               type:'number',   placeholder:'e.g. 4500' },
+    { key:'malePop',         label:'Male Population',                type:'number',   placeholder:'e.g. 2300' },
+    { key:'femalePop',       label:'Female Population',              type:'number',   placeholder:'e.g. 2200' },
+    { key:'childrenCount',   label:'Children Count (0–14)',          type:'number',   placeholder:'e.g. 900' },
+    { key:'seniorCount',     label:'Senior Citizen Count (60+)',     type:'number',   placeholder:'e.g. 300' },
+    { key:'totalVoters',     label:'Total Voters',                   type:'number',   placeholder:'e.g. 3100' },
+    { key:'totalHouseholds', label:'Total Households',               type:'number',   placeholder:'e.g. 1100' },
+    { key:'maleLiteracy',    label:'Male Literacy Rate (%)',         type:'text',     placeholder:'e.g. 88.5' },
+    { key:'femaleLiteracy',  label:'Female Literacy Rate (%)',       type:'text',     placeholder:'e.g. 79.2' }
+  ]},
+  'w-elected': { icon:'&#x1F3DB;&#xFE0F;', fields:[
+    { key:'members',         label:'Elected Representatives & Ward Members', type:'members' }
+  ]},
+  'w-infrastructure': { icon:'&#x1F3D7;&#xFE0F;', fields:[
+    { key:'totalRoads',      label:'Total Roads (km)',               type:'text',     placeholder:'e.g. 12.5' },
+    { key:'cementRoads',     label:'Cement / Paved Roads (km)',      type:'text',     placeholder:'e.g. 8' },
+    { key:'roadCondition',   label:'Overall Road Condition',         type:'select',   options:['Good','Average','Poor'] },
+    { key:'streetLights',    label:'Street Lights Count',            type:'number',   placeholder:'e.g. 120' },
+    { key:'drainageSystem',  label:'Drainage System Available',      type:'select',   options:['Yes','No','Partial'] },
+    { key:'publicTransport', label:'Public Transport Connectivity',  type:'select',   options:['Bus','Auto / Rickshaw','Both','None'] },
+    { key:'infraRemarks',    label:'Infrastructure Remarks',         type:'textarea', placeholder:'Any additional infrastructure notes...' }
+  ]},
+  'w-water': { icon:'&#x1F4A7;', fields:[
+    { key:'waterSource',     label:'Primary Water Source',           type:'select',   options:['Municipal Supply','Borewell','River','Dam / Canal','Mixed'] },
+    { key:'tapConnections',  label:'Tap Connections Count',          type:'number',   placeholder:'e.g. 800' },
+    { key:'borewells',       label:'Borewells Count',                type:'number',   placeholder:'e.g. 6' },
+    { key:'waterTanks',      label:'Water Storage Tanks Count',      type:'number',   placeholder:'e.g. 2' },
+    { key:'purifiedWater',   label:'Purified Drinking Water Supply', type:'select',   options:['Yes','No','Partial'] },
+    { key:'waterAvailability',label:'Water Availability (hrs/day)',  type:'text',     placeholder:'e.g. 4 hours' }
+  ]},
+  'w-sanitation': { icon:'&#x1F9F9;', fields:[
+    { key:'publicToilets',   label:'Public Toilets Count',           type:'number',   placeholder:'e.g. 8' },
+    { key:'householdToilets',label:'Households with Toilet Count',   type:'number',   placeholder:'e.g. 950' },
+    { key:'garbageCollection',label:'Garbage Collection Available',  type:'select',   options:['Yes','No','Partial'] },
+    { key:'wasteManagement', label:'Waste Management System',        type:'select',   options:['Centralized','Decentralized','None','Under Development'] },
+    { key:'openDefecation',  label:'Open Defecation Free (ODF)',     type:'select',   options:['Yes','No','In Progress'] }
+  ]},
+  'w-health': { icon:'&#x1F3E5;', fields:[
+    { key:'subCentreAvail',  label:'Health Sub-Centre Available',    type:'select',   options:['Yes','No'] },
+    { key:'phcAvail',        label:'PHC / Primary Health Centre',    type:'select',   options:['Yes','No'] },
+    { key:'ashaCount',       label:'ASHA Workers Count',             type:'number',   placeholder:'e.g. 4' },
+    { key:'doctorsCount',    label:'Doctors Count (local)',          type:'number',   placeholder:'e.g. 2' },
+    { key:'ambulanceAvail',  label:'Ambulance / 108 Service Access', type:'select',   options:['Yes','No'] },
+    { key:'healthCamps',     label:'Regular Health Camps Conducted', type:'select',   options:['Yes','No','Occasional'] }
+  ]},
+  'w-education': { icon:'&#x1F393;', fields:[
+    { key:'totalSchools',    label:'Total Schools',                  type:'number',   placeholder:'e.g. 3' },
+    { key:'govtSchools',     label:'Government Schools Count',       type:'number',   placeholder:'e.g. 2' },
+    { key:'pvtSchools',      label:'Private Schools Count',          type:'number',   placeholder:'e.g. 1' },
+    { key:'enrollment',      label:'Total Student Enrollment',       type:'number',   placeholder:'e.g. 620' },
+    { key:'anganwadiAvail',  label:'Anganwadi Centre Available',     type:'select',   options:['Yes','No'] },
+    { key:'anganwadiCount',  label:'Anganwadi Centres Count',        type:'number',   placeholder:'e.g. 2' }
+  ]},
+  'w-economy': { icon:'&#x1F33E;', fields:[
+    { key:'primaryOccupation',label:'Primary Occupation',            type:'select',   options:['Agriculture','Labour','Trade / Business','Government Service','Mixed'] },
+    { key:'totalFarmers',    label:'Farming Households Count',       type:'number',   placeholder:'e.g. 450' },
+    { key:'majorCrops',      label:'Major Crops',                    type:'text',     placeholder:'e.g. Wheat, Onion, Sugarcane' },
+    { key:'shgCount',        label:'Self-Help Groups (SHG) Count',   type:'number',   placeholder:'e.g. 8' },
+    { key:'econRemarks',     label:'Economic Activity Notes',        type:'textarea', placeholder:'Other livelihood activities, industries...' }
+  ]},
+  'w-safety': { icon:'&#x1F6A8;', fields:[
+    { key:'policeOutpost',   label:'Police Outpost / Station Nearby',type:'select',   options:['Yes','No'] },
+    { key:'fireService',     label:'Fire Emergency Service Access',  type:'select',   options:['Yes','No'] },
+    { key:'cctvSurveillance',label:'CCTV Surveillance Available',    type:'select',   options:['Yes','No','Partial'] },
+    { key:'emergencyResponse',label:'Emergency Response Facility',   type:'select',   options:['Yes','No'] }
+  ]},
+  'w-social': { icon:'&#x1F3AD;', fields:[
+    { key:'religiousPlaces', label:'Religious Places Count',         type:'number',   placeholder:'e.g. 5' },
+    { key:'festivalsYearly', label:'Festivals Celebrated Yearly',    type:'number',   placeholder:'e.g. 4' },
+    { key:'communityHall',   label:'Community / Gram Sabha Hall',    type:'select',   options:['Yes','No'] },
+    { key:'socialRemarks',   label:'Cultural / Heritage Notes',      type:'textarea', placeholder:'Notable cultural sites, traditions...' }
+  ]}
+};
+
+/* ============================================================
+   WARD LOCALSTORAGE HELPERS
+   ============================================================ */
+function wsLoad() {
+  try { var raw = localStorage.getItem(WS_KEY); return raw ? JSON.parse(raw) : {}; } catch(e) { return {}; }
+}
+function wsSave(store) {
+  try { localStorage.setItem(WS_KEY, JSON.stringify(store)); } catch(e) {}
+}
+function wsGet(sectionId) { return wsLoad()[sectionId] || {}; }
+function wsSet(sectionId, data) { var store = wsLoad(); store[sectionId] = data; wsSave(store); }
+function wsDelete(sectionId) { var store = wsLoad(); delete store[sectionId]; wsSave(store); }
+function wsClear() { try { localStorage.removeItem(WS_KEY); } catch(e) {} }
+
+/* ============================================================
+   RECOMPUTE ALL WARD SECTIONS FROM LOCALSTORAGE
+   All sections now use entries[] — count entries for both custom
+   and built-in sections.
+   ============================================================ */
+function recomputeAllWardSections() {
+  WARD_SECTIONS.forEach(function(section) {
+    recomputeSingleWardSection(section);
+  });
+}
+
+/* ============================================================
+   RECOMPUTE A SINGLE WARD SECTION from localStorage
+   ============================================================ */
+function recomputeSingleWardSection(section) {
+  var data = wsGet(section.id);
+  /* Migrate legacy flat-field data to entries[] on first recompute */
+  data = migrateLegacyData(section.id, data);
+  var entryCount = (data.entries || []).length;
+  section.filled      = entryCount;
+  section.total       = Math.max(entryCount, 1);
+  section.lastUpdated = data._lastUpdated || '—';
+  section.lastSaved   = data._lastSaved   || '—';
+  if      (data._submitted)      section.status = 'completed';
+  else if (entryCount === 0)     section.status = 'empty';
+  else                           section.status = 'partial';
+}
+
+/* ============================================================
+   MIGRATE LEGACY FLAT-FIELD DATA → entries[]
+   Safe to call multiple times (idempotent — checks for entries key).
+   ============================================================ */
+function migrateLegacyData(sectionId, data) {
+  if (!data || data.entries) return data; /* already migrated or empty */
+  var formConfig = WARD_SECTION_FORMS[sectionId];
+  if (!formConfig) return data;
+
+  /* Collect any non-empty flat fields or members */
+  var hasLegacyData = false;
+  var entry = { _id: genEntryId(), _createdAt: (data._lastUpdated || '') };
+
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') {
+      if (data.members && data.members.length > 0) {
+        entry.members  = data.members;
+        hasLegacyData  = true;
+      }
+    } else {
+      if (data[field.key] && String(data[field.key]).trim()) {
+        entry[field.key] = data[field.key];
+        hasLegacyData    = true;
+      }
+    }
+  });
+
+  if (hasLegacyData) {
+    /* Promote the legacy data to a single entry */
+    data.entries = [entry];
+    wsSet(sectionId, data);
+  } else {
+    /* No legacy data — initialise with empty entries array */
+    data.entries = [];
+  }
+  return data;
+}
+
+/* ============================================================
+   RENDER WARD SECTION CARDS  (identical to renderSectionCards)
+   Always appends the "Add New Facility" card last.
+   ============================================================ */
+function renderWardSectionCards() {
+  var grid = document.getElementById('wardSectionCardsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  /* --- built-in sections (from WARD_SECTIONS, no _custom flag) --- */
+  WARD_SECTIONS.forEach(function(section) {
+    if (!section._custom) {
+      grid.appendChild(buildWardSectionCard(section, false));
+    }
+  });
+
+  /* --- custom / user-created facilities (source of truth = localStorage) --- */
+  loadWardFacilities().forEach(function(fac) {
+    grid.appendChild(buildWardFacilityCard(fac));
+  });
+
+  /* --- always-last "Add New Facility" card --- */
+  grid.appendChild(buildAddFacilityCard());
+}
+
+/* ============================================================
+   WARD PROGRESS & SUMMARY SYNC
+   ============================================================ */
+function computeWardProgress() {
+  var completed = 0, partial = 0, empty = 0;
+  WARD_SECTIONS.forEach(function(s) {
+    if (s.status === 'completed')  completed++;
+    else if (s.status === 'partial') partial++;
+    else empty++;
+  });
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  set('wardCompletedCount', completed);
+  set('wardPartialCount',   partial);
+  set('wardEmptyCount',     empty);
+  syncWardSummary();
+}
+
+function syncWardSummary() {
+  var data = wsGet('w-basic');
+  var setText = function(id, val, fallback) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = (val && String(val).trim()) ? String(val).trim() : (fallback || 'Not Added');
+  };
+  setText('wardSummaryName',      data.wardName,        'Not Added');
+  setText('wardSummaryType',      data.wardType,        'Not Added');
+  setText('wardSummaryAuthority', data.parentAuthority, 'Not Added');
+  var lastUpdated = data._lastUpdated
+    ? data._lastUpdated + (data._lastSaved ? ' at ' + data._lastSaved : '')
+    : 'Not Updated';
+  setText('wardSummaryLastUpdated', lastUpdated, 'Not Updated');
+
+  var totalFields  = WARD_SECTIONS.reduce(function(a,s) { return a + s.total; }, 0);
+  var filledFields = WARD_SECTIONS.reduce(function(a,s) { return a + s.filled; }, 0);
+  var pct = totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
+  var compEl = document.getElementById('wardCompletion');
+  if (compEl) compEl.textContent = pct + '%';
+
+  var badge = document.getElementById('wardStatusBadge');
+  if (badge && badge.className.indexOf('published') === -1) {
+    if (pct === 0)       { badge.className = 'area-status-badge draft';        badge.textContent = 'Draft'; }
+    else if (pct === 100){ badge.className = 'area-status-badge completed';    badge.textContent = 'Completed'; }
+    else                 { badge.className = 'area-status-badge in-progress';  badge.textContent = 'In Progress'; }
+  }
+}
+
+/* ============================================================
+   WARD PANEL — TOP ACTION BUTTONS
+   ============================================================ */
+function saveWardDraftTop()  { showToast('Ward overview draft saved.', 'success'); }
+function updateWardInfo()    { showToast('Ward information updated.', 'success'); }
+
+function publishWard() {
+  var filledCount = WARD_SECTIONS.filter(function(s) { return s.status !== 'empty'; }).length;
+  var minRequired = Math.ceil(WARD_SECTIONS.length * 0.4);
+  if (filledCount < minRequired) {
+    showToast('Not enough data to publish. Fill at least ' + minRequired + ' sections first.', 'warning');
+    return;
+  }
+  var badge = document.getElementById('wardStatusBadge');
+  if (badge) { badge.className = 'area-status-badge published'; badge.textContent = 'Published'; }
+  showToast('Ward information published successfully!', 'success');
+}
+
+function resetWardData() {
+  showConfirm(
+    'Reset All Ward Data',
+    'This will permanently clear all saved ward information across all sections. This action cannot be undone.',
+    function() {
+      wsClear();
+      recomputeAllWardSections();
+      renderWardSectionCards();
+      computeWardProgress();
+      syncWardSummary();
+      var badge = document.getElementById('wardStatusBadge');
+      if (badge) { badge.className = 'area-status-badge draft'; badge.textContent = 'Draft'; }
+      showToast('All ward data has been reset.', 'info');
+    }
+  );
+}
+
+/* ============================================================
+   WARD QUICK VIEW MODAL
+   ============================================================ */
+function wardQuickView(sectionId) {
+  var section = WARD_SECTIONS.find(function(s) { return s.id === sectionId; });
+  if (!section) return;
+
+  var data       = wsGet(sectionId);
+  data           = migrateLegacyData(sectionId, data);
+  var entries    = data.entries || [];
+  var entryCount = entries.length;
+  var pct        = entryCount > 0 ? 100 : 0;
+  if (section.status === 'completed') pct = 100;
+  else if (section.status === 'partial') pct = Math.min(99, entryCount * 20);
+
+  var statusLabel = section.status === 'completed' ? 'Completed'
+    : section.status === 'partial' ? 'In Progress' : 'Not Started';
+
+  /* Build a summary of what's in the entries */
+  var entrySummaryHtml = '';
+  if (entryCount === 0) {
+    entrySummaryHtml = '<span class="qv-empty-tag">No entries yet — open the section to add data.</span>';
+  } else {
+    var formConfig = WARD_SECTION_FORMS[sectionId];
+    entries.forEach(function(entry, idx) {
+      var nonEmptyFields = [];
+      if (formConfig) {
+        formConfig.fields.forEach(function(f) {
+          if (f.type === 'members') {
+            if (entry.members && entry.members.length) {
+              nonEmptyFields.push('Members (' + entry.members.length + ')');
+            }
+          } else if (entry[f.key] && String(entry[f.key]).trim()) {
+            nonEmptyFields.push(f.label + ': ' + String(entry[f.key]).trim());
+          }
+        });
+      }
+      entrySummaryHtml +=
+        '<div style="margin-bottom:10px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);">' +
+          '<div style="font-size:0.76rem;font-weight:700;color:var(--text-muted);margin-bottom:5px;">Entry ' + (idx + 1) +
+            (entry._updatedAt ? ' · Updated ' + escHtml(entry._updatedAt) : entry._createdAt ? ' · Added ' + escHtml(entry._createdAt) : '') +
+          '</div>' +
+          (nonEmptyFields.length
+            ? nonEmptyFields.slice(0, 3).map(function(t) {
+                return '<div style="font-size:0.78rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(t) + '</div>';
+              }).join('') + (nonEmptyFields.length > 3 ? '<div style="font-size:0.72rem;color:var(--text-muted);">+' + (nonEmptyFields.length - 3) + ' more fields…</div>' : '')
+            : '<div style="font-size:0.76rem;color:var(--text-muted);font-style:italic;">Empty entry</div>') +
+        '</div>';
+    });
+  }
+
+  var bodyHtml =
+    '<div class="modal-section-label">Status</div>' +
+    '<div class="modal-value"><span class="section-card-status ' + section.status + '">' + statusLabel + '</span></div>' +
+    '<div class="modal-section-label">Entries</div>' +
+    '<div class="modal-value" style="font-size:1rem;font-weight:700;color:var(--red);">' + entryCount + ' ' + (entryCount === 1 ? 'entry' : 'entries') + ' saved</div>' +
+    '<div class="modal-section-label">Last Updated</div>' +
+    '<div class="modal-value">' + escHtml(section.lastUpdated) + (section.lastSaved && section.lastSaved !== '—' ? ' &middot; ' + escHtml(section.lastSaved) : '') + '</div>' +
+    '<div class="modal-section-label">Saved Data</div>' +
+    entrySummaryHtml;
+
+  document.getElementById('wardModalTitle').textContent = section.name;
+  document.getElementById('wardModalBody').innerHTML    = bodyHtml;
+  document.getElementById('wardModalOverlay').classList.remove('hidden');
+}
+
+function closeWardModal() {
+  document.getElementById('wardModalOverlay').classList.add('hidden');
+}
+
+/* ============================================================
+   WARD SECTION DETAIL — OPEN
+   ============================================================ */
+function openWardSection(sectionId) {
+  var section = WARD_SECTIONS.find(function(s) { return s.id === sectionId; });
+  if (!section) return;
+  var formConfig = WARD_SECTION_FORMS[sectionId];
+  if (!formConfig) { showToast('Form configuration not found.', 'warning'); return; }
+
+  currentWardSectionId  = sectionId;
+  currentEditingEntryId = null;         // always start in "add new" mode
+
+  document.getElementById('wsdBreadcrumbName').textContent = section.name;
+  document.getElementById('wsdTitle').textContent          = section.name;
+  document.getElementById('wsdSubtitle').textContent       = section.desc;
+  document.getElementById('wsdFormIcon').innerHTML         = formConfig.icon;
+
+  refreshWsdBadge(section);
+  refreshWsdProgress(section);
+
+  var data = wsGet(sectionId);
+  var lastSavedEl = document.getElementById('wsdLastSaved');
+  if (lastSavedEl) {
+    lastSavedEl.textContent = data._lastUpdated
+      ? 'Last saved: ' + data._lastUpdated + (data._lastSaved ? ' at ' + data._lastSaved : '')
+      : 'Not saved yet';
+  }
+
+  renderWardSectionForm(sectionId, formConfig);
+  renderWardSectionPreview(sectionId);
+
+  showPanel('ward-section-detail', null);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function closeWardSectionDetail() {
+  currentWardSectionId = null;
+  var navEl = document.querySelector('.nav-item[onclick*="ward-management"]');
+  showPanel('ward-management', navEl);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function refreshWsdBadge(section) {
+  var statusLabel = section.status === 'completed' ? 'Completed'
+    : section.status === 'partial' ? 'Partially Filled' : 'Empty';
+  var badge = document.getElementById('wsdStatusBadge');
+  if (badge) { badge.className = 'section-card-status ' + section.status; badge.textContent = statusLabel; }
+}
+
+function refreshWsdProgress(section) {
+  var pct = section.total > 0 ? Math.round((section.filled / section.total) * 100) : 0;
+  var fillEl = document.getElementById('wsdProgressFill');
+  var pctEl  = document.getElementById('wsdProgressPct');
+  if (fillEl) fillEl.style.width   = pct + '%';
+  if (pctEl)  pctEl.textContent    = pct + '%';
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+/** Returns true when the current section is a custom facility. */
+function isCustomFacilitySection(sectionId) {
+  var s = WARD_SECTIONS.find(function(x) { return x.id === sectionId; });
+  return !!(s && s._custom);
+}
+
+/** Generate a simple unique ID for entries. */
+function genEntryId() {
+  return 'e-' + Date.now() + '-' + Math.floor(Math.random() * 9000 + 1000);
+}
+
+/* ============================================================
+   WARD SECTION — RENDER FORM
+   Branches on _custom flag:
+     custom  → multi-entry "Add / Edit Entry" form
+     built-in → single-record form (unchanged behaviour)
+   ============================================================ */
+function renderWardSectionForm(sectionId, formConfig) {
+  var formBody = document.getElementById('wsdFormBody');
+  formBody.innerHTML = '';
+
+  if (isCustomFacilitySection(sectionId)) {
+    renderFacilityEntryForm(sectionId, formConfig, formBody);
+  } else {
+    renderBuiltInSectionForm(sectionId, formConfig, formBody);
+  }
+}
+
+/* ---------- Built-in section form (unchanged single-record) ---------- */
+function renderBuiltInSectionForm(sectionId, formConfig, formBody) {
+  var data = wsGet(sectionId);
+
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') {
+      renderWardMembersSection(formBody, data.members || []);
+      return;
+    }
+    var group = document.createElement('div');
+    group.className = 'sd-field-group';
+    var lbl = document.createElement('label');
+    lbl.className   = 'sd-field-label';
+    lbl.htmlFor     = 'wfield-' + field.key;
+    lbl.textContent = field.label;
+    group.appendChild(lbl);
+
+    var input;
+    if (field.type === 'select') {
+      input = document.createElement('select');
+      input.className = 'sd-select';
+      var blank = document.createElement('option');
+      blank.value = ''; blank.textContent = '— Select —';
+      input.appendChild(blank);
+      (field.options || []).forEach(function(opt) {
+        var o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        input.appendChild(o);
+      });
+    } else if (field.type === 'textarea') {
+      input = document.createElement('textarea');
+      input.className   = 'sd-textarea';
+      input.placeholder = field.placeholder || '';
+      input.rows        = 3;
+    } else {
+      input = document.createElement('input');
+      input.className   = 'sd-input';
+      input.type        = field.type === 'number' ? 'number' : 'text';
+      input.placeholder = field.placeholder || '';
+    }
+    input.id    = 'wfield-' + field.key;
+    input.value = data[field.key] || '';
+    group.appendChild(input);
+    formBody.appendChild(group);
+  });
+
+  /* Inline action row */
+  var actionRow = document.createElement('div');
+  actionRow.className = 'wsd-form-action-row';
+
+  var updateBtn = document.createElement('button');
+  updateBtn.type      = 'button';
+  updateBtn.className = 'btn-action btn-outline-red wsd-form-action-btn';
+  updateBtn.innerHTML = '&#x270F;&#xFE0F; Update Information';
+  updateBtn.onclick   = updateWardSectionData;
+
+  var submitBtn = document.createElement('button');
+  submitBtn.type      = 'button';
+  submitBtn.className = 'btn-action btn-primary wsd-form-action-btn';
+  submitBtn.innerHTML = '&#x2713; Submit';
+  submitBtn.onclick   = submitWardSectionData;
+
+  actionRow.appendChild(updateBtn);
+  actionRow.appendChild(submitBtn);
+  formBody.appendChild(actionRow);
+}
+
+/* ---------- Custom facility: multi-entry "Add / Edit Entry" form ---------- */
+function renderFacilityEntryForm(sectionId, formConfig, formBody) {
+  var data    = wsGet(sectionId);
+  var entries = data.entries || [];
+
+  /* --- Form card header --- */
+  var formHeaderDiv = document.createElement('div');
+  formHeaderDiv.className = 'fef-form-header';
+
+  var isEditing = !!currentEditingEntryId;
+  var editEntry = isEditing
+    ? entries.find(function(e) { return e._id === currentEditingEntryId; })
+    : null;
+
+  var titleEl = document.createElement('div');
+  titleEl.className = 'fef-form-title';
+  titleEl.textContent = isEditing ? 'Edit Entry' : 'Add New Entry';
+  formHeaderDiv.appendChild(titleEl);
+
+  var countBadge = document.createElement('span');
+  countBadge.className = 'fef-entry-count';
+  countBadge.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries') + ' saved';
+  formHeaderDiv.appendChild(countBadge);
+  formBody.appendChild(formHeaderDiv);
+
+  /* --- Fields --- */
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') return; /* members not applicable to facilities */
+    var group = document.createElement('div');
+    group.className = 'sd-field-group';
+    var lbl = document.createElement('label');
+    lbl.className   = 'sd-field-label';
+    lbl.htmlFor     = 'wfield-' + field.key;
+    lbl.textContent = field.label;
+    group.appendChild(lbl);
+
+    var input;
+    if (field.type === 'select') {
+      input = document.createElement('select');
+      input.className = 'sd-select';
+      var blank = document.createElement('option');
+      blank.value = ''; blank.textContent = '— Select —';
+      input.appendChild(blank);
+      (field.options || []).forEach(function(opt) {
+        var o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        input.appendChild(o);
+      });
+    } else if (field.type === 'textarea') {
+      input = document.createElement('textarea');
+      input.className   = 'sd-textarea';
+      input.placeholder = field.placeholder || '';
+      input.rows        = 3;
+    } else {
+      input = document.createElement('input');
+      input.className   = 'sd-input';
+      input.type        = field.type === 'number' ? 'number' : 'text';
+      input.placeholder = field.placeholder || '';
+    }
+    input.id    = 'wfield-' + field.key;
+    /* Populate with editing entry values, or empty for new */
+    input.value = (editEntry && editEntry[field.key] != null) ? editEntry[field.key] : '';
+    group.appendChild(input);
+    formBody.appendChild(group);
+  });
+
+  /* --- Action row --- */
+  var actionRow = document.createElement('div');
+  actionRow.className = 'wsd-form-action-row';
+
+  if (isEditing) {
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type      = 'button';
+    cancelBtn.className = 'btn-action btn-ghost wsd-form-action-btn';
+    cancelBtn.innerHTML = '&#x2715; Cancel Edit';
+    cancelBtn.onclick   = function() {
+      currentEditingEntryId = null;
+      renderWardSectionForm(sectionId, WARD_SECTION_FORMS[sectionId]);
+    };
+
+    var saveEditBtn = document.createElement('button');
+    saveEditBtn.type      = 'button';
+    saveEditBtn.className = 'btn-action btn-primary wsd-form-action-btn';
+    saveEditBtn.innerHTML = '&#x2713; Save Changes';
+    saveEditBtn.onclick   = saveFacilityEntry;
+
+    actionRow.appendChild(cancelBtn);
+    actionRow.appendChild(saveEditBtn);
+  } else {
+    var draftBtn = document.createElement('button');
+    draftBtn.type      = 'button';
+    draftBtn.className = 'btn-action btn-ghost wsd-form-action-btn';
+    draftBtn.innerHTML = '&#x1F4BE; Save Draft';
+    draftBtn.onclick   = saveWardSectionDraft;
+
+    var addBtn = document.createElement('button');
+    addBtn.type      = 'button';
+    addBtn.className = 'btn-action btn-primary wsd-form-action-btn';
+    addBtn.innerHTML = '&#x2B; Add Entry';
+    addBtn.onclick   = saveFacilityEntry;
+
+    actionRow.appendChild(draftBtn);
+    actionRow.appendChild(addBtn);
+  }
+
+  formBody.appendChild(actionRow);
+}
+
+/* ============================================================
+   WARD MEMBERS (same dynamic-row pattern as area sections)
+   ============================================================ */
+function renderWardMembersSection(container, members) {
+  var wrap = document.createElement('div');
+  wrap.className = 'sd-members-section';
+  var hdr = document.createElement('div');
+  hdr.className = 'sd-members-header';
+  var title = document.createElement('div');
+  title.className   = 'sd-members-title';
+  title.textContent = 'Ward Members & Representatives';
+  hdr.appendChild(title);
+  var addBtn = document.createElement('button');
+  addBtn.className   = 'sd-btn-add-member';
+  addBtn.textContent = '+ Add Member';
+  addBtn.type        = 'button';
+  addBtn.onclick     = addWardMember;
+  hdr.appendChild(addBtn);
+  wrap.appendChild(hdr);
+  var list = document.createElement('div');
+  list.className = 'sd-members-list';
+  list.id        = 'wardMembersList';
+  if (!members || members.length === 0) { list.appendChild(buildWardMembersEmpty()); }
+  else { members.forEach(function(m, i) { list.appendChild(createWardMemberItem(m, i)); }); }
+  wrap.appendChild(list);
+  container.appendChild(wrap);
+}
+
+function buildWardMembersEmpty() {
+  var el = document.createElement('div');
+  el.className = 'sd-members-empty';
+  el.innerHTML = '<div style="font-size:1.8rem;margin-bottom:8px;">&#x1F3DB;&#xFE0F;</div>No members added yet.<br><span style="font-size:0.78rem;">Click "+ Add Member" to start.</span>';
+  return el;
+}
+
+function createWardMemberItem(member, idx) {
+  var item = document.createElement('div');
+  item.className     = 'sd-member-item';
+  item.dataset.index = idx;
+  var hdr = document.createElement('div');
+  hdr.className = 'sd-member-item-header';
+  var nameDisplay = document.createElement('div');
+  nameDisplay.className   = 'sd-member-item-title';
+  nameDisplay.textContent = (member.name && member.name.trim()) ? member.name : 'Member ' + (idx + 1);
+  hdr.appendChild(nameDisplay);
+  var acts = document.createElement('div');
+  acts.className = 'sd-member-item-actions';
+  var delBtn = document.createElement('button');
+  delBtn.className = 'sd-btn-icon sd-btn-icon-del';
+  delBtn.innerHTML = '&#x1F5D1;';
+  delBtn.title     = 'Delete member';
+  delBtn.type      = 'button';
+  delBtn.onclick   = (function(i) { return function() { deleteWardMember(i); }; })(idx);
+  acts.appendChild(delBtn);
+  hdr.appendChild(acts);
+  item.appendChild(hdr);
+
+  var fields = document.createElement('div');
+  fields.className = 'sd-member-fields';
+  var defs = [
+    { key:'name',    label:'Member Name',        placeholder:'Full name' },
+    { key:'role',    label:'Role / Designation', placeholder:'e.g. Ward Councillor / Panch' },
+    { key:'mobile',  label:'Mobile Number',      placeholder:'e.g. +91 98765 43210' },
+    { key:'email',   label:'Email Address',      placeholder:'e.g. member@gov.in' },
+    { key:'address', label:'Address',            placeholder:'Residential address' }
+  ];
+  defs.forEach(function(fd) {
+    var fw = document.createElement('div');
+    fw.className = 'sd-member-field';
+    var lbl = document.createElement('div');
+    lbl.className   = 'sd-member-field-label';
+    lbl.textContent = fd.label;
+    fw.appendChild(lbl);
+    var inp = document.createElement('input');
+    inp.className   = 'sd-member-field-input';
+    inp.type        = 'text';
+    inp.placeholder = fd.placeholder;
+    inp.value       = member[fd.key] || '';
+    inp.oninput = (function(i, k) { return function() { updateWardMemberField(i, k, this.value); }; })(idx, fd.key);
+    fw.appendChild(inp);
+    fields.appendChild(fw);
+  });
+  item.appendChild(fields);
+  return item;
+}
+
+function addWardMember() {
+  if (!currentWardSectionId) return;
+  var data = wsGet(currentWardSectionId);
+  if (!data.members) data.members = [];
+  data.members.push({ name:'', role:'', mobile:'', email:'', address:'' });
+  wsSet(currentWardSectionId, data);
+  refreshWardMembersList(data.members);
+  showToast('Member row added.', 'info');
+}
+
+function deleteWardMember(idx) {
+  if (!currentWardSectionId) return;
+  showConfirm('Delete Member', 'Remove this member from the list?', function() {
+    var data = wsGet(currentWardSectionId);
+    if (!data.members) return;
+    data.members.splice(idx, 1);
+    wsSet(currentWardSectionId, data);
+    refreshWardMembersList(data.members);
+    renderWardSectionPreview(currentWardSectionId);
+    syncWardSectionMeta(currentWardSectionId);
+    showToast('Member deleted.', 'info');
+  });
+}
+
+function updateWardMemberField(idx, key, value) {
+  if (!currentWardSectionId) return;
+  var data = wsGet(currentWardSectionId);
+  if (!data.members || !data.members[idx]) return;
+  data.members[idx][key] = value;
+  var items = document.querySelectorAll('#wardMembersList .sd-member-item');
+  if (items[idx] && key === 'name') {
+    var titleEl = items[idx].querySelector('.sd-member-item-title');
+    if (titleEl) titleEl.textContent = value.trim() || 'Member ' + (idx + 1);
+  }
+  wsSet(currentWardSectionId, data);
+  renderWardSectionPreview(currentWardSectionId);
+}
+
+function refreshWardMembersList(members) {
+  var list = document.getElementById('wardMembersList');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!members || members.length === 0) { list.appendChild(buildWardMembersEmpty()); }
+  else { members.forEach(function(m, i) { list.appendChild(createWardMemberItem(m, i)); }); }
+}
+
+/* ============================================================
+   WARD SECTION — COLLECT FORM DATA
+   ============================================================ */
+function collectWardFormData() {
+  if (!currentWardSectionId) return null;
+  var formConfig = WARD_SECTION_FORMS[currentWardSectionId];
+  if (!formConfig) return null;
+  var existing = wsGet(currentWardSectionId);
+  var data = Object.assign({}, existing);
+  formConfig.fields.forEach(function(field) {
+    if (field.type !== 'members') {
+      var input = document.getElementById('wfield-' + field.key);
+      if (input) data[field.key] = input.value;
+    }
+  });
+  return data;
+}
+
+/* Collect only the entry fields (no meta keys) */
+function collectEntryFields() {
+  var formConfig = WARD_SECTION_FORMS[currentWardSectionId];
+  if (!formConfig) return {};
+  var entry = {};
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') return;
+    var input = document.getElementById('wfield-' + field.key);
+    if (input) entry[field.key] = input.value;
+  });
+  return entry;
+}
+
+/* ============================================================
+   SAVE / UPDATE FACILITY ENTRY  (custom sections only)
+   Handles both Add new entry and Edit existing entry.
+   ============================================================ */
+function saveFacilityEntry() {
+  if (!currentWardSectionId) return;
+  var fields  = collectEntryFields();
+  var data    = wsGet(currentWardSectionId);
+  var entries = data.entries ? data.entries.slice() : [];
+  var ts      = nowTimestamp();
+
+  if (currentEditingEntryId) {
+    /* Update existing entry — find by _id and patch in-place */
+    var idx = -1;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i]._id === currentEditingEntryId) { idx = i; break; }
+    }
+    if (idx !== -1) {
+      entries[idx] = Object.assign({}, entries[idx], fields, { _updatedAt: ts.full });
+    }
+    currentEditingEntryId = null;
+    showToast('Entry updated successfully.', 'success');
+  } else {
+    /* Add new entry */
+    fields._id        = genEntryId();
+    fields._createdAt = ts.full;
+    entries.push(fields);
+    showToast('Entry added successfully.', 'success');
+  }
+
+  data.entries      = entries;
+  data._lastUpdated = ts.date;
+  data._lastSaved   = ts.time;
+  wsSet(currentWardSectionId, data);
+  syncWardSectionMeta(currentWardSectionId);
+  renderWardSectionPreview(currentWardSectionId);
+  syncWardSummary();
+  /* Re-render form in "add new" mode (cleared) */
+  renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+}
+
+/* ============================================================
+   WARD SECTION — RENDER PREVIEW (right panel)
+   Branches on _custom flag.
+   ============================================================ */
+function renderWardSectionPreview(sectionId) {
+  var previewBody = document.getElementById('wsdPreviewBody');
+  if (!previewBody) return;
+
+  if (isCustomFacilitySection(sectionId)) {
+    renderFacilityEntriesPreview(sectionId, previewBody);
+  } else {
+    renderBuiltInSectionPreview(sectionId, previewBody);
+  }
+}
+
+/* ---------- Custom facility: list of entries ---------- */
+function renderFacilityEntriesPreview(sectionId, previewBody) {
+  var data    = wsGet(sectionId);
+  var entries = data.entries || [];
+  var config  = WARD_SECTION_FORMS[sectionId];
+
+  if (!entries.length) {
+    previewBody.innerHTML =
+      '<div class="sd-preview-empty">' +
+        '<div class="sd-preview-empty-icon">&#x1F4C4;</div>' +
+        '<div style="font-weight:700;margin-bottom:6px;">No entries yet</div>' +
+        '<div style="font-size:0.78rem;">Fill the form and click Add Entry to save your first record.</div>' +
+      '</div>';
+    return;
+  }
+
+  var html = '';
+  if (data._lastUpdated) {
+    html += '<div class="sd-preview-timestamp">&#x1F4C5; Last saved: ' +
+      escHtml(data._lastUpdated) + (data._lastSaved ? ' at ' + escHtml(data._lastSaved) : '') + '</div>';
+  }
+
+  html += '<div class="fef-entries-list">';
+  entries.forEach(function(entry, idx) {
+    html += '<div class="fef-entry-card" data-entry-id="' + escHtml(entry._id) + '">';
+
+    /* Entry header */
+    html += '<div class="fef-entry-header">';
+    html += '<span class="fef-entry-num">Entry ' + (idx + 1) + '</span>';
+    if (entry._updatedAt) {
+      html += '<span class="fef-entry-ts">Updated: ' + escHtml(entry._updatedAt) + '</span>';
+    } else if (entry._createdAt) {
+      html += '<span class="fef-entry-ts">Added: ' + escHtml(entry._createdAt) + '</span>';
+    }
+    html += '<div class="fef-entry-actions">';
+    html += '<button class="fef-btn fef-btn-edit" onclick="editFacilityEntry(\'' + escHtml(entry._id) + '\')" title="Edit this entry">&#x270F;&#xFE0F; Edit</button>';
+    html += '<button class="fef-btn fef-btn-delete" onclick="deleteFacilityEntry(\'' + escHtml(entry._id) + '\')" title="Delete this entry">&#x1F5D1;</button>';
+    html += '</div>';
+    html += '</div>';
+
+    /* Entry fields */
+    html += '<div class="fef-entry-fields">';
+    if (config) {
+      config.fields.forEach(function(field) {
+        if (field.type === 'members') return;
+        var val = entry[field.key];
+        if (val && String(val).trim()) {
+          html += '<div class="fef-entry-field">';
+          html += '<span class="fef-field-label">' + escHtml(field.label) + '</span>';
+          html += '<span class="fef-field-value">' + escHtml(val) + '</span>';
+          html += '</div>';
+        }
+      });
+    }
+    html += '</div>';
+    html += '</div>'; /* .fef-entry-card */
+  });
+  html += '</div>'; /* .fef-entries-list */
+
+  previewBody.innerHTML = html;
+}
+
+/* ---------- Built-in section preview (unchanged) ---------- */
+function renderBuiltInSectionPreview(sectionId, previewBody) {
+  var data = wsGet(sectionId);
+  var formConfig = WARD_SECTION_FORMS[sectionId];
+  if (!formConfig) {
+    previewBody.innerHTML = '<div class="sd-preview-empty"><div class="sd-preview-empty-icon">&#x1F4C4;</div>No configuration found.</div>';
+    return;
+  }
+  var hasData = false;
+  var html    = '';
+  if (data._lastUpdated) {
+    html += '<div class="sd-preview-timestamp">&#x1F4C5; Saved: ' + escHtml(data._lastUpdated) +
+      (data._lastSaved ? ' at ' + escHtml(data._lastSaved) : '') + '</div>';
+    hasData = true;
+  }
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') {
+      var members = data.members || [];
+      if (members.length > 0) {
+        hasData = true;
+        html += '<div class="sd-preview-item">';
+        html += '<div class="sd-preview-label">Ward Members (' + members.length + ')</div>';
+        html += '<div class="sd-preview-members">';
+        members.forEach(function(m, i) {
+          html += '<div class="sd-preview-member-card">';
+          html += '<div class="sd-preview-member-name">' + escHtml(m.name || 'Member ' + (i + 1)) + '</div>';
+          if (m.role)    html += '<div class="sd-preview-member-detail"><strong>Role:</strong> '    + escHtml(m.role)    + '</div>';
+          if (m.mobile)  html += '<div class="sd-preview-member-detail"><strong>Mobile:</strong> '  + escHtml(m.mobile)  + '</div>';
+          if (m.email)   html += '<div class="sd-preview-member-detail"><strong>Email:</strong> '   + escHtml(m.email)   + '</div>';
+          if (m.address) html += '<div class="sd-preview-member-detail"><strong>Address:</strong> ' + escHtml(m.address) + '</div>';
+          html += '</div>';
+        });
+        html += '</div></div>';
+      }
+    } else {
+      var val = data[field.key];
+      if (val && String(val).trim()) {
+        hasData = true;
+        html += '<div class="sd-preview-item">' +
+          '<div class="sd-preview-label">'  + escHtml(field.label) + '</div>' +
+          '<div class="sd-preview-value">'  + escHtml(val)         + '</div>' +
+          '</div>';
+      }
+    }
+  });
+  if (!hasData) {
+    previewBody.innerHTML =
+      '<div class="sd-preview-empty">' +
+        '<div class="sd-preview-empty-icon">&#x1F4C4;</div>' +
+        '<div style="font-weight:700;margin-bottom:6px;">No information added yet</div>' +
+        '<div style="font-size:0.78rem;">Fill the form on the left and click Save Draft or Submit.</div>' +
+      '</div>';
+  } else {
+    previewBody.innerHTML = html;
+  }
+}
+
+/* ============================================================
+   EDIT / DELETE individual facility entry
+   ============================================================ */
+function editFacilityEntry(entryId) {
+  currentEditingEntryId = entryId;
+  renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+  /* Scroll form into view */
+  var formCard = document.querySelector('.sd-form-card');
+  if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function deleteFacilityEntry(entryId) {
+  showConfirm('Delete Entry', 'Remove this entry? This cannot be undone.', function() {
+    var data    = wsGet(currentWardSectionId);
+    data.entries = (data.entries || []).filter(function(e) { return e._id !== entryId; });
+    var ts = nowTimestamp();
+    data._lastUpdated = ts.date;
+    data._lastSaved   = ts.time;
+    wsSet(currentWardSectionId, data);
+    /* If we were editing the deleted entry, cancel edit mode */
+    if (currentEditingEntryId === entryId) {
+      currentEditingEntryId = null;
+      renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+    }
+    syncWardSectionMeta(currentWardSectionId);
+    renderWardSectionPreview(currentWardSectionId);
+    syncWardSummary();
+    showToast('Entry deleted.', 'info');
+  });
+}
+
+/* ============================================================
+   WARD SECTION — SYNC META
+   ============================================================ */
+function syncWardSectionMeta(sectionId) {
+  var section = WARD_SECTIONS.find(function(s) { return s.id === sectionId; });
+  if (!section) return;
+  var data = wsGet(sectionId);
+  var formConfig = WARD_SECTION_FORMS[sectionId];
+  if (!formConfig) return;
+
+  var filled = 0, total = 0;
+
+  if (isCustomFacilitySection(sectionId)) {
+    /* For custom facilities: filled = number of entries, total = entries (no fixed total) */
+    var entryCount = (data.entries || []).length;
+    filled = entryCount;
+    total  = Math.max(entryCount, 1); /* avoid 0/0 */
+  } else {
+    formConfig.fields.forEach(function(field) {
+      if (field.type === 'members') {
+        total++;
+        if (data.members && data.members.length > 0) filled++;
+      } else {
+        total++;
+        if (data[field.key] && String(data[field.key]).trim()) filled++;
+      }
+    });
+  }
+
+  section.filled      = filled;
+  section.total       = total;
+  section.lastUpdated = data._lastUpdated || '—';
+  section.lastSaved   = data._lastSaved   || '—';
+  if (data._submitted)     section.status = 'completed';
+  else if (filled === 0)   section.status = 'empty';
+  else                     section.status = 'partial';
+
+  refreshWsdBadge(section);
+  refreshWsdProgress(section);
+  var lastSavedEl = document.getElementById('wsdLastSaved');
+  if (lastSavedEl) {
+    lastSavedEl.textContent = data._lastUpdated
+      ? 'Last saved: ' + data._lastUpdated + (data._lastSaved ? ' at ' + data._lastSaved : '')
+      : 'Not saved yet';
+  }
+  renderWardSectionCards();
+  computeWardProgress();
+}
+
+/* ============================================================
+   WARD SECTION DETAIL — ACTION BUTTONS
+   ============================================================ */
+function saveWardSectionDraft() {
+  if (!currentWardSectionId) return;
+  if (isCustomFacilitySection(currentWardSectionId)) {
+    /* For custom: just stamp a timestamp (entries managed separately) */
+    var data = wsGet(currentWardSectionId);
+    var ts = nowTimestamp();
+    data._lastUpdated = ts.date;
+    data._lastSaved   = ts.time;
+    wsSet(currentWardSectionId, data);
+    syncWardSectionMeta(currentWardSectionId);
+    renderWardSectionPreview(currentWardSectionId);
+    syncWardSummary();
+    showToast('Draft saved.', 'success');
+    return;
+  }
+  /* Built-in: single-record save */
+  var data = collectWardFormData();
+  if (!data) return;
+  var ts = nowTimestamp();
+  data._lastUpdated = ts.date;
+  data._lastSaved   = ts.time;
+  wsSet(currentWardSectionId, data);
+  syncWardSectionMeta(currentWardSectionId);
+  renderWardSectionPreview(currentWardSectionId);
+  syncWardSummary();
+  showToast('Draft saved successfully.', 'success');
+}
+
+function submitWardSectionData() {
+  if (!currentWardSectionId) return;
+  if (isCustomFacilitySection(currentWardSectionId)) {
+    /* Custom: mark all entries as submitted */
+    var data = wsGet(currentWardSectionId);
+    if (!(data.entries || []).length) {
+      showToast('Add at least one entry before submitting.', 'warning');
+      return;
+    }
+    var ts = nowTimestamp();
+    data._lastUpdated = ts.date;
+    data._lastSaved   = ts.time;
+    data._submitted   = true;
+    wsSet(currentWardSectionId, data);
+    syncWardSectionMeta(currentWardSectionId);
+    renderWardSectionPreview(currentWardSectionId);
+    syncWardSummary();
+    renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+    showToast('Section submitted and marked as Completed!', 'success');
+    return;
+  }
+  /* Built-in */
+  var data = collectWardFormData();
+  if (!data) return;
+  var ts = nowTimestamp();
+  data._lastUpdated = ts.date;
+  data._lastSaved   = ts.time;
+  data._submitted   = true;
+  wsSet(currentWardSectionId, data);
+  syncWardSectionMeta(currentWardSectionId);
+  renderWardSectionPreview(currentWardSectionId);
+  syncWardSummary();
+  renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+  showToast('Section submitted and marked as Completed!', 'success');
+}
+
+function updateWardSectionData() {
+  if (!currentWardSectionId) return;
+  if (isCustomFacilitySection(currentWardSectionId)) {
+    /* Custom: stamp timestamp only (entries managed via saveFacilityEntry) */
+    var data = wsGet(currentWardSectionId);
+    var ts = nowTimestamp();
+    data._lastUpdated = ts.date;
+    data._lastSaved   = ts.time;
+    wsSet(currentWardSectionId, data);
+    syncWardSectionMeta(currentWardSectionId);
+    renderWardSectionPreview(currentWardSectionId);
+    syncWardSummary();
+    showToast('Information updated.', 'success');
+    return;
+  }
+  /* Built-in */
+  var data = collectWardFormData();
+  if (!data) return;
+  var ts = nowTimestamp();
+  data._lastUpdated = ts.date;
+  data._lastSaved   = ts.time;
+  wsSet(currentWardSectionId, data);
+  syncWardSectionMeta(currentWardSectionId);
+  renderWardSectionPreview(currentWardSectionId);
+  syncWardSummary();
+  renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+  showToast('Information updated successfully.', 'success');
+}
+
+function deleteWardSectionData() {
+  if (!currentWardSectionId) return;
+  var sectionName = (WARD_SECTIONS.find(function(s) { return s.id === currentWardSectionId; }) || {}).name || 'this section';
+  showConfirm(
+    'Delete Section Data',
+    'Clear all saved data for "' + sectionName + '"? This cannot be undone.',
+    function() {
+      wsDelete(currentWardSectionId);
+      currentEditingEntryId = null;
+      syncWardSectionMeta(currentWardSectionId);
+      renderWardSectionForm(currentWardSectionId, WARD_SECTION_FORMS[currentWardSectionId]);
+      renderWardSectionPreview(currentWardSectionId);
+      showToast('Section data deleted.', 'info');
+    }
+  );
+}
+
+function clearWardSectionForm() {
+  if (!currentWardSectionId) return;
+  if (isCustomFacilitySection(currentWardSectionId)) { return; }
+  var formConfig = WARD_SECTION_FORMS[currentWardSectionId];
+  if (!formConfig) return;
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') return;
+    var input = document.getElementById('wfield-' + field.key);
+    if (input) input.value = '';
+  });
+}
+
+/* ============================================================
+   INIT — hook into showPanel to load ward data on navigate
+   ============================================================ */
+(function initWardManagement() {
+  var _origShowPanel = typeof showPanel === 'function' ? showPanel : null;
+  if (!_origShowPanel) return;
+  var _wrapped = function(panelId, navEl) {
+    var result = _origShowPanel.call(this, panelId, navEl);
+    if (panelId === 'ward-management') {
+      recomputeAllWardSections();
+      renderWardSectionCards();
+      computeWardProgress();
+    }
+    return result;
+  };
+  /* Only wrap once — guard against double-patching from a previous session */
+  if (!showPanel._wardWrapped) {
+    _wrapped._wardWrapped = true;
+    showPanel = _wrapped;
+  }
+
+  /* Escape key closes ward modal */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeWardModal();
+  });
+
+  /* On page load, if ward-management is somehow the active panel, initialise */
+  document.addEventListener('DOMContentLoaded', function() {
+    var activePanel = document.querySelector('.panel.active');
+    if (activePanel && activePanel.id === 'panel-ward-management') {
+      recomputeAllWardSections();
+      renderWardSectionCards();
+      computeWardProgress();
+    }
+  });
+})();
+
+
+/* ============================================================
+   WARD SECTION CARD BUILDER  (extracted from renderWardSectionCards)
+   ============================================================ */
+function buildWardSectionCard(section, animate) {
+  var statusLabel = section.status === 'completed' ? 'Completed'
+    : section.status === 'partial' ? 'In Progress' : 'Not Started';
+  var updatedText = (section.lastUpdated && section.lastUpdated !== '—')
+    ? section.lastUpdated + (section.lastSaved && section.lastSaved !== '—' ? ' &middot; ' + section.lastSaved : '')
+    : 'Not updated yet';
+
+  var card = document.createElement('div');
+  card.className = 'sc-card sc-card--' + section.status + (animate ? ' sc-card--new-facility' : '');
+  card.innerHTML =
+    '<div class="sc-card-body">' +
+      '<div class="sc-card-top">' +
+        '<div class="sc-card-icon-wrap sc-icon--' + section.status + '">' +
+          '<span class="sc-card-icon">' + (section.icon || '&#x1F4C4;') + '</span>' +
+        '</div>' +
+        '<span class="sc-badge sc-badge--' + section.status + '">' + statusLabel + '</span>' +
+      '</div>' +
+      '<div class="sc-card-name">'    + escHtml(section.name) + '</div>' +
+      '<div class="sc-card-desc">'    + escHtml(section.desc) + '</div>' +
+      '<div class="sc-card-updated">&#x1F4C5; ' + updatedText + '</div>' +
+    '</div>' +
+    '<div class="sc-card-footer">' +
+      '<button class="sc-btn sc-btn--primary" onclick="openWardSection(\'' + section.id + '\')">' +
+        '&#x1F4C2; Open Section' +
+      '</button>' +
+      '<button class="sc-btn sc-btn--ghost" onclick="wardQuickView(\'' + section.id + '\')">' +
+        '&#x1F441;&#xFE0F; Quick View' +
+      '</button>' +
+    '</div>';
+  return card;
+}
+
+/* ============================================================
+   ADD FACILITY CARD BUILDER
+   ============================================================ */
+function buildAddFacilityCard() {
+  var card = document.createElement('div');
+  card.className = 'sc-card sc-card--add';
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', 'Add a new facility section');
+  card.onclick = openFacilityModal;
+  card.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFacilityModal(); } };
+  card.innerHTML =
+    '<div class="sc-add-body">' +
+      '<div class="sc-add-icon-wrap">&#x2795;</div>' +
+      '<div class="sc-add-label">Add New Facility</div>' +
+      '<div class="sc-add-hint">Create a custom section to track<br>any ward-specific facility or data</div>' +
+    '</div>';
+  return card;
+}
+
+/* ============================================================
+   FACILITY ICON PICKER
+   Returns an HTML entity / emoji based on facility name keywords.
+   ============================================================ */
+function getFacilityIcon(name) {
+  if (!name) return '&#x1F3D7;&#xFE0F;';
+  var n = name.toLowerCase();
+  if (/bus\s*stop|bus\s*stand|bus\s*depot|transport/.test(n))          return '&#x1F68C;';
+  if (/hospital|clinic|health\s*cent|dispensary|phc|medical/.test(n))  return '&#x1F3E5;';
+  if (/school|college|university|vidyalay|education|anganwadi/.test(n)) return '&#x1F3EB;';
+  if (/garden|park|ground|playground|maidan/.test(n))                   return '&#x1F333;';
+  if (/water\s*tank|water|water\s*supply|borewell|well|pump/.test(n))         return '&#x1F4A7;';
+  if (/road|highway|path|lane|street\s*road/.test(n))                   return '&#x1F6E3;&#xFE0F;';
+  if (/street\s*light|lamp|light/.test(n))                              return '&#x1F4A1;';
+  if (/community\s*hall|sabha|hall|auditorium|centre|center/.test(n))   return '&#x1F3E2;';
+  if (/police|chowki|outpost/.test(n))                                   return '&#x1F46E;';
+  if (/fire/.test(n))                                                    return '&#x1F692;';
+  if (/market|bazaar|shop/.test(n))                                      return '&#x1F6D2;';
+  if (/library|reading/.test(n))                                         return '&#x1F4DA;';
+  if (/toilet|sanitation|washroom/.test(n))                              return '&#x1F6BB;';
+  if (/drain|sewage|waste/.test(n))                                      return '&#x267B;&#xFE0F;';
+  if (/electricity|power|solar|energy/.test(n))                          return '&#x26A1;';
+  if (/temple|mosque|church|mandir|masjid|religious/.test(n))            return '&#x26EA;';
+  if (/bank|atm|finance/.test(n))                                        return '&#x1F3E6;';
+  if (/post\s*office|postal/.test(n))                                    return '&#x1F4EE;';
+  if (/cremation|cemetery|burial/.test(n))                               return '&#x26B0;&#xFE0F;';
+  if (/stadium|sports|gym/.test(n))                                      return '&#x1F3DF;&#xFE0F;';
+  if (/bridge|flyover|overpass/.test(n))                                 return '&#x1F309;';
+  return '&#x1F3D7;&#xFE0F;'; /* default: building construction */
+}
+
+/* ============================================================
+   CUSTOM FACILITY CARD BUILDER  (matches built-in card style)
+   NOTE: Does NOT mutate WARD_SECTIONS — that belongs only in
+   createFacility() and rehydrateWardFacilities().
+   ============================================================ */
+function buildWardFacilityCard(fac) {
+  /* Look up the runtime section — must already exist (injected by
+     createFacility or rehydrateWardFacilities before this is called) */
+  var section = WARD_SECTIONS.find(function(s) { return s.id === fac.id; });
+
+  /* Safety fallback: if section somehow not in array yet, create a
+     minimal one — but do NOT push it (caller is responsible for that) */
+  if (!section) {
+    section = {
+      id:          fac.id,
+      name:        fac.name,
+      icon:        fac.icon || getFacilityIcon(fac.name),
+      desc:        fac.desc || 'Custom facility section.',
+      status:      'empty',
+      filled:      0,
+      total:       8,
+      lastUpdated: '—',
+      lastSaved:   '—',
+      _custom:     true
+    };
+  }
+
+  var statusLabel = section.status === 'completed' ? 'Completed'
+    : section.status === 'partial' ? 'In Progress' : 'Not Started';
+  var updatedText = (section.lastUpdated && section.lastUpdated !== '—')
+    ? section.lastUpdated + (section.lastSaved && section.lastSaved !== '—' ? ' &middot; ' + section.lastSaved : '')
+    : 'Not updated yet';
+
+  var card = document.createElement('div');
+  card.className = 'sc-card sc-card--' + section.status + ' sc-card--custom';
+  card.dataset.facilityId = fac.id;
+
+  card.innerHTML =
+    '<div class="sc-card-body">' +
+      '<div class="sc-card-top">' +
+        '<div class="sc-card-icon-wrap sc-icon--' + section.status + '">' +
+          '<span class="sc-card-icon">' + section.icon + '</span>' +
+        '</div>' +
+        '<span class="sc-badge sc-badge--' + section.status + '">' + statusLabel + '</span>' +
+      '</div>' +
+      '<div class="sc-card-name">'    + escHtml(section.name) + '</div>' +
+      '<div class="sc-card-desc">'    + escHtml(section.desc || 'Custom facility section.') + '</div>' +
+      '<div class="sc-card-updated">&#x1F4C5; ' + updatedText + '</div>' +
+    '</div>' +
+    '<div class="sc-card-footer">' +
+      '<button class="sc-btn sc-btn--primary" onclick="openWardSection(\'' + section.id + '\')">' +
+        '&#x1F4C2; Open Section' +
+      '</button>' +
+      '<button class="sc-btn sc-btn--ghost" onclick="wardQuickView(\'' + section.id + '\')">' +
+        '&#x1F441;&#xFE0F; Quick View' +
+      '</button>' +
+    '</div>';
+
+  /* Delete icon — top-right corner, built via DOM API (no quote-escaping issues) */
+  var delBtn = document.createElement('button');
+  delBtn.className = 'sc-card-delete';
+  delBtn.setAttribute('aria-label', 'Delete ' + section.name);
+  delBtn.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+      '<polyline points="3 6 5 6 21 6"/>' +
+      '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+      '<path d="M10 11v6"/>' +
+      '<path d="M14 11v6"/>' +
+      '<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>' +
+    '</svg>';
+  delBtn.addEventListener('click', (function(facId) {
+    return function(e) { e.stopPropagation(); deleteFacility(facId); };
+  })(fac.id));
+  card.appendChild(delBtn);
+
+  return card;
+}
+
+/* ============================================================
+   FACILITY FORM CONFIG FACTORY  (single source of truth)
+   ============================================================ */
+function makeFacilityFormConfig(icon) {
+  return {
+    icon: icon || '&#x1F3D7;&#xFE0F;',
+    fields: [
+      { key:'facilityDetails',   label:'Facility Details',      type:'textarea', placeholder:'Describe this facility — capacity, current state, key information…' },
+      { key:'location',          label:'Location / Address',    type:'text',     placeholder:'e.g. Near main market, Ward 7' },
+      { key:'status',            label:'Operational Status',    type:'select',   options:['Operational','Planned','Under Construction','Renovation in Progress','Under Repair','Damaged','Temporarily Closed','Permanently Closed'] },
+      { key:'capacity',          label:'Capacity / Coverage',   type:'text',     placeholder:'e.g. 500 persons, 2 acres' },
+      { key:'establishmentYear', label:'Establishment Year',    type:'number',   placeholder:'e.g. 2005' },
+      { key:'facilityCondition', label:'Facility Condition',    type:'select',   options:['Excellent','Good','Fair','Needs Repair','Critical'] },
+      { key:'lastInspection',    label:'Last Inspection Date',  type:'text',     placeholder:'e.g. 12 Jan 2025' },
+      { key:'remarks',           label:'Remarks / Notes',       type:'textarea', placeholder:'Any additional notes about this facility…' }
+    ]
+  };
+}
+
+/* ============================================================
+   FACILITY LOCALSTORAGE  (list of custom facility metadata)
+   ============================================================ */
+var FACILITY_LS_KEY = 'adminWardFacilities';
+
+function loadWardFacilities() {
+  try {
+    var raw = localStorage.getItem(FACILITY_LS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveWardFacilities(list) {
+  try { localStorage.setItem(FACILITY_LS_KEY, JSON.stringify(list)); } catch(e) {}
+}
+
+/* ============================================================
+   RECOMPUTE A SINGLE WARD SECTION from localStorage
+   (used after injecting a custom section into WARD_SECTIONS)
+   ============================================================ */
+function recomputeSingleWardSection(section) {
+  var data = wsGet(section.id);
+  var formConfig = WARD_SECTION_FORMS[section.id];
+  if (!formConfig) { section.total = 0; section.filled = 0; return; }
+  var filled = 0, total = 0;
+  formConfig.fields.forEach(function(field) {
+    if (field.type === 'members') {
+      total++;
+      if (data.members && data.members.length > 0) filled++;
+    } else {
+      total++;
+      if (data[field.key] && String(data[field.key]).trim()) filled++;
+    }
+  });
+  section.filled      = filled;
+  section.total       = total;
+  section.lastUpdated = data._lastUpdated || '—';
+  section.lastSaved   = data._lastSaved   || '—';
+  if      (data._submitted)  section.status = 'completed';
+  else if (filled === 0)     section.status = 'empty';
+  else                       section.status = 'partial';
+}
+
+/* ============================================================
+   RE-INJECT SAVED FACILITIES INTO WARD_SECTIONS on page load.
+   Called once on DOMContentLoaded so openWardSection /
+   wardQuickView / renderWardSectionCards all find them.
+   ============================================================ */
+function rehydrateWardFacilities() {
+  loadWardFacilities().forEach(function(fac) {
+    /* Skip if already in the runtime array (idempotent) */
+    var already = WARD_SECTIONS.find(function(s) { return s.id === fac.id; });
+    if (already) return;
+
+    /* Resolve icon — upgrade legacy entries that only have the generic icon */
+    var icon = (fac.icon && fac.icon !== '&#x1F3D7;&#xFE0F;')
+      ? fac.icon
+      : getFacilityIcon(fac.name);
+
+    var section = {
+      id:          fac.id,
+      name:        fac.name,
+      icon:        icon,
+      desc:        fac.desc || 'Custom facility section.',
+      status:      'empty',
+      filled:      0,
+      total:       8,
+      lastUpdated: '—',
+      lastSaved:   '—',
+      _custom:     true
+    };
+    WARD_SECTIONS.push(section);
+    WARD_SECTION_FORMS[fac.id] = makeFacilityFormConfig(icon);
+    recomputeSingleWardSection(section);
+  });
+}
+
+/* ============================================================
+   FACILITY MODAL — OPEN / CLOSE
+   ============================================================ */
+function openFacilityModal() {
+  /* Reset form */
+  var nameEl = document.getElementById('facilityNameInput');
+  var descEl = document.getElementById('facilityDescInput');
+  if (nameEl) { nameEl.value = ''; nameEl.classList.remove('input-error'); }
+  if (descEl)   descEl.value = '';
+
+  var errEl = document.getElementById('facilityNameError');
+  if (errEl) errEl.classList.add('hidden');
+
+  updateFacilityCharCount('facilityNameInput', 'facilityCharCount',  80);
+  updateFacilityCharCount('facilityDescInput', 'facilityDescCount', 200);
+
+  document.getElementById('facilityModalOverlay').classList.remove('hidden');
+  /* Auto-focus name field after animation */
+  setTimeout(function() { if (nameEl) nameEl.focus(); }, 80);
+}
+
+function closeFacilityModal() {
+  document.getElementById('facilityModalOverlay').classList.add('hidden');
+}
+
+/* ---- Character counter ---- */
+function updateFacilityCharCount(inputId, counterId, max) {
+  var el  = document.getElementById(inputId);
+  var cnt = document.getElementById(counterId);
+  if (!el || !cnt) return;
+  var len = el.value.length;
+  cnt.textContent = len + ' / ' + max;
+  cnt.className   = 'facility-char-count' +
+    (len >= max ? ' at-limit' : len >= max * 0.85 ? ' near-limit' : '');
+}
+
+/* Wire up live char-count updates (once, after DOM ready) */
+document.addEventListener('DOMContentLoaded', function() {
+  var nameEl = document.getElementById('facilityNameInput');
+  var descEl = document.getElementById('facilityDescInput');
+  if (nameEl) nameEl.addEventListener('input', function() {
+    updateFacilityCharCount('facilityNameInput', 'facilityCharCount', 80);
+    /* Clear error on type */
+    var errEl = document.getElementById('facilityNameError');
+    if (errEl && !errEl.classList.contains('hidden')) {
+      errEl.classList.add('hidden');
+      nameEl.classList.remove('input-error');
+    }
+  });
+  if (descEl) descEl.addEventListener('input', function() {
+    updateFacilityCharCount('facilityDescInput', 'facilityDescCount', 200);
+  });
+});
+
+/* ============================================================
+   CREATE FACILITY
+   ============================================================ */
+function createFacility() {
+  var nameEl = document.getElementById('facilityNameInput');
+  var descEl = document.getElementById('facilityDescInput');
+  var errEl  = document.getElementById('facilityNameError');
+
+  var name = (nameEl ? nameEl.value.trim() : '');
+  var desc = (descEl ? descEl.value.trim() : '');
+
+  /* Validate */
+  if (!name) {
+    if (nameEl) nameEl.classList.add('input-error');
+    if (errEl)  errEl.classList.remove('hidden');
+    if (nameEl) nameEl.focus();
+    return;
+  }
+
+  /* Build unique id */
+  var id   = 'wf-' + Date.now();
+  var icon = getFacilityIcon(name);
+
+  /* Persist metadata to localStorage FIRST */
+  var facilities = loadWardFacilities();
+  var newFac = {
+    id:        id,
+    name:      name,
+    desc:      desc,
+    icon:      icon,
+    createdAt: new Date().toISOString()
+  };
+  facilities.push(newFac);
+  saveWardFacilities(facilities);
+
+  /* Close modal */
+  closeFacilityModal();
+
+  /* Inject into live WARD_SECTIONS runtime array (single authoritative push) */
+  var section = {
+    id:          id,
+    name:        name,
+    icon:        icon,
+    desc:        desc || 'Custom facility section.',
+    status:      'empty',
+    filled:      0,
+    total:       8,
+    lastUpdated: '—',
+    lastSaved:   '—',
+    _custom:     true
+  };
+  WARD_SECTIONS.push(section);
+
+  /* Inject form config */
+  WARD_SECTION_FORMS[id] = makeFacilityFormConfig(icon);
+
+  /* Single render pass — no direct DOM insert to avoid duplicate risk */
+  renderWardSectionCards();
+
+  /* Apply slide-in animation to the newly rendered card */
+  var grid = document.getElementById('wardSectionCardsGrid');
+  if (grid) {
+    var newCard = grid.querySelector('[data-facility-id="' + id + '"]');
+    if (newCard) newCard.classList.add('sc-card--new-facility');
+  }
+
+  showToast('"' + escHtml(name) + '" facility section created!', 'success');
+}
+
+/* ============================================================
+   DELETE FACILITY
+   ============================================================ */
+function deleteFacility(id) {
+  var section = WARD_SECTIONS.find(function(s) { return s.id === id; });
+  var facName = section ? section.name : 'this facility';
+
+  showConfirm(
+    'Delete Facility',
+    'Are you sure you want to delete "' + facName + '"? This action cannot be undone.',
+    function() {
+      /* 1. Remove from facilities list in localStorage */
+      var facilities = loadWardFacilities().filter(function(f) { return f.id !== id; });
+      saveWardFacilities(facilities);
+
+      /* 2. Remove all section detail data from localStorage */
+      wsDelete(id);
+
+      /* 3. Remove from runtime WARD_SECTIONS array */
+      WARD_SECTIONS = WARD_SECTIONS.filter(function(s) { return s.id !== id; });
+
+      /* 4. Remove from form config map */
+      delete WARD_SECTION_FORMS[id];
+
+      /* 5. If user is currently inside this section's detail panel, go back.
+            showPanel triggers the wrapper → renderWardSectionCards(),
+            which is the correct final grid state. */
+      if (currentWardSectionId === id) {
+        currentWardSectionId = null;
+        var navEl = document.querySelector('.nav-item[onclick*="ward-management"]');
+        showPanel('ward-management', navEl);
+        /* renderWardSectionCards already called by wrapper above — done */
+        showToast('"' + escHtml(facName) + '" facility deleted.', 'info');
+        return;
+      }
+
+      /* 6. Not in detail panel — animate card out then do a clean re-render */
+      var grid = document.getElementById('wardSectionCardsGrid');
+      var card = grid ? grid.querySelector('[data-facility-id="' + id + '"]') : null;
+
+      if (card) {
+        card.classList.add('sc-card--removing');
+        setTimeout(function() {
+          /* Full re-render guarantees no stale cards and add-card stays last */
+          renderWardSectionCards();
+        }, 320);
+      } else {
+        /* Card not found in DOM (edge case) — re-render immediately */
+        renderWardSectionCards();
+      }
+
+      showToast('"' + escHtml(facName) + '" facility deleted.', 'info');
+    }
+  );
+}
+
+/* ============================================================
+   ESCAPE KEY — also close facility modal
+   ============================================================ */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeFacilityModal();
+});
+
+/* ============================================================
+   BOOT — rehydrate on page load so custom facilities survive refresh
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  rehydrateWardFacilities();
+});
