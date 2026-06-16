@@ -1,4 +1,5 @@
-﻿using CitizenConnect.API.Domain.Enums;
+﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.API.Domain.Enums;
 using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.Domain.Entities

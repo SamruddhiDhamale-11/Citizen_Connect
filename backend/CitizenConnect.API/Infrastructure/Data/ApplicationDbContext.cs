@@ -1,4 +1,5 @@
-﻿using CitizenConnect.API.Domain.Entities;
+﻿
+using CitizenConnect.API.Domain.Entities;
 using CitizenConnect.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -205,10 +206,10 @@ namespace CitizenConnect.Infrastructure.Data
             // =====================================================
 
             modelBuilder.Entity<Ward>()
-    .HasOne(w => w.JurisdictionType)
-    .WithMany(jt => jt.Wards)
-    .HasForeignKey(w => w.JurisdictionTypeId)
-    .OnDelete(DeleteBehavior.Restrict);
+     .HasOne(w => w.Jurisdiction)
+     .WithMany(j => j.Wards)
+     .HasForeignKey(w => w.JurisdictionId)
+     .OnDelete(DeleteBehavior.Restrict);
             // =====================================================
             // COMPLAINT -> CITIZEN
             // =====================================================
@@ -469,14 +470,21 @@ modelBuilder.Entity<OfficerCategoryMapping>()
             modelBuilder.Entity<Department>()
                 .HasIndex(x => x.DepartmentName)
                 .IsUnique();
-            modelBuilder.Entity<Ward>()
-                .HasIndex(x => new
-                {
-                    x.JurisdictionTypeId,
-                    x.WardNumber
-                })
-                .IsUnique();
 
+
+            modelBuilder.Entity<Ward>()
+    .HasIndex(x => new
+    {
+        x.JurisdictionId,
+        x.WardNumber
+    })
+    .IsUnique();
+
+            modelBuilder.Entity<Ward>()
+    .HasOne(w => w.Jurisdiction)
+    .WithMany(j => j.Wards)
+    .HasForeignKey(w => w.JurisdictionId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Complaint>()
                 .Property(x => x.ComplaintNumber)

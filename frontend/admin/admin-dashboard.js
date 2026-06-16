@@ -3368,3 +3368,137 @@ async function updateSuggestionStatus() {
 
     alert(result.message);
 }
+
+
+const WARD_API_BASE =
+    "http://localhost:5079/api/master/wards";
+
+async function loadWards()
+{
+    try
+    {
+        const response =
+            await fetch(WARD_API_BASE);
+
+        if (!response.ok)
+        {
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+        const text =
+            await response.text();
+
+        if (!text)
+        {
+            console.warn(
+                "No ward data returned"
+            );
+
+            return;
+        }
+
+        const wards =
+            JSON.parse(text);
+
+        renderWards(wards);
+    }
+    catch(error)
+    {
+        console.error(error);
+
+        showToast(
+            "Failed to load wards",
+            "error"
+        );
+    }
+}
+
+function renderWards(wards)
+{
+    let html = "";
+
+    wards.forEach(ward =>
+    {
+        html += `
+        <div class="stat-card">
+
+            <div class="stat-body">
+
+                <div class="stat-number">
+                    ${ward.wardNumber}
+                </div>
+
+                <div class="stat-label">
+                    ${ward.wardName}
+                </div>
+
+                <div>
+                    ${ward.areaName}
+                </div>
+
+            </div>
+
+            <button
+                class="btn-action btn-outline-red"
+                onclick="editWard(${ward.wardId})">
+                Edit
+            </button>
+
+        </div>
+        `;
+    });
+
+    document.getElementById(
+        "wardContainer"
+    ).innerHTML = html;
+}
+
+async function saveWard()
+{
+    const ward =
+    {
+        wardNumber:
+            document.getElementById(
+                "wardNumber"
+            ).value,
+
+        wardName:
+            document.getElementById(
+                "wardName"
+            ).value,
+
+        areaName:
+            document.getElementById(
+                "areaName"
+            ).value,
+
+        pincode:
+            document.getElementById(
+                "pincode"
+            ).value
+    };
+
+    await fetch(
+        WARD_API_BASE,
+        {
+            method: "POST",
+
+            headers:
+            {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body:
+                JSON.stringify(ward)
+        });
+
+    loadWards();
+
+    showToast(
+        "Ward added successfully",
+        "success"
+    );
+}
