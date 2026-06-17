@@ -75,16 +75,30 @@
 
             <li><a href="#contact">Contact</a></li>
 
-            <li>
-                <a href="#listen" class="nav-listen-link">
-                    <span class="nav-listen-icon">
-                        <i class="fa-solid fa-microphone-lines"></i>
-                    </span>
-                    Listen to our application
-                </a>
-            </li>
-
         </ul>
+
+        <div class="mobile-menu" id="mobileMenu">
+
+    <a href="#about">About</a>
+
+    <a href="#features">Features</a>
+
+    <a href="#stakeholders">Services</a>
+
+    <a href="#process">Process</a>
+
+    <a href="#contact">Contact</a>
+
+    <a href="#"
+       onclick="openRolePopup('officials'); return false;"
+       class="mobile-login-btn">
+
+        Login for Officials
+
+    </a>
+
+</div>
+
 
         <div class="nav-actions">
 
@@ -92,11 +106,11 @@
                 Login for Officials
             </a>
 
-            <a href="#" onclick="openRolePopup('citizen'); return false;" class="btn btn-primary">
-                Register as a Citizen
-            </a>
-
         </div>
+
+        <button class="hamburger" id="hamburgerBtn">
+    <i class="fa-solid fa-bars"></i>
+</button>
 
     </div>
 
@@ -141,59 +155,37 @@
 
             </p>
 
-            <div class="hero-buttons">
 
-                <a href="#" onclick="openRolePopup('officials'); return false;" class="btn btn-primary">
-                    Login for Officials
-                </a>
+            <a href="#listen" class="nav-listen-link">
 
-                <a href="#" onclick="openRolePopup('citizen'); return false;" class="btn btn-secondary">
-                    Register as a Citizen
-                </a>
+    <span class="nav-listen-icon">
+        <i class="fa-solid fa-microphone-lines"></i>
 
-                <a href="#features" class="btn btn-glass">
+        <span class="sound-wave">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    </span>
 
-                    Explore Features
+    Listen to our application
 
-                </a>
+</a>
 
-            </div>
+           <div class="hero-buttons">
 
-            <div class="hero-highlights">
+    <a href="./login/citizen/citizen-register.html" class="btn btn-secondary">
+        <i class="fa-solid fa-user-plus"></i>
+        Register as a Citizen
+    </a>
 
-                <div>
+    <a href="./login/citizen/citizen-login.html" class="btn btn-glass">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Login as a Citizen
+    </a>
 
-                    <i class="fa-solid fa-location-dot"></i>
-
-                    Report Civic Issues
-
-                </div>
-
-                <div>
-
-                    <i class="fa-solid fa-chart-line"></i>
-
-                    Track Complaints
-
-                </div>
-
-                <div>
-
-                    <i class="fa-solid fa-building-columns"></i>
-
-                    Connect Authorities
-
-                </div>
-
-                <div>
-
-                    <i class="fa-solid fa-users"></i>
-
-                    Improve Community
-
-                </div>
-
-            </div>
+</div>
 
         </div>
 

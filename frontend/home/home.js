@@ -429,6 +429,40 @@ if (cta) {
 }
 
 /* ==========================================================
+   MOBILE MENU
+   ========================================================== */
+
+const hamburgerBtn =
+    document.getElementById('hamburgerBtn');
+
+const mobileMenu =
+    document.getElementById('mobileMenu');
+
+if(hamburgerBtn && mobileMenu){
+
+    hamburgerBtn.addEventListener('click', () => {
+
+        mobileMenu.classList.toggle('show');
+
+        const icon =
+            hamburgerBtn.querySelector('i');
+
+        if(mobileMenu.classList.contains('show')){
+
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-xmark');
+
+        }else{
+
+            icon.classList.remove('fa-xmark');
+            icon.classList.add('fa-bars');
+        }
+
+    });
+
+}
+
+/* ==========================================================
    END
    ========================================================== */
 
@@ -442,26 +476,7 @@ function openRolePopup(role) {
     const title = document.getElementById('popupTitle');
     const content = document.getElementById('popupContent');
 
-    if (role === 'citizen') {
-
-    title.innerHTML = 'Citizen Portal';
-
-    content.innerHTML = `
-        <a href="./login/citizen/citizen-register.html"
-           class="popup-btn primary">
-           New Citizen Registration
-        </a>
-
-        <br><br>
-
-        <a href="./login/citizen/citizen-login.html"
-           class="popup-btn secondary">
-           Already Registered
-        </a>
-    `;
-}
-
-    else if (role === 'admin') {
+    if (role === 'admin') {
 
         title.innerHTML = 'Administrator Portal';
 
