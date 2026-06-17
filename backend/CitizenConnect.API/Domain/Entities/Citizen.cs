@@ -24,6 +24,8 @@ namespace CitizenConnect.Domain.Entities
 
         public Ward Ward { get; set; } = null!;
 
+        public Locality Locality { get; set; } = null!;
+
         public ResidenceType ResidenceType { get; set; } = null!;
 
         public ICollection<Complaint> Complaints { get; set; }

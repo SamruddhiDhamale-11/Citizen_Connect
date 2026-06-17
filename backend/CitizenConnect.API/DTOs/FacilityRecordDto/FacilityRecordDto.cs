@@ -1,19 +1,12 @@
-﻿namespace CitizenConnect.API.DTOs.FacilityDataDto
+﻿namespace CitizenConnect.API.DTOs.FacilityRecordDto
 {
-    public class FacilityDataResponseDto
+    public class FacilityRecordDto
     {
-        public int FacilityDataId { get; set; }
-
         public int FacilityRecordId { get; set; }
 
         public int FacilityModuleId { get; set; }
 
         public string FacilityModuleName { get; set; }
-            = string.Empty;
-
-        public int FacilityFieldId { get; set; }
-
-        public string FacilityFieldName { get; set; }
             = string.Empty;
 
         public int JurisdictionId { get; set; }
@@ -25,7 +18,6 @@
 
         public string? WardName { get; set; }
 
-        public string FieldValue { get; set; }
-            = string.Empty;
+        public bool IsActive { get; set; }
     }
 }

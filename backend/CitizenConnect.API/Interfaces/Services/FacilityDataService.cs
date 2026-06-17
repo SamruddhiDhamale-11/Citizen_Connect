@@ -17,18 +17,34 @@ namespace CitizenConnect.API.Services
         }
 
         public async Task<FacilityDataResponseDto>
-    CreateAsync(CreateFacilityDataDto dto)
+            CreateAsync(CreateFacilityDataDto dto)
         {
+            var recordExists =
+                await _context.FacilityRecords
+                    .AnyAsync(x =>
+                        x.FacilityRecordId ==
+                        dto.FacilityRecordId);
+
+            if (!recordExists)
+            {
+                throw new Exception(
+                    "Facility Record not found.");
+            }
+
             var facilityData = new FacilityData
             {
-                FacilityModuleId = dto.FacilityModuleId,
-                FacilityFieldId = dto.FacilityFieldId,
-                JurisdictionId = dto.JurisdictionId,
-                WardId = dto.WardId,
-                FieldValue = dto.FieldValue
+                FacilityRecordId =
+                    dto.FacilityRecordId,
+
+                FacilityFieldId =
+                    dto.FacilityFieldId,
+
+                FieldValue =
+                    dto.FieldValue
             };
 
-            _context.FacilityDatas.Add(facilityData);
+            _context.FacilityDatas.Add(
+                facilityData);
 
             await _context.SaveChangesAsync();
 
@@ -38,28 +54,9 @@ namespace CitizenConnect.API.Services
                     "Failed to create Facility Data.");
         }
 
-        public async Task<bool>
-    DeleteAsync(int facilityDataId)
-        {
-            var facilityData = await _context.FacilityDatas
-                .FirstOrDefaultAsync(x =>
-                    x.FacilityDataId ==
-                    facilityDataId);
-
-            if (facilityData == null)
-            {
-                return false;
-            }
-
-            _context.FacilityDatas.Remove(facilityData);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<IEnumerable<FacilityDataResponseDto>>
-     GetAllAsync()
+        public async Task<IEnumerable<
+            FacilityDataResponseDto>>
+            GetAllAsync()
         {
             return await _context.FacilityDatas
                 .Select(x =>
@@ -68,31 +65,45 @@ namespace CitizenConnect.API.Services
                         FacilityDataId =
                             x.FacilityDataId,
 
+                        FacilityRecordId =
+                            x.FacilityRecordId,
+
                         FacilityModuleId =
-                            x.FacilityModuleId,
+                            x.FacilityRecord
+                                .FacilityModuleId,
 
                         FacilityModuleName =
-                            x.FacilityModule.ModuleName,
+                            x.FacilityRecord
+                                .FacilityModule
+                                .ModuleName,
 
                         FacilityFieldId =
                             x.FacilityFieldId,
 
                         FacilityFieldName =
-                            x.FacilityField.FieldName,
+                            x.FacilityField
+                                .FieldName,
 
                         JurisdictionId =
-                            x.JurisdictionId,
+                            x.FacilityRecord
+                                .JurisdictionId,
 
                         JurisdictionName =
-                            x.Jurisdiction.JurisdictionName,
+                            x.FacilityRecord
+                                .Jurisdiction
+                                .JurisdictionName,
 
                         WardId =
-                            x.WardId,
+                            x.FacilityRecord
+                                .WardId,
 
                         WardName =
-                            x.Ward != null
-                                ? x.Ward.WardName
-                                : null,
+                            x.FacilityRecord
+                                .Ward != null
+                                    ? x.FacilityRecord
+                                        .Ward
+                                        .WardName
+                                    : null,
 
                         FieldValue =
                             x.FieldValue
@@ -100,8 +111,10 @@ namespace CitizenConnect.API.Services
                 .ToListAsync();
         }
 
-        public async Task<FacilityDataResponseDto?>
-    GetByIdAsync(int facilityDataId)
+        public async Task<
+            FacilityDataResponseDto?>
+            GetByIdAsync(
+                int facilityDataId)
         {
             return await _context.FacilityDatas
                 .Where(x =>
@@ -113,31 +126,45 @@ namespace CitizenConnect.API.Services
                         FacilityDataId =
                             x.FacilityDataId,
 
+                        FacilityRecordId =
+                            x.FacilityRecordId,
+
                         FacilityModuleId =
-                            x.FacilityModuleId,
+                            x.FacilityRecord
+                                .FacilityModuleId,
 
                         FacilityModuleName =
-                            x.FacilityModule.ModuleName,
+                            x.FacilityRecord
+                                .FacilityModule
+                                .ModuleName,
 
                         FacilityFieldId =
                             x.FacilityFieldId,
 
                         FacilityFieldName =
-                            x.FacilityField.FieldName,
+                            x.FacilityField
+                                .FieldName,
 
                         JurisdictionId =
-                            x.JurisdictionId,
+                            x.FacilityRecord
+                                .JurisdictionId,
 
                         JurisdictionName =
-                            x.Jurisdiction.JurisdictionName,
+                            x.FacilityRecord
+                                .Jurisdiction
+                                .JurisdictionName,
 
                         WardId =
-                            x.WardId,
+                            x.FacilityRecord
+                                .WardId,
 
                         WardName =
-                            x.Ward != null
-                                ? x.Ward.WardName
-                                : null,
+                            x.FacilityRecord
+                                .Ward != null
+                                    ? x.FacilityRecord
+                                        .Ward
+                                        .WardName
+                                    : null,
 
                         FieldValue =
                             x.FieldValue
@@ -145,18 +172,15 @@ namespace CitizenConnect.API.Services
                 .FirstOrDefaultAsync();
         }
 
-        public Task<IEnumerable<FacilityDataResponseDto>> GetByJurisdictionAsync(int jurisdictionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<FacilityDataResponseDto>>
-    GetByModuleAsync(
-        int facilityModuleId)
+        public async Task<IEnumerable<
+            FacilityDataResponseDto>>
+            GetByModuleAsync(
+                int facilityModuleId)
         {
             return await _context.FacilityDatas
                 .Where(x =>
-                    x.FacilityModuleId ==
+                    x.FacilityRecord
+                        .FacilityModuleId ==
                     facilityModuleId)
                 .Select(x =>
                     new FacilityDataResponseDto
@@ -164,31 +188,107 @@ namespace CitizenConnect.API.Services
                         FacilityDataId =
                             x.FacilityDataId,
 
+                        FacilityRecordId =
+                            x.FacilityRecordId,
+
                         FacilityModuleId =
-                            x.FacilityModuleId,
+                            x.FacilityRecord
+                                .FacilityModuleId,
 
                         FacilityModuleName =
-                            x.FacilityModule.ModuleName,
+                            x.FacilityRecord
+                                .FacilityModule
+                                .ModuleName,
 
                         FacilityFieldId =
                             x.FacilityFieldId,
 
                         FacilityFieldName =
-                            x.FacilityField.FieldName,
+                            x.FacilityField
+                                .FieldName,
 
                         JurisdictionId =
-                            x.JurisdictionId,
+                            x.FacilityRecord
+                                .JurisdictionId,
 
                         JurisdictionName =
-                            x.Jurisdiction.JurisdictionName,
+                            x.FacilityRecord
+                                .Jurisdiction
+                                .JurisdictionName,
 
                         WardId =
-                            x.WardId,
+                            x.FacilityRecord
+                                .WardId,
 
                         WardName =
-                            x.Ward != null
-                                ? x.Ward.WardName
-                                : null,
+                            x.FacilityRecord
+                                .Ward != null
+                                    ? x.FacilityRecord
+                                        .Ward
+                                        .WardName
+                                    : null,
+
+                        FieldValue =
+                            x.FieldValue
+                    })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<
+            FacilityDataResponseDto>>
+            GetByJurisdictionAsync(
+                int jurisdictionId)
+        {
+            return await _context.FacilityDatas
+                .Where(x =>
+                    x.FacilityRecord
+                        .JurisdictionId ==
+                    jurisdictionId)
+                .Select(x =>
+                    new FacilityDataResponseDto
+                    {
+                        FacilityDataId =
+                            x.FacilityDataId,
+
+                        FacilityRecordId =
+                            x.FacilityRecordId,
+
+                        FacilityModuleId =
+                            x.FacilityRecord
+                                .FacilityModuleId,
+
+                        FacilityModuleName =
+                            x.FacilityRecord
+                                .FacilityModule
+                                .ModuleName,
+
+                        FacilityFieldId =
+                            x.FacilityFieldId,
+
+                        FacilityFieldName =
+                            x.FacilityField
+                                .FieldName,
+
+                        JurisdictionId =
+                            x.FacilityRecord
+                                .JurisdictionId,
+
+                        JurisdictionName =
+                            x.FacilityRecord
+                                .Jurisdiction
+                                .JurisdictionName,
+
+                        WardId =
+                            x.FacilityRecord
+                                .WardId,
+
+                        WardName =
+                            x.FacilityRecord
+                                .Ward != null
+                                    ? x.FacilityRecord
+                                        .Ward
+                                        .WardName
+                                    : null,
 
                         FieldValue =
                             x.FieldValue
@@ -197,29 +297,19 @@ namespace CitizenConnect.API.Services
         }
 
         public async Task<bool>
-     UpdateAsync(UpdateFacilityDataDto dto)
+            UpdateAsync(
+                UpdateFacilityDataDto dto)
         {
-            var facilityData = await _context.FacilityDatas
-                .FirstOrDefaultAsync(x =>
-                    x.FacilityDataId ==
-                    dto.FacilityDataId);
+            var facilityData =
+                await _context.FacilityDatas
+                    .FirstOrDefaultAsync(x =>
+                        x.FacilityDataId ==
+                        dto.FacilityDataId);
 
             if (facilityData == null)
             {
                 return false;
             }
-
-            facilityData.FacilityModuleId =
-                dto.FacilityModuleId;
-
-            facilityData.FacilityFieldId =
-                dto.FacilityFieldId;
-
-            facilityData.JurisdictionId =
-                dto.JurisdictionId;
-
-            facilityData.WardId =
-                dto.WardId;
 
             facilityData.FieldValue =
                 dto.FieldValue;
@@ -229,6 +319,140 @@ namespace CitizenConnect.API.Services
             return true;
         }
 
+        public async Task<bool>
+            DeleteAsync(
+                int facilityDataId)
+        {
+            var facilityData =
+                await _context.FacilityDatas
+                    .FirstOrDefaultAsync(x =>
+                        x.FacilityDataId ==
+                        facilityDataId);
+
+            if (facilityData == null)
+            {
+                return false;
+            }
+
+            _context.FacilityDatas
+                .Remove(facilityData);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<IEnumerable<FacilityDataResponseDto>>
+    GetByRecordAsync(int facilityRecordId)
+        {
+            return await _context.FacilityDatas
+                .Where(x =>
+                    x.FacilityRecordId ==
+                    facilityRecordId)
+                .Select(x =>
+                    new FacilityDataResponseDto
+                    {
+                        FacilityDataId =
+                            x.FacilityDataId,
+
+                        FacilityRecordId =
+                            x.FacilityRecordId,
+
+                        FacilityModuleId =
+                            x.FacilityRecord
+                                .FacilityModuleId,
+
+                        FacilityModuleName =
+                            x.FacilityRecord
+                                .FacilityModule
+                                .ModuleName,
+
+                        FacilityFieldId =
+                            x.FacilityFieldId,
+
+                        FacilityFieldName =
+                            x.FacilityField
+                                .FieldName,
+
+                        JurisdictionId =
+                            x.FacilityRecord
+                                .JurisdictionId,
+
+                        JurisdictionName =
+                            x.FacilityRecord
+                                .Jurisdiction
+                                .JurisdictionName,
+
+                        WardId =
+                            x.FacilityRecord
+                                .WardId,
+
+                        WardName =
+                            x.FacilityRecord.Ward != null
+                                ? x.FacilityRecord.Ward.WardName
+                                : null,
+
+                        FieldValue =
+                            x.FieldValue
+                    })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<FacilityDataResponseDto>>
+    GetByWardAsync(int wardId)
+        {
+            return await _context.FacilityDatas
+                .Where(x =>
+                    x.FacilityRecord.WardId ==
+                    wardId)
+                .Select(x =>
+                    new FacilityDataResponseDto
+                    {
+                        FacilityDataId =
+                            x.FacilityDataId,
+
+                        FacilityRecordId =
+                            x.FacilityRecordId,
+
+                        FacilityModuleId =
+                            x.FacilityRecord
+                                .FacilityModuleId,
+
+                        FacilityModuleName =
+                            x.FacilityRecord
+                                .FacilityModule
+                                .ModuleName,
+
+                        FacilityFieldId =
+                            x.FacilityFieldId,
+
+                        FacilityFieldName =
+                            x.FacilityField
+                                .FieldName,
+
+                        JurisdictionId =
+                            x.FacilityRecord
+                                .JurisdictionId,
+
+                        JurisdictionName =
+                            x.FacilityRecord
+                                .Jurisdiction
+                                .JurisdictionName,
+
+                        WardId =
+                            x.FacilityRecord
+                                .WardId,
+
+                        WardName =
+                            x.FacilityRecord.Ward != null
+                                ? x.FacilityRecord.Ward.WardName
+                                : null,
+
+                        FieldValue =
+                            x.FieldValue
+                    })
+                .ToListAsync();
+        }
     }
 }
            
