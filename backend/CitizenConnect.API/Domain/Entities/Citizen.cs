@@ -1,4 +1,5 @@
 ﻿
+using CitizenConnect.API.Domain.Entities;
 using CitizenConnect.Domain.Common;
 
 namespace CitizenConnect.Domain.Entities
@@ -12,6 +13,7 @@ namespace CitizenConnect.Domain.Entities
         public DateTime DateOfBirth { get; set; }
 
         public int WardId { get; set; }
+        public int LocalityId { get; set; }
 
         public int ResidenceTypeId { get; set; }
 
@@ -22,6 +24,8 @@ namespace CitizenConnect.Domain.Entities
         public User User { get; set; } = null!;
 
         public Ward Ward { get; set; } = null!;
+
+        public Locality Locality { get; set; } = null!;
 
         public ResidenceType ResidenceType { get; set; } = null!;
 

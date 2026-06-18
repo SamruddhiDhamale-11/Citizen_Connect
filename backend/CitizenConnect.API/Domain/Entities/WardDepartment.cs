@@ -1,4 +1,6 @@
-﻿namespace CitizenConnect.Domain.Entities
+﻿using CitizenConnect.API.Domain.Entities;
+
+namespace CitizenConnect.Domain.Entities
 {
     public class WardDepartment
     {

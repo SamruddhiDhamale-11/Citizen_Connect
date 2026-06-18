@@ -1,5 +1,6 @@
 using CitizenConnect.API.Configurations;
 using CitizenConnect.API.Interfaces.Services;
+using CitizenConnect.API.Services;
 using CitizenConnect.Application.Interfaces.Services;
 using CitizenConnect.Application.Services;
 using CitizenConnect.Application.Services.Interfaces;
@@ -41,12 +42,17 @@ builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IOfficerService,OfficerService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-
+builder.Services
+.AddScoped<IDashboardService,
+DashboardService>();
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 builder.Services.AddScoped<ISuggestionService,SuggestionService>();
-// builder.Services.AddScoped<
-//     IJurisdictionService,
-//     JurisdictionService>();
+builder.Services.AddScoped<
+    IWardService,
+    WardService>();
+ builder.Services.AddScoped<
+     IJurisdictionService,
+    JurisdictionService>();
 
 builder.Services.AddScoped<
     IFacilityModuleService,
@@ -59,18 +65,25 @@ builder.Services.AddScoped<
 // builder.Services.AddScoped<
 //     IFacilityDataService,
 //     FacilityDataService>();
+ builder.Services.AddScoped<
+     IFacilityDataService,
+     FacilityDataService>();
 
-// builder.Services.AddScoped<
-//     IFacilityFieldOptionService,
-//     FacilityFieldOptionService>();
+ builder.Services.AddScoped<
+    IFacilityFieldOptionService,
+  FacilityFieldOptionService>();
 
 builder.Services.AddScoped<
     IFacilityFieldService,
     FacilityFieldService>();
 
-// builder.Services.AddScoped<
-//     IDemographicService,
-//     DemographicService>();
+builder.Services.AddScoped<
+    IFacilityRecordService,
+    FacilityRecordService>();
+
+ builder.Services.AddScoped<
+    IDemographicService,
+   DemographicService>();
 
 
 builder.Services

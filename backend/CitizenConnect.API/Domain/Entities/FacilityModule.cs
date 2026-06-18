@@ -25,5 +25,9 @@ namespace CitizenConnect.API.Domain.Entities
 
         public ICollection<FacilityData> FacilityDatas
         { get; set; } = new List<FacilityData>();
+
+        public ICollection<FacilityRecord> FacilityRecords
+        { get; set; }
+    = new List<FacilityRecord>();
     }
 }

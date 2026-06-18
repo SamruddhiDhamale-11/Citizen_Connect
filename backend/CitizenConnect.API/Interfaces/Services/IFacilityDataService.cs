@@ -20,9 +20,15 @@ namespace CitizenConnect.API.Interfaces.Services
             GetAllAsync();
 
         Task<IEnumerable<FacilityDataResponseDto>>
+            GetByRecordAsync(int facilityRecordId);
+
+        Task<IEnumerable<FacilityDataResponseDto>>
             GetByJurisdictionAsync(int jurisdictionId);
 
         Task<IEnumerable<FacilityDataResponseDto>>
             GetByModuleAsync(int facilityModuleId);
+
+        Task<IEnumerable<FacilityDataResponseDto>>
+            GetByWardAsync(int wardId);
     }
 }

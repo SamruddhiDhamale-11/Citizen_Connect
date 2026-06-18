@@ -1,7 +1,8 @@
 ﻿using CitizenConnect.API.Domain.Entities;
 using CitizenConnect.Domain.Common;
+using CitizenConnect.Domain.Entities;
 
-namespace CitizenConnect.Domain.Entities
+namespace CitizenConnect.API.Domain.Entities
 {
     public class Ward : BaseEntity
     {
@@ -21,11 +22,9 @@ namespace CitizenConnect.Domain.Entities
 
         public decimal Longitude { get; set; }
 
-        public int JurisdictionTypeId { get; set; }
+        public int JurisdictionId { get; set; }
 
-        // Navigation
-        public JurisdictionType JurisdictionType
-        { get; set; } = null!;
+        public Jurisdiction Jurisdiction { get; set; }
 
         public ICollection<Citizen> Citizens { get; set; }= new List<Citizen>();
 

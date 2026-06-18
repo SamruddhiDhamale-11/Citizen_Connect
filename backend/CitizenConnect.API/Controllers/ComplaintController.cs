@@ -2,9 +2,7 @@
 using CitizenConnect.Interfaces.Services;
 using CitizenConnect.Infrastructure.Data;   // 👈 ADD THIS
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;    
 
-using Microsoft.AspNetCore.Mvc;
 
 namespace CitizenConnect.Controllers
 {

@@ -1,4 +1,5 @@
-﻿using CitizenConnect.API.Domain.Entities;
+﻿
+using CitizenConnect.API.Domain.Entities;
 using CitizenConnect.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -98,6 +99,9 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<FacilityModule> FacilityModules
             => Set<FacilityModule>();
 
+        public DbSet<FacilityRecord> FacilityRecords
+    => Set<FacilityRecord>();
+
         public DbSet<FacilityField> FacilityFields
             => Set<FacilityField>();
 
@@ -180,6 +184,13 @@ namespace CitizenConnect.Infrastructure.Data
                 .HasForeignKey(x => x.WardId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+            modelBuilder.Entity<Citizen>()
+     .HasOne(x => x.Locality)
+     .WithMany(x => x.Citizens)
+     .HasForeignKey(x => x.LocalityId)
+     .OnDelete(DeleteBehavior.Restrict);
+
             // =====================================================
             // CITIZEN -> RESIDENCE TYPE
             // =====================================================
@@ -205,10 +216,10 @@ namespace CitizenConnect.Infrastructure.Data
             // =====================================================
 
             modelBuilder.Entity<Ward>()
-    .HasOne(w => w.JurisdictionType)
-    .WithMany(jt => jt.Wards)
-    .HasForeignKey(w => w.JurisdictionTypeId)
-    .OnDelete(DeleteBehavior.Restrict);
+     .HasOne(w => w.Jurisdiction)
+     .WithMany(j => j.Wards)
+     .HasForeignKey(w => w.JurisdictionId)
+     .OnDelete(DeleteBehavior.Restrict);
             // =====================================================
             // COMPLAINT -> CITIZEN
             // =====================================================
@@ -218,6 +229,13 @@ namespace CitizenConnect.Infrastructure.Data
                 .WithMany(x => x.Complaints)
                 .HasForeignKey(x => x.CitizenId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Complaint>()
+    .HasOne(x => x.Locality)
+    .WithMany(x => x.Complaints)
+    .HasForeignKey(x => x.LocalityId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================
             // COMPLAINT -> WARD
@@ -407,52 +425,58 @@ modelBuilder.Entity<OfficerCategoryMapping>()
                 .WithMany(m => m.FacilityFields)
                 .HasForeignKey(f => f.FacilityModuleId)
                 .OnDelete(DeleteBehavior.Cascade);
-            // =====================================================
-            // FACILITY DATA -> JURISDICTION
-            // =====================================================
-
-            modelBuilder.Entity<FacilityData>()
-                .HasOne(f => f.Jurisdiction)
-                .WithMany(j => j.FacilityDatas)
-                .HasForeignKey(f => f.JurisdictionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =====================================================
-            // FACILITY DATA -> WARD
-            // =====================================================
-
-            modelBuilder.Entity<FacilityData>()
-                .HasOne(f => f.Ward)
-                .WithMany(w => w.FacilityDatas)
-                .HasForeignKey(f => f.WardId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+           
 
             // =====================================================
             // FACILITY DATA -> FACILITY FIELD
             // =====================================================
 
-            modelBuilder.Entity<FacilityData>()
-                .HasOne(f => f.FacilityField)
-                .WithMany()
-                .HasForeignKey(f => f.FacilityFieldId)
-                .OnDelete(DeleteBehavior.Restrict);
+            
 
-            // =====================================================
-            // FACILITY DATA -> FACILITY MODULE
-            // =====================================================
-
-            modelBuilder.Entity<FacilityData>()
-                .HasOne(f => f.FacilityModule)
-                .WithMany()
-                .HasForeignKey(f => f.FacilityModuleId)
-                .OnDelete(DeleteBehavior.Restrict);
+        
 
             modelBuilder.Entity<Demographic>()
     .HasOne(d => d.Ward)
     .WithMany(w => w.Demographics)
     .HasForeignKey(d => d.WardId)
     .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+            modelBuilder.Entity<FacilityRecord>()
+    .HasOne(x => x.FacilityModule)
+    .WithMany(x => x.FacilityRecords)
+    .HasForeignKey(x => x.FacilityModuleId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FacilityRecord>()
+    .HasOne(x => x.Jurisdiction)
+    .WithMany()
+    .HasForeignKey(x => x.JurisdictionId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FacilityRecord>()
+    .HasOne(x => x.Ward)
+    .WithMany()
+    .HasForeignKey(x => x.WardId)
+    .IsRequired(false)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FacilityData>()
+    .HasOne(x => x.FacilityRecord)
+    .WithMany(x => x.FacilityDatas)
+    .HasForeignKey(x => x.FacilityRecordId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<FacilityData>()
+    .HasOne(x => x.FacilityField)
+    .WithMany(x => x.FacilityDatas)
+    .HasForeignKey(x => x.FacilityFieldId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+
 
             // =====================================================
             // UNIQUE CONSTRAINTS
@@ -469,13 +493,15 @@ modelBuilder.Entity<OfficerCategoryMapping>()
             modelBuilder.Entity<Department>()
                 .HasIndex(x => x.DepartmentName)
                 .IsUnique();
+
+
             modelBuilder.Entity<Ward>()
-                .HasIndex(x => new
-                {
-                    x.JurisdictionTypeId,
-                    x.WardNumber
-                })
-                .IsUnique();
+    .HasIndex(x => new
+    {
+        x.JurisdictionId,
+        x.WardNumber
+    })
+    .IsUnique();
 
 
             modelBuilder.Entity<Complaint>()
@@ -502,6 +528,21 @@ modelBuilder.Entity<OfficerCategoryMapping>()
             modelBuilder.Entity<FacilityModule>()
                 .HasIndex(x => x.ModuleName)
                 .IsUnique();
+
+            modelBuilder.Entity<FacilityData>()
+    .HasIndex(x => x.FacilityRecordId);
+
+            modelBuilder.Entity<FacilityData>()
+    .HasIndex(x => x.FacilityFieldId);
+
+
+            modelBuilder.Entity<FacilityData>()
+    .HasIndex(x => new
+    {
+        x.FacilityRecordId,
+        x.FacilityFieldId
+    })
+    .IsUnique();
 
             // =====================================================
             // USER CONFIGURATION
@@ -724,32 +765,22 @@ modelBuilder.Entity<OfficerCategoryMapping>()
                 .Property(x => x.FieldValue)
                 .HasMaxLength(2000);
 
-            modelBuilder.Entity<FacilityData>()
-    .HasOne(x => x.FacilityField)
-    .WithMany(x => x.FacilityDatas)
-    .HasForeignKey(x => x.FacilityFieldId);
+           
 
 
-            modelBuilder.Entity<FacilityData>()
-    .HasOne(x => x.FacilityModule)
-    .WithMany(x => x.FacilityDatas)
-    .HasForeignKey(x => x.FacilityModuleId);
 
-            // =====================================================
-            // FACILITY DATA INDEXES
-            // =====================================================
+            modelBuilder.Entity<FacilityRecord>()
+       .HasIndex(x => x.JurisdictionId);
 
-            modelBuilder.Entity<FacilityData>()
-                .HasIndex(x => x.JurisdictionId);
+            modelBuilder.Entity<FacilityRecord>()
+    .HasIndex(x => x.WardId);
 
-            modelBuilder.Entity<FacilityData>()
-                .HasIndex(x => x.WardId);
+            modelBuilder.Entity<FacilityRecord>()
+    .HasIndex(x => x.FacilityModuleId);
 
-            modelBuilder.Entity<FacilityData>()
-                .HasIndex(x => x.FacilityModuleId);
 
-            modelBuilder.Entity<FacilityData>()
-                .HasIndex(x => x.FacilityFieldId);
+
+           
 
 
             modelBuilder.Entity<FacilityFieldOption>()
@@ -763,15 +794,6 @@ modelBuilder.Entity<OfficerCategoryMapping>()
     .IsRequired()
     .HasMaxLength(200);
 
-            modelBuilder.Entity<FacilityData>()
-    .HasIndex(x => new
-    {
-        x.JurisdictionId,
-        x.WardId,
-        x.FacilityModuleId,
-        x.FacilityFieldId
-    })
-    .IsUnique();
 
             modelBuilder.Entity<FacilityField>()
     .HasIndex(x => new
@@ -813,13 +835,7 @@ modelBuilder.Entity<OfficerCategoryMapping>()
     .HasIndex(x => x.CreatedAt);
 
 
-            modelBuilder.Entity<FacilityData>()
-    .HasIndex(x => new
-    {
-        x.JurisdictionId,
-        x.WardId,
-        x.FacilityModuleId
-    });
+           
 
 
             modelBuilder.Entity<FacilityFieldOption>()
