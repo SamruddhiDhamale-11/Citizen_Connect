@@ -17,6 +17,7 @@ namespace CitizenConnect.Domain.Entities
 
         public bool IsVoterRegistered { get; set; }
 
+        
         // Navigation
         public User User { get; set; } = null!;
 

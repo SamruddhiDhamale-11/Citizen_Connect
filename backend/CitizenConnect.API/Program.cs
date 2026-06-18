@@ -52,6 +52,10 @@ builder.Services.AddScoped<
     IFacilityModuleService,
     FacilityModuleService>();
 
+    builder.Services.AddScoped<
+    ILocalityService,
+    LocalityService>();
+
 // builder.Services.AddScoped<
 //     IFacilityDataService,
 //     FacilityDataService>();

@@ -346,5 +346,24 @@ namespace CitizenConnect.Application.Services
 
             return true;
         }
+
+        public async Task<List<object>>
+GetLocalitiesByPincodeAsync(string pincode)
+{
+    return await _context.Localities
+        .Include(x => x.Ward)
+        .Where(x => x.Pincode == pincode)
+        .Select(x => new
+        {
+            x.LocalityId,
+            x.LocalityName,
+            x.WardId,
+            WardName = x.Ward.WardName
+        })
+        .Cast<object>()
+        .ToListAsync();
+}
     }
+
+    
 }
