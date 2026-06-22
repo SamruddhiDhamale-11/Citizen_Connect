@@ -164,16 +164,668 @@
       </div>
 
       <!-- ============================================================
-           PANEL: RAISE COMPLAINT
+           PANEL: RAISE COMPLAINT  (Step 1 — Department Selection)
            ============================================================ -->
       <div class="panel" id="panel-complaint">
 
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Raise a Complaint</h1>
-            <p class="page-subtitle">Report civic issues in your ward for official action</p>
+        <!-- ── STEP 1: Department Selection Dashboard ── -->
+        <div id="dept-selection-view">
+
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Raise a Complaint</h1>
+              <p class="page-subtitle">Report civic issues in your ward for official action</p>
+            </div>
           </div>
-        </div>
+
+          <!-- Section heading + subtitle -->
+          <div class="dept-section-heading">
+            <div class="dept-heading-badge">
+              <span class="dept-heading-icon">🏛️</span>
+              <span>Department Portal</span>
+            </div>
+            <h2 class="dept-main-title">Select Complaint Department</h2>
+            <p class="dept-main-subtitle">Choose the department related to your issue to raise a complaint.</p>
+            <div class="dept-meta-row">
+              <span class="dept-count-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                16 Departments Available
+              </span>
+              <div class="dept-search-box">
+                <svg class="dept-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="deptSearchInput" class="dept-search-input" placeholder="Search Department..." oninput="filterDepartments(this.value)" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          
+
+          <!-- Department Cards Grid -->
+          <div class="dept-grid" id="deptGrid">
+
+            <div class="dept-card dept-card--orange" data-dept-id="1" data-dept-name="Roads &amp; Potholes" onclick="selectDepartment(1,'Roads &amp; Potholes')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Roads & Potholes: road surface + traffic cone -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="rd1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9e9e9e"/><stop offset="100%" stop-color="#616161"/></linearGradient>
+                      <linearGradient id="rd2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9800"/><stop offset="100%" stop-color="#e65100"/></linearGradient>
+                    </defs>
+                    <!-- Road surface -->
+                    <path d="M4 38 L14 14 L34 14 L44 38 Z" fill="url(#rd1)" rx="2"/>
+                    <!-- Road edge lines -->
+                    <path d="M4 38 L14 14" stroke="#fff" stroke-width="1.5" stroke-opacity="0.4"/>
+                    <path d="M44 38 L34 14" stroke="#fff" stroke-width="1.5" stroke-opacity="0.4"/>
+                    <!-- Centre dashes -->
+                    <line x1="24" y1="16" x2="24" y2="21" stroke="#fff9c4" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="24" y1="25" x2="24" y2="30" stroke="#fff9c4" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="24" y1="34" x2="24" y2="38" stroke="#fff9c4" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Pothole circle -->
+                    <ellipse cx="14" cy="32" rx="4" ry="2.5" fill="#424242" stroke="#757575" stroke-width="1"/>
+                    <!-- Traffic cone body -->
+                    <polygon points="35,38 40,38 38,22 37,22" fill="url(#rd2)"/>
+                    <!-- Cone white stripe -->
+                    <rect x="35.5" y="30" width="4" height="2.5" rx="0.5" fill="white" opacity="0.85"/>
+                    <!-- Cone base -->
+                    <rect x="33.5" y="37" width="8" height="2.5" rx="1" fill="#e65100"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Roads &amp; Potholes</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--blue" data-dept-id="2" data-dept-name="Water Supply &amp; Leakage" onclick="selectDepartment(2,'Water Supply &amp; Leakage')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Water Supply: faucet body + falling droplet -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="ws1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4fc3f7"/><stop offset="100%" stop-color="#0277bd"/></linearGradient>
+                      <linearGradient id="ws2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#81d4fa"/><stop offset="100%" stop-color="#0288d1"/></linearGradient>
+                      <linearGradient id="ws3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#80deea"/><stop offset="100%" stop-color="#00838f"/></linearGradient>
+                    </defs>
+                    <!-- Inlet pipe (top) -->
+                    <rect x="30" y="4" width="8" height="16" rx="4" fill="url(#ws1)"/>
+                    <!-- Elbow connector -->
+                    <path d="M30 18 Q30 26 22 26" stroke="#0288d1" stroke-width="6" stroke-linecap="round" fill="none"/>
+                    <!-- Lever handle -->
+                    <rect x="16" y="12" width="20" height="5" rx="2.5" fill="#29b6f6"/>
+                    <rect x="23" y="8" width="5" height="9" rx="2.5" fill="#0277bd"/>
+                    <!-- Faucet body -->
+                    <rect x="16" y="26" width="16" height="10" rx="5" fill="url(#ws2)"/>
+                    <!-- Spout -->
+                    <rect x="10" y="30" width="12" height="6" rx="3" fill="url(#ws1)"/>
+                    <!-- Spout opening -->
+                    <ellipse cx="10" cy="33" rx="3" ry="2" fill="#01579b"/>
+                    <!-- Water stream -->
+                    <line x1="10" y1="35" x2="10" y2="39" stroke="#4dd0e1" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2.5 2"/>
+                    <!-- Droplet -->
+                    <path d="M10 39 C7 39 5 41.5 5 43.5 C5 46 7.2 48 10 48 C12.8 48 15 46 15 43.5 C15 41.5 13 39 10 39 Z" fill="url(#ws3)"/>
+                    <ellipse cx="8" cy="42" rx="1.3" ry="2" fill="white" opacity="0.35" transform="rotate(-15,8,42)"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Water Supply &amp; Leakage</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--green" data-dept-id="3" data-dept-name="Garbage &amp; Sanitation" onclick="selectDepartment(3,'Garbage &amp; Sanitation')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Garbage & Sanitation: bin + recycle arrows -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="gb1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#2e7d32"/></linearGradient>
+                      <linearGradient id="gb2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#1565c0"/></linearGradient>
+                    </defs>
+                    <!-- Bin body -->
+                    <path d="M12 18 L15 44 L33 44 L36 18 Z" fill="url(#gb1)" rx="2"/>
+                    <!-- Bin lid -->
+                    <rect x="10" y="13" width="28" height="6" rx="3" fill="#388e3c"/>
+                    <!-- Lid handle -->
+                    <rect x="20" y="10" width="8" height="4" rx="2" fill="#2e7d32"/>
+                    <!-- Bin vertical lines -->
+                    <line x1="20" y1="22" x2="18" y2="40" stroke="#a5d6a7" stroke-width="1.5" stroke-opacity="0.6"/>
+                    <line x1="28" y1="22" x2="30" y2="40" stroke="#a5d6a7" stroke-width="1.5" stroke-opacity="0.6"/>
+                    <!-- Recycle symbol (simplified 3-arrow) -->
+                    <path d="M38 8 L43 14 L40 14 L40 20 L36 20 L36 14 L33 14 Z" fill="url(#gb2)" opacity="0.9"/>
+                    <path d="M43 22 L37 28 L37 25 L31 25 L31 21 L37 21 L37 18 Z" fill="url(#gb2)" opacity="0.9" transform="rotate(120,37,23)"/>
+                    <path d="M31 8 L37 2 L37 5 L43 5 L43 9 L37 9 L37 12 Z" fill="url(#gb2)" opacity="0.9" transform="rotate(240,37,7)"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Garbage &amp; Sanitation</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--yellow" data-dept-id="4" data-dept-name="Streetlights &amp; Electricity" onclick="selectDepartment(4,'Streetlights &amp; Electricity')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Streetlights: lamp post + glow halo -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <radialGradient id="sl1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff9c4" stop-opacity="0.9"/><stop offset="100%" stop-color="#f9a825" stop-opacity="0"/></radialGradient>
+                      <linearGradient id="sl2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#546e7a"/><stop offset="100%" stop-color="#263238"/></linearGradient>
+                      <linearGradient id="sl3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff176"/><stop offset="100%" stop-color="#f9a825"/></linearGradient>
+                    </defs>
+                    <!-- Glow halo -->
+                    <circle cx="34" cy="11" r="12" fill="url(#sl1)"/>
+                    <!-- Arm bracket -->
+                    <path d="M20 12 Q26 6 34 6" stroke="url(#sl2)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                    <!-- Lamp head housing -->
+                    <rect x="28" y="4" width="14" height="8" rx="4" fill="#455a64"/>
+                    <!-- Bulb glow -->
+                    <ellipse cx="35" cy="8" rx="5" ry="3" fill="url(#sl3)"/>
+                    <!-- Rays -->
+                    <line x1="35" y1="2"  x2="35" y2="0"  stroke="#ffd54f" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="42" y1="5"  x2="44" y2="3"  stroke="#ffd54f" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="44" y1="11" x2="47" y2="11" stroke="#ffd54f" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="26" y1="5"  x2="24" y2="3"  stroke="#ffd54f" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Pole -->
+                    <rect x="18" y="12" width="4" height="34" rx="2" fill="url(#sl2)"/>
+                    <!-- Base plate -->
+                    <rect x="14" y="44" width="12" height="3" rx="1.5" fill="#37474f"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Streetlights &amp; Electricity</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--teal" data-dept-id="5" data-dept-name="Drainage &amp; Sewage" onclick="selectDepartment(5,'Drainage &amp; Sewage')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Drainage: underground pipe cross-section + flow arrows -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="dr1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#80cbc4"/><stop offset="100%" stop-color="#00695c"/></linearGradient>
+                      <linearGradient id="dr2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4dd0e1"/><stop offset="100%" stop-color="#006064"/></linearGradient>
+                    </defs>
+                    <!-- Ground surface -->
+                    <rect x="2" y="18" width="44" height="5" rx="1" fill="#8d6e63" opacity="0.7"/>
+                    <rect x="2" y="18" width="44" height="2" rx="1" fill="#a1887f" opacity="0.5"/>
+                    <!-- Grate slot on surface -->
+                    <rect x="18" y="19" width="12" height="3" rx="1" fill="#4e342e"/>
+                    <line x1="21" y1="19" x2="21" y2="22" stroke="#6d4c41" stroke-width="1"/>
+                    <line x1="25" y1="19" x2="25" y2="22" stroke="#6d4c41" stroke-width="1"/>
+                    <!-- Main horizontal pipe -->
+                    <rect x="4" y="28" width="40" height="12" rx="6" fill="url(#dr1)"/>
+                    <rect x="4" y="28" width="40" height="4" rx="4" fill="#80cbc4" opacity="0.4"/>
+                    <!-- Vertical drop pipe -->
+                    <rect x="20" y="23" width="8" height="8" rx="2" fill="url(#dr2)"/>
+                    <!-- Water flow arrows inside pipe -->
+                    <path d="M10 34 L16 34" stroke="#e0f7fa" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M14 31 L18 34 L14 37" stroke="#e0f7fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M26 34 L32 34" stroke="#e0f7fa" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M30 31 L34 34 L30 37" stroke="#e0f7fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Drainage &amp; Sewage</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--amber" data-dept-id="6" data-dept-name="Public Electricity Issues" onclick="selectDepartment(6,'Public Electricity Issues')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Public Electricity: utility pole + lightning bolt -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="el1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#78909c"/><stop offset="100%" stop-color="#37474f"/></linearGradient>
+                      <linearGradient id="el2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffee58"/><stop offset="100%" stop-color="#f57f17"/></linearGradient>
+                    </defs>
+                    <!-- Pole mast -->
+                    <rect x="14" y="4" width="4" height="42" rx="2" fill="url(#el1)"/>
+                    <!-- Top cross-arm -->
+                    <rect x="6" y="9" width="20" height="3.5" rx="1.5" fill="#546e7a"/>
+                    <!-- Insulators on top arm -->
+                    <circle cx="7"  cy="10.5" r="2" fill="#b0bec5"/>
+                    <circle cx="25" cy="10.5" r="2" fill="#b0bec5"/>
+                    <!-- Bottom cross-arm -->
+                    <rect x="8" y="18" width="16" height="3" rx="1.5" fill="#546e7a"/>
+                    <!-- Insulators on bottom arm -->
+                    <circle cx="9"  cy="19.5" r="1.6" fill="#b0bec5"/>
+                    <circle cx="23" cy="19.5" r="1.6" fill="#b0bec5"/>
+                    <!-- Wires drooping from top arm -->
+                    <path d="M7 13 C5 18 3 20 3 24"  stroke="#607d8b" stroke-width="1.5" fill="none"/>
+                    <path d="M25 13 C27 18 29 20 29 24" stroke="#607d8b" stroke-width="1.5" fill="none"/>
+                    <!-- Lightning bolt -->
+                    <polygon points="33,6 27,24 33,22 29,42 41,20 34,22 39,6" fill="url(#el2)"/>
+                    <polygon points="33,6 27,24 33,22 29,42 41,20 34,22 39,6" fill="none" stroke="#ff8f00" stroke-width="0.8" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Public Electricity Issues</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--red" data-dept-id="7" data-dept-name="Illegal Construction &amp; Encroachment" onclick="selectDepartment(7,'Illegal Construction &amp; Encroachment')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Illegal Construction: building + warning triangle -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="cn1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#90a4ae"/><stop offset="100%" stop-color="#546e7a"/></linearGradient>
+                      <linearGradient id="cn2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef5350"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
+                    </defs>
+                    <!-- Building walls -->
+                    <rect x="4" y="20" width="28" height="26" rx="1" fill="url(#cn1)"/>
+                    <!-- Roof -->
+                    <polygon points="2,21 18,6 32,21" fill="#607d8b"/>
+                    <!-- Door -->
+                    <rect x="13" y="34" width="8" height="12" rx="1" fill="#37474f"/>
+                    <!-- Windows -->
+                    <rect x="7"  y="25" width="7" height="6" rx="1" fill="#b3e5fc" opacity="0.9"/>
+                    <rect x="22" y="25" width="7" height="6" rx="1" fill="#b3e5fc" opacity="0.9"/>
+                    <!-- Warning triangle -->
+                    <polygon points="34,46 48,46 41,30" fill="url(#cn2)"/>
+                    <polygon points="34,46 48,46 41,30" fill="none" stroke="#ff8a80" stroke-width="1" stroke-linejoin="round"/>
+                    <!-- Exclamation mark -->
+                    <rect x="39.5" y="35" width="3" height="6" rx="1.5" fill="white"/>
+                    <circle cx="41" cy="44" r="1.5" fill="white"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Illegal Construction &amp; Encroachment</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--purple" data-dept-id="8" data-dept-name="Traffic &amp; Parking Issues" onclick="selectDepartment(8,'Traffic &amp; Parking Issues')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Traffic & Parking: car silhouette + parking sign -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="tp1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9575cd"/><stop offset="100%" stop-color="#4527a0"/></linearGradient>
+                      <linearGradient id="tp2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5c6bc0"/><stop offset="100%" stop-color="#1a237e"/></linearGradient>
+                    </defs>
+                    <!-- Car body -->
+                    <path d="M5 30 L8 22 L16 18 L32 18 L38 24 L42 26 L42 36 L38 36 L38 34 L10 34 L10 36 L5 36 Z" fill="url(#tp1)"/>
+                    <!-- Windshield -->
+                    <path d="M16 18 L13 26 L34 26 L32 18 Z" fill="#b3c5f9" opacity="0.7"/>
+                    <!-- Wheels -->
+                    <circle cx="14" cy="36" r="5" fill="#37474f"/>
+                    <circle cx="14" cy="36" r="2.5" fill="#78909c"/>
+                    <circle cx="34" cy="36" r="5" fill="#37474f"/>
+                    <circle cx="34" cy="36" r="2.5" fill="#78909c"/>
+                    <!-- Headlight -->
+                    <ellipse cx="41" cy="29" rx="2" ry="3" fill="#fff9c4" opacity="0.9"/>
+                    <!-- Parking sign board -->
+                    <rect x="30" y="2" width="18" height="18" rx="4" fill="url(#tp2)"/>
+                    <!-- P letter -->
+                    <text x="34" y="16" font-size="14" font-weight="bold" fill="white" font-family="Arial,sans-serif">P</text>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Traffic &amp; Parking Issues</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--indigo" data-dept-id="9" data-dept-name="Noise Pollution" onclick="selectDepartment(9,'Noise Pollution')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Noise Pollution: speaker + sound arcs + alert badge -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="np1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7986cb"/><stop offset="100%" stop-color="#283593"/></linearGradient>
+                      <linearGradient id="np2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb74d"/><stop offset="100%" stop-color="#e65100"/></linearGradient>
+                    </defs>
+                    <!-- Speaker box -->
+                    <rect x="4" y="16" width="12" height="16" rx="2" fill="url(#np1)"/>
+                    <!-- Speaker cone -->
+                    <polygon points="16,14 28,8 28,40 16,34" fill="#5c6bc0"/>
+                    <!-- Speaker cone detail -->
+                    <ellipse cx="28" cy="24" rx="3" ry="6" fill="#3949ab" opacity="0.5"/>
+                    <!-- Sound wave arcs -->
+                    <path d="M33 16 C38 18 38 30 33 32" stroke="#7986cb" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M37 12 C44 16 44 32 37 36" stroke="#9fa8da" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+                    <!-- Alert badge -->
+                    <circle cx="40" cy="10" r="8" fill="url(#np2)"/>
+                    <rect x="38.5" y="5.5" width="3" height="6" rx="1.5" fill="white"/>
+                    <circle cx="40" cy="14" r="1.5" fill="white"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Noise Pollution</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--gray" data-dept-id="10" data-dept-name="Other Civic Issues" onclick="selectDepartment(10,'Other Civic Issues')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Other Civic Issues: clipboard + checklist lines -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="oc1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#90a4ae"/><stop offset="100%" stop-color="#455a64"/></linearGradient>
+                      <linearGradient id="oc2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#64b5f6"/><stop offset="100%" stop-color="#1565c0"/></linearGradient>
+                    </defs>
+                    <!-- Clipboard board -->
+                    <rect x="8" y="10" width="32" height="36" rx="3" fill="url(#oc1)"/>
+                    <!-- Paper sheet -->
+                    <rect x="11" y="16" width="26" height="27" rx="2" fill="#eceff1"/>
+                    <!-- Clip top -->
+                    <rect x="18" y="6" width="12" height="8" rx="3" fill="#607d8b"/>
+                    <rect x="20" y="8" width="8" height="4" rx="2" fill="#90a4ae"/>
+                    <!-- List lines with check dots -->
+                    <circle cx="16" cy="23" r="2.5" fill="url(#oc2)"/>
+                    <rect x="21" y="21.5" width="13" height="3" rx="1.5" fill="#90a4ae"/>
+                    <circle cx="16" cy="31" r="2.5" fill="url(#oc2)"/>
+                    <rect x="21" y="29.5" width="13" height="3" rx="1.5" fill="#90a4ae"/>
+                    <circle cx="16" cy="39" r="2.5" fill="#cfd8dc"/>
+                    <rect x="21" y="37.5" width="9" height="3" rx="1.5" fill="#cfd8dc"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Other Civic Issues</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--cyan" data-dept-id="11" data-dept-name="Waterlogging &amp; Flooding" onclick="selectDepartment(11,'Waterlogging &amp; Flooding')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Waterlogging: submerged house + wave layers -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="wl1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4dd0e1"/><stop offset="100%" stop-color="#006064" stop-opacity="0.9"/></linearGradient>
+                      <linearGradient id="wl2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#80deea"/><stop offset="100%" stop-color="#0097a7"/></linearGradient>
+                    </defs>
+                    <!-- House outline (partially submerged) -->
+                    <polygon points="10,26 24,10 38,26" fill="#78909c"/>
+                    <rect x="14" y="26" width="20" height="14" rx="1" fill="#90a4ae"/>
+                    <!-- House door -->
+                    <rect x="20" y="32" width="8" height="8" rx="1" fill="#607d8b"/>
+                    <!-- House windows -->
+                    <rect x="15" y="28" width="5" height="5" rx="1" fill="#b3e5fc" opacity="0.8"/>
+                    <rect x="28" y="28" width="5" height="5" rx="1" fill="#b3e5fc" opacity="0.8"/>
+                    <!-- Flood water layer 1 -->
+                    <path d="M0 36 C8 32 16 40 24 36 C32 32 40 40 48 36 L48 48 L0 48 Z" fill="url(#wl1)" opacity="0.9"/>
+                    <!-- Flood water layer 2 (ripple) -->
+                    <path d="M0 40 C8 36 16 44 24 40 C32 36 40 44 48 40" stroke="url(#wl2)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Waterlogging &amp; Flooding</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--darkblue" data-dept-id="12" data-dept-name="Public Safety &amp; Security" onclick="selectDepartment(12,'Public Safety &amp; Security')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Public Safety: shield with checkmark + star badge -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="ps1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e88e5"/><stop offset="100%" stop-color="#0d47a1"/></linearGradient>
+                      <linearGradient id="ps2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#69f0ae"/><stop offset="100%" stop-color="#1b5e20"/></linearGradient>
+                    </defs>
+                    <!-- Shield body -->
+                    <path d="M24 4 L42 11 L42 26 C42 36 34 43 24 46 C14 43 6 36 6 26 L6 11 Z" fill="url(#ps1)"/>
+                    <!-- Shield inner highlight -->
+                    <path d="M24 8 L38 14 L38 26 C38 34 31 40 24 43 C17 40 10 34 10 26 L10 14 Z" fill="#1565c0" opacity="0.4"/>
+                    <!-- Checkmark -->
+                    <polyline points="15,25 21,32 33,18" stroke="url(#ps2)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <!-- Badge star top-right -->
+                    <polygon points="40,4 41.5,8 46,8 42.5,11 44,15 40,12.5 36,15 37.5,11 34,8 38.5,8" fill="#ffd740" opacity="0.95"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Public Safety &amp; Security</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--emerald" data-dept-id="13" data-dept-name="Parks &amp; Public Spaces" onclick="selectDepartment(13,'Parks &amp; Public Spaces')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Parks & Public Spaces: tree canopy + park bench -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="pk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#1b5e20"/></linearGradient>
+                      <linearGradient id="pk2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a5d6a7"/><stop offset="100%" stop-color="#388e3c"/></linearGradient>
+                      <linearGradient id="pk3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bcaaa4"/><stop offset="100%" stop-color="#6d4c41"/></linearGradient>
+                    </defs>
+                    <!-- Tree trunk -->
+                    <rect x="19" y="30" width="6" height="16" rx="3" fill="url(#pk3)"/>
+                    <!-- Tree roots spread -->
+                    <path d="M19 44 C15 44 12 46 12 46" stroke="#6d4c41" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <path d="M25 44 C29 44 32 46 32 46" stroke="#6d4c41" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <!-- Lower canopy layer -->
+                    <ellipse cx="24" cy="28" rx="14" ry="10" fill="url(#pk2)"/>
+                    <!-- Upper canopy layer -->
+                    <ellipse cx="24" cy="18" rx="11" ry="9" fill="url(#pk1)"/>
+                    <!-- Top canopy highlight -->
+                    <ellipse cx="24" cy="14" rx="7" ry="5" fill="#81c784" opacity="0.6"/>
+                    <!-- Park bench seat -->
+                    <rect x="30" y="36" width="16" height="3" rx="1.5" fill="#8d6e63"/>
+                    <!-- Bench back -->
+                    <rect x="30" y="32" width="16" height="2.5" rx="1.2" fill="#a1887f"/>
+                    <!-- Bench legs -->
+                    <rect x="32" y="39" width="2.5" height="5" rx="1" fill="#6d4c41"/>
+                    <rect x="41.5" y="39" width="2.5" height="5" rx="1" fill="#6d4c41"/>
+                    <!-- Ground line -->
+                    <line x1="2" y1="46" x2="46" y2="46" stroke="#a5d6a7" stroke-width="1.5" stroke-opacity="0.5"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Parks &amp; Public Spaces</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--brown" data-dept-id="14" data-dept-name="Animal &amp; Stray Dog Issues" onclick="selectDepartment(14,'Animal &amp; Stray Dog Issues')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Animal & Stray Dog: dog silhouette + paw print -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="an1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a1887f"/><stop offset="100%" stop-color="#4e342e"/></linearGradient>
+                      <linearGradient id="an2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb74d"/><stop offset="100%" stop-color="#e65100"/></linearGradient>
+                    </defs>
+                    <!-- Dog body -->
+                    <ellipse cx="22" cy="32" rx="12" ry="9" fill="url(#an1)"/>
+                    <!-- Dog head -->
+                    <circle cx="34" cy="24" r="8" fill="#8d6e63"/>
+                    <!-- Dog snout -->
+                    <ellipse cx="40" cy="27" rx="4" ry="3" fill="#795548"/>
+                    <!-- Dog nose -->
+                    <ellipse cx="42" cy="26" rx="1.5" ry="1" fill="#3e2723"/>
+                    <!-- Dog ear (floppy) -->
+                    <path d="M29 18 C26 12 28 8 32 10 C35 12 34 18 31 20 Z" fill="#6d4c41"/>
+                    <!-- Dog eye -->
+                    <circle cx="36" cy="22" r="1.5" fill="#1a1a1a"/>
+                    <circle cx="36.5" cy="21.5" r="0.5" fill="white"/>
+                    <!-- Dog tail (curved up) -->
+                    <path d="M10 28 C6 22 4 16 8 12 C10 10 13 12 12 16" stroke="#795548" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                    <!-- Dog legs -->
+                    <rect x="14" y="38" width="4" height="8" rx="2" fill="#6d4c41"/>
+                    <rect x="20" y="38" width="4" height="8" rx="2" fill="#6d4c41"/>
+                    <rect x="26" y="38" width="4" height="8" rx="2" fill="#6d4c41"/>
+                    <!-- Paw print badge (top-right) -->
+                    <circle cx="40" cy="8"  r="2"   fill="url(#an2)"/>
+                    <circle cx="44" cy="10" r="1.8" fill="url(#an2)"/>
+                    <circle cx="36" cy="10" r="1.8" fill="url(#an2)"/>
+                    <ellipse cx="40" cy="14" rx="3" ry="4" fill="url(#an2)"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Animal &amp; Stray Dog Issues</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--slate" data-dept-id="15" data-dept-name="Government Property Damage" onclick="selectDepartment(15,'Government Property Damage')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Govt Property Damage: landmark building + crack/damage mark -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="gv1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#90a4ae"/><stop offset="100%" stop-color="#37474f"/></linearGradient>
+                      <linearGradient id="gv2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef9a9a"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
+                    </defs>
+                    <!-- Base / ground line -->
+                    <rect x="2" y="44" width="44" height="3" rx="1" fill="#546e7a"/>
+                    <!-- Building pediment steps -->
+                    <rect x="4"  y="41" width="40" height="4" rx="1" fill="#607d8b"/>
+                    <rect x="8"  y="38" width="32" height="4" rx="1" fill="#546e7a"/>
+                    <!-- Roof pediment (triangle) -->
+                    <polygon points="6,38 24,22 42,38" fill="url(#gv1)"/>
+                    <!-- Roof ridge cap -->
+                    <rect x="6" y="37" width="36" height="2" rx="1" fill="#455a64"/>
+                    <!-- Columns -->
+                    <rect x="9"  y="28" width="4" height="10" rx="2" fill="#78909c"/>
+                    <rect x="17" y="28" width="4" height="10" rx="2" fill="#78909c"/>
+                    <rect x="25" y="28" width="4" height="10" rx="2" fill="#78909c"/>
+                    <rect x="33" y="28" width="4" height="10" rx="2" fill="#78909c"/>
+                    <!-- Column capitals -->
+                    <rect x="8"  y="27" width="6" height="2" rx="1" fill="#90a4ae"/>
+                    <rect x="16" y="27" width="6" height="2" rx="1" fill="#90a4ae"/>
+                    <rect x="24" y="27" width="6" height="2" rx="1" fill="#90a4ae"/>
+                    <rect x="32" y="27" width="6" height="2" rx="1" fill="#90a4ae"/>
+                    <!-- Emblem circle on pediment -->
+                    <circle cx="24" cy="30" r="4" fill="#455a64" opacity="0.5"/>
+                    <!-- Damage crack lines (red) -->
+                    <path d="M28 24 L32 30 L29 31 L34 38" stroke="url(#gv2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M33 27 L35 31" stroke="#ef5350" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Government Property Damage</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="dept-card dept-card--sky" data-dept-id="16" data-dept-name="Air Pollution" onclick="selectDepartment(16,'Air Pollution')">
+              <div class="dept-card-inner">
+                <div class="dept-card-icon-wrap">
+                  <!-- Air Pollution: factory chimneys + smog cloud -->
+                  <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="ap1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#78909c"/><stop offset="100%" stop-color="#37474f"/></linearGradient>
+                      <linearGradient id="ap2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b0bec5"/><stop offset="100%" stop-color="#546e7a"/></linearGradient>
+                      <linearGradient id="ap3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eceff1"/><stop offset="100%" stop-color="#90a4ae"/></linearGradient>
+                    </defs>
+                    <!-- Ground / base bar -->
+                    <rect x="2" y="43" width="44" height="4" rx="1.5" fill="#546e7a"/>
+                    <!-- Factory building body -->
+                    <rect x="6" y="30" width="36" height="14" rx="2" fill="url(#ap1)"/>
+                    <!-- Building windows -->
+                    <rect x="10" y="34" width="5"  height="4" rx="1" fill="#b0bec5" opacity="0.6"/>
+                    <rect x="19" y="34" width="5"  height="4" rx="1" fill="#b0bec5" opacity="0.6"/>
+                    <rect x="28" y="34" width="5"  height="4" rx="1" fill="#b0bec5" opacity="0.6"/>
+                    <!-- Chimney stack 1 (left, tall) -->
+                    <rect x="10" y="14" width="7" height="18" rx="3" fill="url(#ap2)"/>
+                    <!-- Chimney stack 2 (centre) -->
+                    <rect x="20" y="18" width="7" height="14" rx="3" fill="url(#ap2)"/>
+                    <!-- Chimney stack 3 (right, medium) -->
+                    <rect x="30" y="16" width="7" height="16" rx="3" fill="url(#ap2)"/>
+                    <!-- Smog cloud (large, dirty grey) -->
+                    <ellipse cx="20" cy="10" rx="12" ry="7" fill="url(#ap3)" opacity="0.88"/>
+                    <ellipse cx="30" cy="8"  rx="10" ry="6" fill="#cfd8dc" opacity="0.82"/>
+                    <ellipse cx="14" cy="12" rx="7"  ry="5" fill="#eceff1" opacity="0.75"/>
+                    <ellipse cx="36" cy="11" rx="8"  ry="5" fill="#b0bec5" opacity="0.7"/>
+                    <!-- Pollution tint overlay on cloud -->
+                    <ellipse cx="24" cy="9" rx="14" ry="7" fill="#78909c" opacity="0.18"/>
+                  </svg>
+                </div>
+                <div class="dept-card-name">Air Pollution</div>
+                <div class="dept-card-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /dept-grid -->
+
+          <!-- No results message -->
+          <div class="dept-no-results hidden" id="deptNoResults">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <p>No department found for "<strong id="deptSearchTerm"></strong>"</p>
+            <span>Try a different keyword or browse all departments above.</span>
+          </div>
+
+        </div><!-- /dept-selection-view -->
+
+
+<!-- STEP 2 : Category Selection -->
+<div id="category-selection-view" class="hidden">
+
+    <div class="page-header">
+        <h1 class="page-title">Select Complaint Category</h1>
+        <p class="page-subtitle">
+            Choose the category related to your complaint
+        </p>
+    </div>
+
+    <div id="selectedDepartmentTitle"
+     style="font-size:18px;font-weight:600;margin-bottom:20px;">
+</div>
+
+<div style="margin-bottom:15px;">
+    <button
+        class="btn-outline"
+        onclick="backToDepartments()">
+        ← Back To Departments
+    </button>
+</div>
+
+    <div class="dept-grid" id="categoryGrid">
+        <!-- Categories loaded from API -->
+    </div>
+
+</div>
+
+
+        <!-- ── STEP 2: Complaint Form ── -->
+        <div id="complaint-form-view" class="hidden">
+
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Raise a Complaint</h1>
+              <p class="page-subtitle">Report civic issues in your ward for official action</p>
+            </div>
+          </div>
+
+          <!-- Selected Department Banner -->
+          <div class="selected-dept-banner" id="selectedDeptBanner">
+            <div class="selected-dept-info">
+              <div class="selected-dept-dot"></div>
+              <div>
+                <div class="selected-dept-label">Selected Department</div>
+                <div class="selected-dept-name" id="selectedDeptNameDisplay">—</div>
+              </div>
+            </div>
+            <button class="btn-change-dept" onclick="changeDepartment()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+              Change Department
+            </button>
+          </div>
 
         <div class="form-card">
           <div class="form-card-header">
@@ -247,20 +899,80 @@
               <button type="submit" class="btn-submit">Submit Complaint</button>
             </div>
           </form>
-        </div>
-      </div>
+        </div><!-- /form-card -->
+
+        </div><!-- /complaint-form-view -->
+      </div><!-- /panel-complaint -->
 
       <!-- ============================================================
-           PANEL: GIVE SUGGESTION
+           PANEL: GIVE SUGGESTION  (Step 1 — Department Selection)
            ============================================================ -->
       <div class="panel" id="panel-suggestion">
 
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Give a Suggestion</h1>
-            <p class="page-subtitle">Share your ideas to improve civic services in your ward</p>
+        <!-- ── STEP 1: Department Selection ── -->
+        <div id="sugg-selection-view">
+
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Give a Suggestion</h1>
+              <p class="page-subtitle">Share your ideas to improve civic services in your ward</p>
+            </div>
           </div>
-        </div>
+
+          <div class="dept-section-heading">
+            <div class="dept-heading-badge">
+              <span class="dept-heading-icon">💡</span>
+              <span>Department Portal</span>
+            </div>
+            <h2 class="dept-main-title">Select Suggestion Department</h2>
+            <p class="dept-main-subtitle">Choose the department related to your suggestion.</p>
+            <div class="dept-meta-row">
+              <span class="dept-count-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                16 Departments Available
+              </span>
+              <div class="dept-search-box">
+                <svg class="dept-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="suggDeptSearchInput" class="dept-search-input" placeholder="Search Department..." oninput="filterSuggDepartments(this.value)" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards rendered by JS from shared DEPT_CARDS config -->
+          <div class="dept-grid" id="suggDeptGrid"></div>
+
+          <div class="dept-no-results hidden" id="suggDeptNoResults">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <p>No department found for "<strong id="suggDeptSearchTerm"></strong>"</p>
+            <span>Try a different keyword or browse all departments above.</span>
+          </div>
+
+        </div><!-- /sugg-selection-view -->
+
+        <!-- ── STEP 2: Suggestion Form ── -->
+        <div id="suggestion-form-view" class="hidden">
+
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Give a Suggestion</h1>
+              <p class="page-subtitle">Share your ideas to improve civic services in your ward</p>
+            </div>
+          </div>
+
+          <!-- Selected Department Banner -->
+          <div class="selected-dept-banner" id="selectedSuggDeptBanner">
+            <div class="selected-dept-info">
+              <div class="selected-dept-dot"></div>
+              <div>
+                <div class="selected-dept-label">Selected Department</div>
+                <div class="selected-dept-name" id="selectedSuggDeptNameDisplay">—</div>
+              </div>
+            </div>
+            <button class="btn-change-dept" onclick="changeSuggDepartment()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+              Change Department
+            </button>
+          </div>
 
         <div class="form-card">
           <div class="form-card-header">
@@ -335,8 +1047,10 @@
               <button type="submit" class="btn-submit">Submit Suggestion</button>
             </div>
           </form>
-        </div>
-      </div>
+        </div><!-- /form-card -->
+
+        </div><!-- /suggestion-form-view -->
+      </div><!-- /panel-suggestion -->
 
       <!-- ============================================================
            PANEL: MY COMPLAINTS

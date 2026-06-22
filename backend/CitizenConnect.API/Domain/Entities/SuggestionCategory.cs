@@ -11,6 +11,10 @@ namespace CitizenConnect.Domain.Entities
 
         public string? Description { get; set; }
 
+        public int DepartmentId { get; set; }
+
+public Department Department { get; set; } = null!;
+
         public ICollection<Suggestion>
             Suggestions
         { get; set; }
