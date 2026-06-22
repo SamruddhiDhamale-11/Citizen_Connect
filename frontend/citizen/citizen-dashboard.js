@@ -9,17 +9,15 @@
   const SUGGESTION_API_BASE = "http://localhost:5079/api/suggestions";
   const DEPARTMENT_API_BASE = "http://localhost:5079/api/departments";
 
-
-const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
-let complaintData = [];
-let map;
+  const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
+  let map;
 let marker;
 
 let selectedLatitude = null;
 let selectedLongitude = null;
- //// const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
-  //let complaintData = [];
 
+  let complaintData = [];
+  let suggestionData = [];
 
   // ---- Init ----
   document.addEventListener(
@@ -31,31 +29,10 @@ let selectedLongitude = null;
     setupCharCounters();
     // loadComplaintCategories();
 
-  setDate();
-  setupCharCounters();
-  loadComplaintCategories();
-  loadSuggestionCategories();
-  loadComplaintLocalities();
-
-  loadCitizenProfile().then(async function () {
-
-    await loadCitizenComplaints();
-
-    await loadCitizenSuggestions();
-});
-
-});
-
-function requireCitizenSession() {
-  const userId = localStorage.getItem("userId");
-  const role = localStorage.getItem("role");
-  if (!userId || role !== "Citizen") {
-    window.location.href = "../home/login/citizen/citizen-login.html";
-    return false;
   if (selectedDeptId) {
       loadComplaintCategoriesByDepartment(selectedDeptId);
   }
-
+    loadComplaintLocalities();
     loadSuggestionCategories();
     await loadDepartments();
 
@@ -66,8 +43,8 @@ function requireCitizenSession() {
       await loadCitizenSuggestions();
   });
 
-}
-}
+  });
+
   function requireCitizenSession() {
     const userId = localStorage.getItem("userId");
     const role = localStorage.getItem("role");
@@ -120,6 +97,8 @@ function requireCitizenSession() {
     citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
     citizenProfile.wardDisplay = profile.wardDisplay || "";
 
+    window.currentCitizenProfile = profile;
+
     const wardField = document.getElementById("complaintWard");
     if (wardField) wardField.value = ward;
 
@@ -130,9 +109,23 @@ function requireCitizenSession() {
     setText("profileAvatar", initials);
     setText("profileName", fullName);
     setText("profileRoleBadge", wardLine);
-    setText("profileFullName", fullName);
-    setText("profileMobile", mobile);
-    setText("profileEmail", email);
+   const fullNameInput =
+    document.getElementById("profileFullName");
+
+if (fullNameInput)
+    fullNameInput.value = fullName;
+
+const mobileInput =
+    document.getElementById("profileMobile");
+
+if (mobileInput)
+    mobileInput.value = profile.mobileNo || "";
+
+const emailInput =
+    document.getElementById("profileEmail");
+
+if (emailInput)
+    emailInput.value = email === "—" ? "" : email;
     setText("profileWard", ward);
     setText("profileResidency", residency);
     setText("profileRegistered", registered);
@@ -178,6 +171,90 @@ function requireCitizenSession() {
     return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
   }
 
+  async function updateProfile() {
+
+    const citizenId =
+        localStorage.getItem("citizenId");
+
+    if (!citizenId) {
+        alert("Citizen not found.");
+        return;
+    }
+
+    const fullName =
+        document.getElementById("profileFullName").value.trim();
+
+    const mobileNo =
+        document.getElementById("profileMobile").value.trim();
+
+    const email =
+        document.getElementById("profileEmail").value.trim();
+
+    const parts =
+        fullName.split(" ");
+
+    const firstName =
+        parts[0] || "";
+
+    const lastName =
+        parts.length > 1
+            ? parts[parts.length - 1]
+            : "";
+
+    const middleName =
+        parts.length > 2
+            ? parts.slice(1, -1).join(" ")
+            : "";
+
+    const payload = {
+        firstName,
+        middleName,
+        lastName,
+        mobileNo,
+        whatsappNo: mobileNo,
+        email
+    };
+
+    try {
+
+        const response =
+            await fetch(
+                CITIZEN_API_BASE +
+                "/profile/" +
+                citizenId,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.message ||
+                "Update failed");
+        }
+
+        alert(
+            "Profile updated successfully");
+
+        await loadCitizenProfile();
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to update profile");
+    }
+}
+
   async function loadCitizenComplaints() {
     const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
     if (!citizenId) {
@@ -198,10 +275,17 @@ function requireCitizenSession() {
         : [];
       complaintData = list;
       renderComplaints(list);
+      const statComplaints =
+    document.getElementById("statComplaints");
+
+if (statComplaints) {
+    statComplaints.textContent = list.length;
+}
       updateComplaintStats(list);
     } catch (_) {
       renderComplaints([]);
       updateComplaintStats([]);
+      renderRecentActivity();
     }
   }
 
@@ -275,6 +359,23 @@ function requireCitizenSession() {
   });
 
       renderSuggestions(mapped);
+      renderRecentActivity();
+
+      const statSuggestions =
+    document.getElementById("statSuggestions");
+
+if (statSuggestions) {
+    statSuggestions.textContent = mapped.length;
+}
+
+const civicScore =
+    document.getElementById("civicScore");
+
+if (civicScore) {
+    civicScore.textContent =
+        (complaintData.length * 10) +
+        (mapped.length * 5);
+}
 
 
     } catch (err) {
@@ -282,6 +383,56 @@ function requireCitizenSession() {
       renderSuggestions([]);
     }
   }
+
+  function renderRecentActivity() {
+
+    const container =
+        document.getElementById("recentActivityList");
+
+    if (!container) return;
+
+    let activities = [];
+
+    complaintData.forEach(c => {
+        activities.push({
+            type: "complaint",
+            title: c.title,
+            status: c.status,
+            date: c.createdAt || c.date || ""
+        });
+    });
+
+    suggestionData.forEach(s => {
+        activities.push({
+            type: "suggestion",
+            title: s.title,
+            status: s.status,
+            date: s.createdAt || s.date || ""
+        });
+    });
+
+    activities.sort((a, b) =>
+        new Date(b.date) - new Date(a.date)
+    );
+
+    activities = activities.slice(0, 5);
+
+    container.innerHTML = activities.map(item => `
+        <div class="activity-item">
+            <div class="activity-dot ${item.type}"></div>
+
+            <div class="activity-body">
+                <div class="activity-title">
+                    ${item.title}
+                </div>
+
+                <div class="activity-meta">
+                    ${item.status}
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
 
   async function viewSuggestionHistory(suggestionId)
   {
@@ -592,31 +743,6 @@ function requireCitizenSession() {
           theme: d.themeColor || "gray"
       };
 
-  const catSelect = document.getElementById("complaintCategory");
-  const cat       = catSelect.value;
-  const priority = document.getElementById("complaintPriority").value;
-  const title    = document.getElementById("complaintTitle").value.trim();
-  const desc     = document.getElementById("complaintDesc").value.trim();
-  const localityId =
-document.getElementById(
-"complaintLocality"
-).value;
-
-const address =
-document.getElementById(
-"complaintAddress"
-).value.trim();
-
-const latitude =
-document.getElementById(
-"latitude"
-).value;
-
-const longitude =
-document.getElementById(
-"longitude"
-).value;
-
   });
 
           renderDeptGrid(
@@ -695,45 +821,6 @@ document.getElementById(
     }
   }
 
-
-  const fd = new FormData();
-  fd.append("CitizenId", citizenId);
-  fd.append("WardId", wardId);
-  fd.append("ComplaintCategoryId", cat);
-  fd.append("Title", title);
-  const categoryName =
-    document.getElementById("complaintCategory")
-            .options[document.getElementById("complaintCategory").selectedIndex]
-            .text;
-
-fd.append("CategoryName", categoryName);
-  fd.append("Description", desc);
-  fd.append("Address", location);
-  fd.append(
-"LocalityId",
-localityId
-);
-
-fd.append(
-"Address",
-address
-);
-
-fd.append(
-"Latitude",
-latitude
-);
-
-fd.append(
-"Longitude",
-longitude
-);
-  fd.append("Priority", priority);
-  fd.append("IsAnonymous", document.getElementById("complaintAnon").checked ? "true" : "false");
-  if (fileInput && fileInput.files && fileInput.files.length > 0) {
-    fd.append("Files", fileInput.files[0]);
-  }
-
   function closeSidebar() {
     const sidebar = document.querySelector(".sidebar");
     const overlay = document.getElementById("sidebarOverlay");
@@ -742,7 +829,6 @@ longitude
     overlay.classList.remove("visible");
     if (hamburger) hamburger.classList.remove("open");
     document.body.style.overflow = "";
-
   }
 
   // ---- Logout ----
@@ -1764,8 +1850,80 @@ escHtml(c.desc) +
     const cards = document.querySelectorAll("#suggDeptGrid .dept-card");
     let visible = 0;
 
+    cards.forEach(function (card) {
+      const name = (card.dataset.deptName || "").toLowerCase().replace(/&amp;/g, "&");
+      const show = !q || name.includes(q);
+      card.style.display = show ? "" : "none";
+      if (show) visible++;
+    });
 
-async function loadComplaintLocalities() {
+    const noResults = document.getElementById("suggDeptNoResults");
+    const termEl    = document.getElementById("suggDeptSearchTerm");
+    if (noResults) {
+      if (visible === 0 && q) {
+        if (termEl) termEl.textContent = query;
+        noResults.classList.remove("hidden");
+      } else {
+        noResults.classList.add("hidden");
+      }
+    }
+  }
+
+  /* ================================================================
+    PANEL SWITCHING — handles both complaint + suggestion dept reset
+    ================================================================ */
+  function showPanel(name, clickedEl) {
+    // Reset complaint dept step
+    if (name === "complaint") {
+      const deptView = document.getElementById("dept-selection-view");
+      const formView = document.getElementById("complaint-form-view");
+      if (deptView) deptView.classList.remove("hidden");
+      if (formView) formView.classList.add("hidden");
+      selectedDeptId   = null;
+      selectedDeptName = "";
+      document.querySelectorAll("#deptGrid .dept-card").forEach(function (c) { c.classList.remove("selected"); });
+      const si = document.getElementById("deptSearchInput");
+      if (si) { si.value = ""; filterDepartments(""); }
+    }
+
+    // Reset suggestion dept step
+    if (name === "suggestion") {
+      const sv = document.getElementById("sugg-selection-view");
+      const fv = document.getElementById("suggestion-form-view");
+      if (sv) sv.classList.remove("hidden");
+      if (fv) fv.classList.add("hidden");
+      selectedSuggDeptId   = null;
+      selectedSuggDeptName = "";
+      document.querySelectorAll("#suggDeptGrid .dept-card").forEach(function (c) { c.classList.remove("selected"); });
+      const ssi = document.getElementById("suggDeptSearchInput");
+      if (ssi) { ssi.value = ""; filterSuggDepartments(""); }
+    }
+
+    document.querySelectorAll(".panel").forEach(function (p) { p.classList.remove("active"); });
+    document.querySelectorAll(".nav-item").forEach(function (n) { n.classList.remove("active"); });
+    const panel = document.getElementById("panel-" + name);
+    if (panel) panel.classList.add("active");
+    if (clickedEl) clickedEl.classList.add("active");
+    closeSidebar();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return false;
+  }
+
+  /* Initialise the suggestion dept grid once DOM is ready */
+  document.addEventListener("DOMContentLoaded", function () {
+
+      requestAnimationFrame(function () {
+
+          renderDeptGrid(
+              "suggDeptGrid",
+              "selectSuggDepartment"
+          );
+
+      });
+
+  });
+
+  async function loadComplaintLocalities() {
 
     const ddl =
         document.getElementById(
@@ -1794,7 +1952,8 @@ async function loadComplaintLocalities() {
     });
 }
 
-function openMapModal() {
+
+  function openMapModal() {
 
     document
         .getElementById("mapModal")
@@ -1868,89 +2027,6 @@ function closeMapModal(){
         .classList
         .add("hidden");
 }
-window.showPanel = showPanel;
-window.logout = logout;
-window.toggleSidebar = toggleSidebar;
-window.closeSidebar = closeSidebar;
-window.submitComplaint = submitComplaint;
-window.submitSuggestion = submitSuggestion;
-window.filterItems = filterItems;
-window.searchItems = searchItems;
-window.showOfficerDetails = showOfficerDetails;
-window.closeOfficerModal = closeOfficerModal;
-    cards.forEach(function (card) {
-      const name = (card.dataset.deptName || "").toLowerCase().replace(/&amp;/g, "&");
-      const show = !q || name.includes(q);
-      card.style.display = show ? "" : "none";
-      if (show) visible++;
-    });
-
-    const noResults = document.getElementById("suggDeptNoResults");
-    const termEl    = document.getElementById("suggDeptSearchTerm");
-    if (noResults) {
-      if (visible === 0 && q) {
-        if (termEl) termEl.textContent = query;
-        noResults.classList.remove("hidden");
-      } else {
-        noResults.classList.add("hidden");
-      }
-    }
-  }
-
-  /* ================================================================
-    PANEL SWITCHING — handles both complaint + suggestion dept reset
-    ================================================================ */
-  function showPanel(name, clickedEl) {
-    // Reset complaint dept step
-    if (name === "complaint") {
-      const deptView = document.getElementById("dept-selection-view");
-      const formView = document.getElementById("complaint-form-view");
-      if (deptView) deptView.classList.remove("hidden");
-      if (formView) formView.classList.add("hidden");
-      selectedDeptId   = null;
-      selectedDeptName = "";
-      document.querySelectorAll("#deptGrid .dept-card").forEach(function (c) { c.classList.remove("selected"); });
-      const si = document.getElementById("deptSearchInput");
-      if (si) { si.value = ""; filterDepartments(""); }
-    }
-
-    // Reset suggestion dept step
-    if (name === "suggestion") {
-      const sv = document.getElementById("sugg-selection-view");
-      const fv = document.getElementById("suggestion-form-view");
-      if (sv) sv.classList.remove("hidden");
-      if (fv) fv.classList.add("hidden");
-      selectedSuggDeptId   = null;
-      selectedSuggDeptName = "";
-      document.querySelectorAll("#suggDeptGrid .dept-card").forEach(function (c) { c.classList.remove("selected"); });
-      const ssi = document.getElementById("suggDeptSearchInput");
-      if (ssi) { ssi.value = ""; filterSuggDepartments(""); }
-    }
-
-    document.querySelectorAll(".panel").forEach(function (p) { p.classList.remove("active"); });
-    document.querySelectorAll(".nav-item").forEach(function (n) { n.classList.remove("active"); });
-    const panel = document.getElementById("panel-" + name);
-    if (panel) panel.classList.add("active");
-    if (clickedEl) clickedEl.classList.add("active");
-    closeSidebar();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return false;
-  }
-
-  /* Initialise the suggestion dept grid once DOM is ready */
-  document.addEventListener("DOMContentLoaded", function () {
-
-      requestAnimationFrame(function () {
-
-          renderDeptGrid(
-              "suggDeptGrid",
-              "selectSuggDepartment"
-          );
-
-      });
-
-  });
-  
 
   window.selectDepartment       = selectDepartment;
   window.changeDepartment       = changeDepartment;
@@ -1975,3 +2051,4 @@ window.closeOfficerModal = closeOfficerModal;
   window.showFileName       = showFileName;
   window.closeSuggestionHistory = closeSuggestionHistory;
   window.viewSuggestionHistory  = viewSuggestionHistory;
+  window.updateProfile = updateProfile;
