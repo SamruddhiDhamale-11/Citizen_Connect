@@ -43,5 +43,7 @@ namespace CitizenConnect.Application.Interfaces.Services
         Task<bool>
             DeleteLocalityAsync(
                 int localityId);
+
+                Task<List<object>> GetLocalitiesByPincodeAsync(string pincode);
     }
 }

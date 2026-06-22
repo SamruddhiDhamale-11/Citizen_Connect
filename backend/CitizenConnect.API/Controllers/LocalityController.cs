@@ -120,5 +120,18 @@ namespace CitizenConnect.API.Controllers
             return Ok(
                 "Locality deleted successfully.");
         }
+
+         [HttpGet("pincode/{pincode}")]
+public async Task<IActionResult>
+GetByPincode(string pincode)
+{
+    var result =
+        await _localityService
+            .GetLocalitiesByPincodeAsync(pincode);
+
+    return Ok(result);
+}
     }
+
+   
 }

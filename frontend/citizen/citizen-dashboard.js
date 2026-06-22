@@ -10,6 +10,12 @@
   const DEPARTMENT_API_BASE = "http://localhost:5079/api/departments";
 
   const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
+  let map;
+let marker;
+
+let selectedLatitude = null;
+let selectedLongitude = null;
+
   let complaintData = [];
   let suggestionData = [];
 
@@ -26,7 +32,7 @@
   if (selectedDeptId) {
       loadComplaintCategoriesByDepartment(selectedDeptId);
   }
-
+    loadComplaintLocalities();
     loadSuggestionCategories();
     await loadDepartments();
 
@@ -1916,6 +1922,111 @@ escHtml(c.desc) +
       });
 
   });
+
+  async function loadComplaintLocalities() {
+
+    const ddl =
+        document.getElementById(
+            "complaintLocality"
+        );
+
+    const response =
+        await fetch(
+            "http://localhost:5079/api/localities"
+        );
+
+    const data =
+        await response.json();
+
+    ddl.innerHTML =
+        '<option value="">Select Locality</option>';
+
+    data.forEach(function(item){
+
+        ddl.innerHTML +=
+        `<option
+            value="${item.localityId}"
+            data-pincode="${item.pincode}">
+            ${item.localityName}
+        </option>`;
+    });
+}
+
+
+  function openMapModal() {
+
+    document
+        .getElementById("mapModal")
+        .classList
+        .remove("hidden");
+
+    setTimeout(initMap,200);
+}
+
+
+function initMap() {
+
+    if(map)
+        return;
+
+    map = L.map("complaintMap")
+        .setView(
+            [18.5204,73.8567],
+            13
+        );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ).addTo(map);
+
+    map.on("click", function(e){
+
+        selectedLatitude =
+            e.latlng.lat;
+
+        selectedLongitude =
+            e.latlng.lng;
+
+        if(marker)
+            map.removeLayer(marker);
+
+        marker =
+            L.marker(e.latlng)
+            .addTo(map);
+    });
+}
+
+function saveMapLocation() {
+
+    if(!selectedLatitude){
+
+        alert(
+            "Please select location on map."
+        );
+
+        return;
+    }
+
+    document.getElementById(
+        "latitude"
+    ).value =
+        selectedLatitude;
+
+    document.getElementById(
+        "longitude"
+    ).value =
+        selectedLongitude;
+
+    closeMapModal();
+}
+
+function closeMapModal(){
+
+    document
+        .getElementById("mapModal")
+        .classList
+        .add("hidden");
+}
 
   window.selectDepartment       = selectDepartment;
   window.changeDepartment       = changeDepartment;

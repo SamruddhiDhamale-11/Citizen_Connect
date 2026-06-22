@@ -525,6 +525,46 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 }
 
 
+.location-card{
+    margin-top:25px;
+    padding:20px;
+    border:1px solid #dbe3ec;
+    border-radius:12px;
+    background:#fafcff;
+}
+
+.location-card-header{
+    display:flex;
+    gap:15px;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.location-icon{
+    font-size:26px;
+}
+
+.location-title{
+    font-size:18px;
+    font-weight:600;
+}
+
+.location-subtitle{
+    color:#6b7280;
+    font-size:13px;
+}
+
+#complaintMap{
+    height:450px;
+    width:100%;
+}
+
+.map-card{
+    width:90%;
+    max-width:1000px;
+
+}
+
 /* ================================================================
    DEPARTMENT SELECTION DASHBOARD  — Government Portal Style
    ================================================================ */
