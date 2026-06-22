@@ -137,30 +137,12 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="section-title" style="margin-top:28px;">Recent Activity</div>
-        <div class="activity-list">
-          <div class="activity-item">
-            <div class="activity-dot complaint"></div>
-            <div class="activity-body">
-              <div class="activity-title">Complaint: Broken streetlight on Main Road</div>
-              <div class="activity-meta">Filed on 28 Apr 2026 · <span class="badge-status pending-text">Pending</span></div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot suggestion"></div>
-            <div class="activity-body">
-              <div class="activity-title">Suggestion: Install CCTV near Ward Park</div>
-              <div class="activity-meta">Submitted on 25 Apr 2026 · <span class="badge-status review-text">Under Review</span></div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot resolved"></div>
-            <div class="activity-body">
-              <div class="activity-title">Complaint: Garbage not collected for 3 days</div>
-              <div class="activity-meta">Resolved on 20 Apr 2026 · <span class="badge-status resolved-text">Resolved</span></div>
-            </div>
-          </div>
-        </div>
+      <div class="section-title" style="margin-top:28px;">
+    Recent Activity
+</div>
+
+<div class="activity-list" id="recentActivityList">
+</div>
       </div>
 
       <!-- ============================================================
@@ -1129,17 +1111,28 @@
           </div>
           <div class="profile-details">
             <div class="profile-row">
-              <span class="profile-key">Full Name</span>
-              <span class="profile-val" id="profileFullName">Rahul Kumar Sharma</span>
-            </div>
-            <div class="profile-row">
-              <span class="profile-key">Mobile</span>
-              <span class="profile-val" id="profileMobile">+91 98765 43210</span>
-            </div>
-            <div class="profile-row">
-              <span class="profile-key">Email</span>
-              <span class="profile-val" id="profileEmail">rahul.sharma@email.com</span>
-            </div>
+  <span class="profile-key">Full Name</span>
+  <input
+      type="text"
+      id="profileFullName"
+      class="form-input">
+</div>
+
+<div class="profile-row">
+  <span class="profile-key">Mobile</span>
+  <input
+      type="text"
+      id="profileMobile"
+      class="form-input">
+</div>
+
+<div class="profile-row">
+  <span class="profile-key">Email</span>
+  <input
+      type="email"
+      id="profileEmail"
+      class="form-input">
+</div>
             <div class="profile-row">
               <span class="profile-key">Ward</span>
               <span class="profile-val" id="profileWard">Ward 12</span>
@@ -1153,6 +1146,15 @@
               <span class="profile-val" id="profileRegistered">15 January 2026</span>
             </div>
           </div>
+
+<div class="profile-action">
+    <button
+        class="profile-save-btn"
+        onclick="updateProfile()">
+        💾 Save Profile
+    </button>
+</div>
+
         </div>
       </div>
 

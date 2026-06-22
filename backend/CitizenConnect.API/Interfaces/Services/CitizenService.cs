@@ -3,6 +3,7 @@ using CitizenConnect.Infrastructure.Data;
 using CitizenConnect.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace CitizenConnect.Services
 {
     public class CitizenService : ICitizenService
@@ -69,6 +70,41 @@ namespace CitizenConnect.Services
                 RegisteredAt = row.CreatedAt
             };
         }
+
+        public async Task<bool> UpdateProfileAsync(
+    int citizenId,
+    UpdateCitizenProfileDto dto)
+{
+    var citizen = await _context.Citizens
+        .Include(x => x.User)
+        .FirstOrDefaultAsync(
+            x => x.CitizenId == citizenId);
+
+    if (citizen == null)
+        return false;
+
+    citizen.User.FirstName =
+        dto.FirstName;
+
+    citizen.User.MiddleName =
+        dto.MiddleName;
+
+    citizen.User.LastName =
+        dto.LastName;
+
+    citizen.User.MobileNo =
+        dto.MobileNo;
+
+    citizen.User.WhatsappNo =
+        dto.WhatsappNo;
+
+    citizen.User.Email =
+        dto.Email;
+
+    await _context.SaveChangesAsync();
+
+    return true;
+}
 
         private static string BuildInitials(string firstName, string lastName)
         {

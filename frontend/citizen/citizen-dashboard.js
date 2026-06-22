@@ -11,6 +11,7 @@
 
   const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
   let complaintData = [];
+  let suggestionData = [];
 
   // ---- Init ----
   document.addEventListener(
@@ -90,6 +91,8 @@
     citizenProfile.wardId = profile.wardId != null ? profile.wardId : null;
     citizenProfile.wardDisplay = profile.wardDisplay || "";
 
+    window.currentCitizenProfile = profile;
+
     const wardField = document.getElementById("complaintWard");
     if (wardField) wardField.value = ward;
 
@@ -100,9 +103,23 @@
     setText("profileAvatar", initials);
     setText("profileName", fullName);
     setText("profileRoleBadge", wardLine);
-    setText("profileFullName", fullName);
-    setText("profileMobile", mobile);
-    setText("profileEmail", email);
+   const fullNameInput =
+    document.getElementById("profileFullName");
+
+if (fullNameInput)
+    fullNameInput.value = fullName;
+
+const mobileInput =
+    document.getElementById("profileMobile");
+
+if (mobileInput)
+    mobileInput.value = profile.mobileNo || "";
+
+const emailInput =
+    document.getElementById("profileEmail");
+
+if (emailInput)
+    emailInput.value = email === "—" ? "" : email;
     setText("profileWard", ward);
     setText("profileResidency", residency);
     setText("profileRegistered", registered);
@@ -148,6 +165,90 @@
     return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
   }
 
+  async function updateProfile() {
+
+    const citizenId =
+        localStorage.getItem("citizenId");
+
+    if (!citizenId) {
+        alert("Citizen not found.");
+        return;
+    }
+
+    const fullName =
+        document.getElementById("profileFullName").value.trim();
+
+    const mobileNo =
+        document.getElementById("profileMobile").value.trim();
+
+    const email =
+        document.getElementById("profileEmail").value.trim();
+
+    const parts =
+        fullName.split(" ");
+
+    const firstName =
+        parts[0] || "";
+
+    const lastName =
+        parts.length > 1
+            ? parts[parts.length - 1]
+            : "";
+
+    const middleName =
+        parts.length > 2
+            ? parts.slice(1, -1).join(" ")
+            : "";
+
+    const payload = {
+        firstName,
+        middleName,
+        lastName,
+        mobileNo,
+        whatsappNo: mobileNo,
+        email
+    };
+
+    try {
+
+        const response =
+            await fetch(
+                CITIZEN_API_BASE +
+                "/profile/" +
+                citizenId,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.message ||
+                "Update failed");
+        }
+
+        alert(
+            "Profile updated successfully");
+
+        await loadCitizenProfile();
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to update profile");
+    }
+}
+
   async function loadCitizenComplaints() {
     const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
     if (!citizenId) {
@@ -168,10 +269,17 @@
         : [];
       complaintData = list;
       renderComplaints(list);
+      const statComplaints =
+    document.getElementById("statComplaints");
+
+if (statComplaints) {
+    statComplaints.textContent = list.length;
+}
       updateComplaintStats(list);
     } catch (_) {
       renderComplaints([]);
       updateComplaintStats([]);
+      renderRecentActivity();
     }
   }
 
@@ -245,6 +353,23 @@
   });
 
       renderSuggestions(mapped);
+      renderRecentActivity();
+
+      const statSuggestions =
+    document.getElementById("statSuggestions");
+
+if (statSuggestions) {
+    statSuggestions.textContent = mapped.length;
+}
+
+const civicScore =
+    document.getElementById("civicScore");
+
+if (civicScore) {
+    civicScore.textContent =
+        (complaintData.length * 10) +
+        (mapped.length * 5);
+}
 
 
     } catch (err) {
@@ -252,6 +377,56 @@
       renderSuggestions([]);
     }
   }
+
+  function renderRecentActivity() {
+
+    const container =
+        document.getElementById("recentActivityList");
+
+    if (!container) return;
+
+    let activities = [];
+
+    complaintData.forEach(c => {
+        activities.push({
+            type: "complaint",
+            title: c.title,
+            status: c.status,
+            date: c.createdAt || c.date || ""
+        });
+    });
+
+    suggestionData.forEach(s => {
+        activities.push({
+            type: "suggestion",
+            title: s.title,
+            status: s.status,
+            date: s.createdAt || s.date || ""
+        });
+    });
+
+    activities.sort((a, b) =>
+        new Date(b.date) - new Date(a.date)
+    );
+
+    activities = activities.slice(0, 5);
+
+    container.innerHTML = activities.map(item => `
+        <div class="activity-item">
+            <div class="activity-dot ${item.type}"></div>
+
+            <div class="activity-body">
+                <div class="activity-title">
+                    ${item.title}
+                </div>
+
+                <div class="activity-meta">
+                    ${item.status}
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
 
   async function viewSuggestionHistory(suggestionId)
   {
@@ -1765,3 +1940,4 @@ escHtml(c.desc) +
   window.showFileName       = showFileName;
   window.closeSuggestionHistory = closeSuggestionHistory;
   window.viewSuggestionHistory  = viewSuggestionHistory;
+  window.updateProfile = updateProfile;

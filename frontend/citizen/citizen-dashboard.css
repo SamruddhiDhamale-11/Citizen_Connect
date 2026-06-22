@@ -1113,3 +1113,39 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     border-radius:8px;
     border:1px solid #ddd;
 }
+
+/* Profile Save Button */
+.profile-action{
+    display:flex;
+    justify-content:center;
+    padding:20px 24px 24px;
+    border-top:1px solid #f1f1f1;
+}
+
+.profile-save-btn{
+    background:#C21807;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:12px 28px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.25s ease;
+    box-shadow:0 4px 12px rgba(194,24,7,0.20);
+}
+
+.profile-save-btn:hover{
+    background:#A51406;
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(194,24,7,0.30);
+}
+
+.profile-save-btn:active{
+    transform:translateY(0);
+}
+
+.profile-save-btn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
