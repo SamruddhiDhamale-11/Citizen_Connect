@@ -10,6 +10,11 @@ const SUGGESTION_API_BASE = "http://localhost:5079/api/suggestions";
 
 const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
 let complaintData = [];
+let map;
+let marker;
+
+let selectedLatitude = null;
+let selectedLongitude = null;
 
 // ---- Init ----
 document.addEventListener("DOMContentLoaded", function () {
@@ -20,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setupCharCounters();
   loadComplaintCategories();
   loadSuggestionCategories();
+  loadComplaintLocalities();
 
   loadCitizenProfile().then(async function () {
 
@@ -585,7 +591,25 @@ async function submitComplaint(e) {
   const priority = document.getElementById("complaintPriority").value;
   const title    = document.getElementById("complaintTitle").value.trim();
   const desc     = document.getElementById("complaintDesc").value.trim();
-  const location = document.getElementById("complaintLocation").value.trim();
+  const localityId =
+document.getElementById(
+"complaintLocality"
+).value;
+
+const address =
+document.getElementById(
+"complaintAddress"
+).value.trim();
+
+const latitude =
+document.getElementById(
+"latitude"
+).value;
+
+const longitude =
+document.getElementById(
+"longitude"
+).value;
 
   if (!cat || !priority || !title || !desc || !location) {
     errEl.textContent = "Please fill all required fields before submitting.";
@@ -637,8 +661,25 @@ async function submitComplaint(e) {
 fd.append("CategoryName", categoryName);
   fd.append("Description", desc);
   fd.append("Address", location);
-  fd.append("Latitude", "0");
-  fd.append("Longitude", "0");
+  fd.append(
+"LocalityId",
+localityId
+);
+
+fd.append(
+"Address",
+address
+);
+
+fd.append(
+"Latitude",
+latitude
+);
+
+fd.append(
+"Longitude",
+longitude
+);
   fd.append("Priority", priority);
   fd.append("IsAnonymous", document.getElementById("complaintAnon").checked ? "true" : "false");
   if (fileInput && fileInput.files && fileInput.files.length > 0) {
@@ -1269,6 +1310,109 @@ function closeOfficerModal()
         .classList.add("hidden");
 }
 
+async function loadComplaintLocalities() {
+
+    const ddl =
+        document.getElementById(
+            "complaintLocality"
+        );
+
+    const response =
+        await fetch(
+            "http://localhost:5079/api/localities"
+        );
+
+    const data =
+        await response.json();
+
+    ddl.innerHTML =
+        '<option value="">Select Locality</option>';
+
+    data.forEach(function(item){
+
+        ddl.innerHTML +=
+        `<option
+            value="${item.localityId}"
+            data-pincode="${item.pincode}">
+            ${item.localityName}
+        </option>`;
+    });
+}
+
+function openMapModal() {
+
+    document
+        .getElementById("mapModal")
+        .classList
+        .remove("hidden");
+
+    setTimeout(initMap,200);
+}
+
+
+function initMap() {
+
+    if(map)
+        return;
+
+    map = L.map("complaintMap")
+        .setView(
+            [18.5204,73.8567],
+            13
+        );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ).addTo(map);
+
+    map.on("click", function(e){
+
+        selectedLatitude =
+            e.latlng.lat;
+
+        selectedLongitude =
+            e.latlng.lng;
+
+        if(marker)
+            map.removeLayer(marker);
+
+        marker =
+            L.marker(e.latlng)
+            .addTo(map);
+    });
+}
+
+function saveMapLocation() {
+
+    if(!selectedLatitude){
+
+        alert(
+            "Please select location on map."
+        );
+
+        return;
+    }
+
+    document.getElementById(
+        "latitude"
+    ).value =
+        selectedLatitude;
+
+    document.getElementById(
+        "longitude"
+    ).value =
+        selectedLongitude;
+
+    closeMapModal();
+}
+
+function closeMapModal(){
+
+    document
+        .getElementById("mapModal")
+        .classList
+        .add("hidden");
+}
 window.showPanel = showPanel;
 window.logout = logout;
 window.toggleSidebar = toggleSidebar;

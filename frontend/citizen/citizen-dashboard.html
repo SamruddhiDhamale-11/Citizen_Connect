@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Citizen Connect — Dashboard</title>
+  <link
+ rel="stylesheet"
+ href="https://unpkg.com/leaflet/dist/leaflet.css">
+ <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <link rel="stylesheet" href="citizen-dashboard.css" />
 </head>
 <body>
@@ -216,10 +220,142 @@
               <div class="char-count"><span id="complaintDescCount">0</span>/1000</div>
             </div>
 
-            <div class="field-group">
-              <label><strong>Location / Address</strong> <span class="req">*</span></label>
-              <input type="text" id="complaintLocation" placeholder="Street name, landmark, area" />
-            </div>
+            <!-- Complaint Location -->
+
+<div class="location-card">
+
+  <div class="location-card-header">
+    <span class="location-icon">📍</span>
+    <div>
+      <div class="location-title">
+        Complaint Location
+      </div>
+
+      <div class="location-subtitle">
+        Select where the issue exists
+      </div>
+    </div>
+  </div>
+
+  <div class="field-row-two">
+
+    <div class="field-group">
+      <label>
+        <strong>Locality</strong>
+        <span class="req">*</span>
+      </label>
+
+      <select id="complaintLocality" required>
+        <option value="">
+          — Select Locality —
+        </option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>
+        <strong>Pincode</strong>
+      </label>
+
+      <input
+        type="text"
+        id="complaintPincode"
+        readonly>
+    </div>
+
+  </div>
+
+  <div class="field-group">
+
+    <label>
+      <strong>Address / Landmark</strong>
+      <span class="req">*</span>
+    </label>
+
+    <textarea
+      id="complaintAddress"
+      rows="3"
+      placeholder="Example: Near Water Tank, Opposite Bus Stop">
+    </textarea>
+
+  </div>
+
+  <div class="field-group">
+
+    <label>
+      <strong>Map Location</strong>
+      <span class="req">*</span>
+    </label>
+
+    <button
+      type="button"
+      class="btn-outline"
+      onclick="openMapModal()">
+
+      📍 Select Location on Map
+
+    </button>
+
+  </div>
+
+  <div class="field-row-two">
+
+    <div class="field-group">
+      <label>Latitude</label>
+      <input
+        type="text"
+        id="latitude"
+        readonly>
+    </div>
+
+    <div class="field-group">
+      <label>Longitude</label>
+      <input
+        type="text"
+        id="longitude"
+        readonly>
+    </div>
+
+  </div>
+  <!-- MAP MODAL -->
+
+<div id="mapModal" class="modal-overlay hidden">
+
+  <div class="modal-card map-card">
+
+    <div class="modal-header">
+
+      <h3>Select Complaint Location</h3>
+
+      <button
+        class="modal-close"
+        onclick="closeMapModal()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+    <div id="complaintMap"></div>
+
+    <div class="modal-footer">
+
+      <button
+        class="btn-submit"
+        onclick="saveMapLocation()">
+
+        Confirm Location
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
 
             <div class="field-group">
               <label><strong>Attach Photo / Document</strong> <span class="field-optional">(Optional)</span></label>
