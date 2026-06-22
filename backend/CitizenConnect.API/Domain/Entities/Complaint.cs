@@ -21,9 +21,9 @@ namespace CitizenConnect.Domain.Entities
         public string Description { get; set; } = string.Empty;
 
         public string Address { get; set; } = string.Empty;
-        public int LocalityId { get; set; }
+        public int? LocalityId { get; set; }
 
-        public Locality Locality { get; set; }
+        public Locality? Locality { get; set; }
 
         public decimal Latitude { get; set; }
 

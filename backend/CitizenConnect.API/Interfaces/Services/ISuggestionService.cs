@@ -19,6 +19,10 @@ namespace CitizenConnect.Application.Interfaces.Services
         Task<List<object>>
             GetSuggestionCategoriesAsync();
 
+           Task<List<object>>
+GetSuggestionCategoriesByDepartmentAsync(
+    int departmentId);
+
         Task<List<object>>
             GetAllSuggestionsAsync();
             Task<List<SuggestionHistoryDto>> GetSuggestionHistoryAsync(int suggestionId);

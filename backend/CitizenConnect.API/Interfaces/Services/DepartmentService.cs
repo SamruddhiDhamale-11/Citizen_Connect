@@ -41,10 +41,12 @@ namespace CitizenConnect.Application.Services
             // Create department entity
 
             var department = new Department
-            {
-                DepartmentName = dto.DepartmentName,
-                Description = dto.Description
-            };
+{
+    DepartmentName = dto.DepartmentName,
+    Description = dto.Description,
+    IconName = dto.IconName,
+    ThemeColor = dto.ThemeColor
+};
 
             // Add into database
 
@@ -78,16 +80,13 @@ namespace CitizenConnect.Application.Services
                     .OrderBy(x => x.DepartmentName)
                     .Select(x =>
                         new DepartmentResponseDto
-                        {
-                            DepartmentId =
-                                x.DepartmentId,
-
-                            DepartmentName =
-                                x.DepartmentName,
-
-                            Description =
-                                x.Description
-                        })
+{
+    DepartmentId = x.DepartmentId,
+    DepartmentName = x.DepartmentName,
+    Description = x.Description,
+    IconName = x.IconName,
+    ThemeColor = x.ThemeColor
+})
                     .ToListAsync();
 
             return departments;
@@ -107,16 +106,13 @@ namespace CitizenConnect.Application.Services
                         == departmentId)
                     .Select(x =>
                         new DepartmentResponseDto
-                        {
-                            DepartmentId =
-                                x.DepartmentId,
-
-                            DepartmentName =
-                                x.DepartmentName,
-
-                            Description =
-                                x.Description
-                        })
+{
+    DepartmentId = x.DepartmentId,
+    DepartmentName = x.DepartmentName,
+    Description = x.Description,
+    IconName = x.IconName,
+    ThemeColor = x.ThemeColor
+})
                     .FirstOrDefaultAsync();
 
             return department;
@@ -164,6 +160,10 @@ namespace CitizenConnect.Application.Services
 
             department.Description =
                 dto.Description;
+
+                department.IconName = dto.IconName;
+
+department.ThemeColor = dto.ThemeColor;
 
             await _context.SaveChangesAsync();
 

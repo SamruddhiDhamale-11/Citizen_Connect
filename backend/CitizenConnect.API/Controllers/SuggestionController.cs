@@ -52,6 +52,30 @@ public class SuggestionController : ControllerBase
         }
 
 
+        [HttpGet("categories/by-department/{departmentId}")]
+public async Task<IActionResult> GetCategoriesByDepartment(
+    int departmentId)
+{
+    try
+    {
+        var result =
+            await _suggestionService
+                .GetSuggestionCategoriesByDepartmentAsync(
+                    departmentId);
+
+        return Ok(result);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
+}
+
+
         /**
          * =====================================================
          * CREATE SUGGESTION

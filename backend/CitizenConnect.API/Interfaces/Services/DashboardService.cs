@@ -28,10 +28,11 @@ namespace CitizenConnect.API.Interfaces.Services
                      .StatusName == "Resolved");
 
             var openComplaints =
-                await _context.Complaints
-                .CountAsync(x =>
-                    x.ComplaintStatusMaster
-                     .StatusName == "Open");
+    await _context.Complaints
+    .CountAsync(x =>
+        x.ComplaintStatusMaster.StatusName == "Pending" ||
+        x.ComplaintStatusMaster.StatusName == "Assigned" ||
+        x.ComplaintStatusMaster.StatusName == "In Progress");
 
             var assignedComplaints =
                 await _context.Complaints
@@ -47,6 +48,12 @@ namespace CitizenConnect.API.Interfaces.Services
             var totalDepartments =
                 await _context.Departments.CountAsync();
 
+            var totalSuggestions =
+    await _context.Suggestions.CountAsync();
+
+    var totalStaff =
+    await _context.Officers.CountAsync();
+
             decimal resolutionRate = 0;
 
             if (totalComplaints > 0)
@@ -58,17 +65,19 @@ namespace CitizenConnect.API.Interfaces.Services
                         2);
             }
 
-            return new DashboardSummaryDto
-            {
-                TotalComplaints = totalComplaints,
-                OpenComplaints = openComplaints,
-                AssignedComplaints = assignedComplaints,
-                ResolvedComplaints = resolvedComplaints,
-                TotalCitizens = totalCitizens,
-                TotalWards = totalWards,
-                TotalDepartments = totalDepartments,
-                ResolutionRate = resolutionRate
-            };
+           return new DashboardSummaryDto
+{
+    TotalComplaints = totalComplaints,
+    OpenComplaints = openComplaints,
+    AssignedComplaints = assignedComplaints,
+    ResolvedComplaints = resolvedComplaints,
+    TotalCitizens = totalCitizens,
+    TotalWards = totalWards,
+    TotalDepartments = totalDepartments,
+    TotalSuggestions = totalSuggestions,
+    TotalStaff = totalStaff,
+    ResolutionRate = resolutionRate
+};
         }
 
         public async Task<List<ComplaintCategoryAnalyticsDto>>
