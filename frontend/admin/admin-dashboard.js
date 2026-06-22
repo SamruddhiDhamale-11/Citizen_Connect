@@ -3166,10 +3166,20 @@ async function saveOfficer() {
       email: document.getElementById('officerEmail').value,
       mobileNumber: document.getElementById('officerMobile').value,
       designation: document.getElementById('officerDesignation').value,
-      departmentId: Number(document.getElementById('officerDepartment').value),
-      categoryId: Number(document.getElementById('officerCategory').value),
-      isAvailable: document.getElementById('officerAvailability').value === 'true'
-    };
+
+      departmentId: Number(
+        document.getElementById('officerDepartment').value
+      ),
+
+      categoryId: Number(
+        document.getElementById('officerCategory').value
+      ),
+
+      wardId: 1,   // only Shivaji Ward
+
+      isAvailable:
+        document.getElementById('officerAvailability').value === 'true'
+};
 
     let response;
 
@@ -3208,9 +3218,8 @@ async function saveOfficer() {
           errorData?.title ||
           JSON.stringify(errorData);
       } catch (e) {
-        errorMessage = await response.text();
-      }
-
+  errorMessage = 'Server error while saving officer.';
+}
       throw new Error(errorMessage);
     }
 
@@ -3260,6 +3269,7 @@ await loadCategoriesByDepartment(officer.departmentId);
 
 document.getElementById('officerCategory').value =
   officer.categoryId;
+  
     document.getElementById('officerAvailability').value = String(officer.isAvailable);
 
     document.getElementById('officerModalOverlay')

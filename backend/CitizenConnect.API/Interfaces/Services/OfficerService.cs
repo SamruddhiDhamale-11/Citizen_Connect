@@ -75,16 +75,19 @@ if (exists)
     };
 }
 
-            var officer = new Officer
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                MobileNumber = dto.MobileNumber,
-                Designation = dto.Designation,
-                DepartmentId = dto.DepartmentId,
-                IsAvailable = dto.IsAvailable
-            };
+            var wardId = 1;
+
+var officer = new Officer
+{
+    FirstName = dto.FirstName,
+    LastName = dto.LastName,
+    Email = dto.Email,
+    MobileNumber = dto.MobileNumber,
+    Designation = dto.Designation,
+    DepartmentId = dto.DepartmentId,
+    WardId = wardId,
+    IsAvailable = dto.IsAvailable
+};
 
             _context.Officers.Add(officer);
 
@@ -231,26 +234,17 @@ if (exists)
                 return false;
             }
 
-            officer.FirstName =
-                dto.FirstName;
+           officer.FirstName = dto.FirstName;
+officer.LastName = dto.LastName;
+officer.Email = dto.Email;
+officer.MobileNumber = dto.MobileNumber;
+officer.Designation = dto.Designation;
 
-            officer.LastName =
-                dto.LastName;
+officer.DepartmentId = dto.DepartmentId;
 
-            officer.Email =
-                dto.Email;
+officer.WardId = 1;
 
-            officer.MobileNumber =
-                dto.MobileNumber;
-
-            officer.Designation =
-                dto.Designation;
-
-            officer.DepartmentId =
-                dto.DepartmentId;
-
-            officer.IsAvailable =
-                dto.IsAvailable;
+officer.IsAvailable = dto.IsAvailable;
 
             var existingMapping =
     await _context.OfficerCategoryMappings
