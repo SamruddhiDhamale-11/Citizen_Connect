@@ -188,6 +188,31 @@ GetCitizenSuggestionsAsync(
                 .ToListAsync();
         }
 
+        //getcategpories by departement
+public async Task<List<object>>
+GetSuggestionCategoriesByDepartmentAsync(
+    int departmentId)
+{
+    return await _context
+        .SuggestionCategories
+        .Where(x =>
+            x.DepartmentId == departmentId &&
+            x.IsActive)
+        .OrderBy(x => x.CategoryName)
+        .Select(x => (object)new
+        {
+            suggestionCategoryId =
+                x.SuggestionCategoryId,
+
+            categoryName =
+                x.CategoryName,
+
+            description =
+                x.Description
+        })
+        .ToListAsync();
+}
+
         // =====================================================
         // GET ALL SUGGESTIONS
         // =====================================================

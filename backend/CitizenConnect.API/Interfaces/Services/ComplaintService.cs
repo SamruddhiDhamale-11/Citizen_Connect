@@ -273,6 +273,8 @@ GetCitizenComplaintsAsync(int citizenId)
 
                 .Include(c => c.ComplaintStatusMaster)
 
+                .Include(c => c.ComplaintImages)
+
                 .Where(c => c.CitizenId == citizenId)
 
                 .Select(c => new ComplaintResponseDto
@@ -303,6 +305,15 @@ GetCitizenComplaintsAsync(int citizenId)
 
                     CreatedAt =
                         c.CreatedAt,
+
+                    ImageUrl = c.ComplaintImages
+    .OrderBy(i => i.ComplaintImageId)
+    .Select(i => i.ImagePath)
+    .FirstOrDefault() ?? "",
+
+Images = c.ComplaintImages
+    .Select(i => i.ImagePath)
+    .ToList(),
 
                     OfficerName =
                         c.AssignedOfficer != null

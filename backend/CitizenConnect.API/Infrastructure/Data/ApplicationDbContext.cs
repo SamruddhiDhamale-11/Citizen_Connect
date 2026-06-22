@@ -231,10 +231,17 @@ namespace CitizenConnect.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
 
+            //       //   modelBuilder.Entity<Complaint>()
+            //  .HasOne(x => x.Locality)
+            // .WithMany(x => x.Complaints)
+            //  .HasForeignKey(x => x.LocalityId)
+            //  .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Complaint>()
     .HasOne(x => x.Locality)
     .WithMany(x => x.Complaints)
     .HasForeignKey(x => x.LocalityId)
+    .IsRequired(false)
     .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================

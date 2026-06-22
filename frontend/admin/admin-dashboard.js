@@ -2697,16 +2697,26 @@ console.log(
 /* ============================================================
    INIT
    ============================================================ */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+
   if (!requireAdminSession()) return;
+
   setDate();
+
+  await loadDashboardSummary();
+
   recomputeAllSections();
+
   renderSectionCards();
+
   computeAreaProgress();
+
   syncAreaSummary();
 });
 
 window.onload = async function () {
+
+    await loadDashboardSummary();
 
     await loadSuggestionStatuses();
 
@@ -2715,6 +2725,57 @@ window.onload = async function () {
 
 var allCitizens = [];
 
+async function loadDashboardSummary() {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:5079/api/Dashboard/summary"
+            );
+
+        const data =
+            await response.json();
+
+        document.getElementById(
+            "totalCitizensCount"
+        ).textContent =
+            data.totalCitizens || 0;
+
+        document.getElementById(
+            "openComplaintsCount"
+        ).textContent =
+            data.openComplaints || 0;
+
+        document.getElementById(
+            "resolvedComplaintsCount"
+        ).textContent =
+            data.resolvedComplaints || 0;
+
+        document.getElementById(
+            "totalStaffCount"
+        ).textContent =
+            data.totalStaff || 0;
+
+        document.getElementById(
+            "totalWardsCount"
+        ).textContent =
+            data.totalWards || 0;
+
+        document.getElementById(
+            "totalSuggestionsCount"
+        ).textContent =
+            data.totalSuggestions || 0;
+
+    }
+    catch (err) {
+
+        console.error(
+            "Dashboard Summary Error",
+            err
+        );
+    }
+}
 /* LOAD CITIZENS */
 async function loadCitizens() {
   try {

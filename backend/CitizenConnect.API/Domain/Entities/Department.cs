@@ -25,6 +25,10 @@ namespace CitizenConnect.Domain.Entities
         { get; set; }
     = new List<Complaint>();
 
+    public string? IconName { get; set; }
+
+public string? ThemeColor { get; set; }
+
 
         public ICollection<WardDepartment> WardDepartments
         { get; set; }

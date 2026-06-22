@@ -17,5 +17,9 @@
         public int TotalDepartments { get; set; }
 
         public decimal ResolutionRate { get; set; }
+
+        public int TotalSuggestions { get; set; }
+
+public int TotalStaff { get; set; }
     }
 }

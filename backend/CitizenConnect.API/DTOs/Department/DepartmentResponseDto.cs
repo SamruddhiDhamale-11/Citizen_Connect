@@ -8,5 +8,9 @@
             = string.Empty;
 
         public string? Description { get; set; }
+
+        public string? IconName { get; set; }
+
+public string? ThemeColor { get; set; }
     }
 }
