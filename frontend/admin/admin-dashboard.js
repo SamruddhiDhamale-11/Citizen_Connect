@@ -1251,6 +1251,108 @@ function updateComplaintStatusCards(complaints) {
         complaints.length;
 }
 
+function updateSuggestionSummaryCards(data) {
+
+    let pending = 0;
+    let underReview = 0;
+    let approved = 0;
+    let implemented = 0;
+    let rejected = 0;
+
+    data.forEach(function(item) {
+
+        const status =
+            (item.status || "")
+            .toString()
+            .trim()
+            .toLowerCase();
+
+        if (status === "pending") {
+            pending++;
+        }
+        else if (status === "under review") {
+            underReview++;
+        }
+        else if (status === "approved") {
+            approved++;
+        }
+        else if (status === "implemented") {
+            implemented++;
+        }
+        else if (status === "rejected") {
+            rejected++;
+        }
+
+    });
+
+    document.getElementById("suggestionPendingCount").textContent =
+        pending;
+
+    document.getElementById("suggestionReviewCount").textContent =
+        underReview;
+
+    document.getElementById("suggestionApprovedCount").textContent =
+        approved;
+
+    document.getElementById("suggestionImplementedCount").textContent =
+        implemented;
+
+    document.getElementById("suggestionRejectedCount").textContent =
+        rejected;
+
+    document.getElementById("suggestionAllCount").textContent =
+        data.length;
+}
+
+function filterSuggestionByCard(status) {
+
+    const dropdown =
+        document.getElementById(
+            "adminSuggestionStatusFilter"
+        );
+
+    if (dropdown) {
+        dropdown.value = status;
+    }
+
+    filterAdminSuggestions(status);
+
+    document
+        .querySelectorAll(
+            "#panel-suggestions-management .status-card"
+        )
+        .forEach(card =>
+            card.classList.remove("active")
+        );
+
+    const activeCard =
+        document.querySelector(
+            '#panel-suggestions-management .status-card.' +
+            (
+                status === "pending"
+                    ? "pending"
+                    : status === "under review"
+                    ? "progress"
+                    : status === "approved"
+                    ? "resolved"
+                   : status === "implemented"
+? "implemented"
+: status === "rejected"
+? "rejected"
+: "all"
+            )
+        );
+
+console.log("Selected Status =", status);
+console.log("Active Card =", activeCard);
+
+console.log(activeCard.className);
+
+    if (activeCard) {
+        activeCard.classList.add("active");
+    }
+}
+
 function filterByStatusCard(status) {
 
     const dropdown =
@@ -1313,7 +1415,11 @@ async function loadAdminSuggestions() {
     };
 });
 
-        renderAdminSuggestions(allSuggestions);
+        console.log(allSuggestions);
+
+updateSuggestionSummaryCards(allSuggestions);
+
+renderAdminSuggestions(allSuggestions);
 
     } catch (error) {
 
