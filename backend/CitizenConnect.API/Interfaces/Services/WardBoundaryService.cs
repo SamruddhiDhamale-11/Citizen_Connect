@@ -55,5 +55,16 @@ namespace CitizenConnect.API.Interfaces.Services
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<string?> GetBoundaryGeoJsonAsync(
+    int wardId)
+        {
+            var boundary =
+                await _context.WardBoundaries
+                    .FirstOrDefaultAsync(
+                        x => x.WardId == wardId);
+
+            return boundary?.GeoJson;
+        }
     }
 }

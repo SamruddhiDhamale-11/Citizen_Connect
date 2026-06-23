@@ -44,5 +44,8 @@ namespace CitizenConnect.API.Interfaces.Services
 
             return polygon.Contains(point);
         }
+
+
+
     }
 }

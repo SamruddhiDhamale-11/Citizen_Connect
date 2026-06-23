@@ -8,6 +8,7 @@
  rel="stylesheet"
  href="https://unpkg.com/leaflet/dist/leaflet.css">
  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+ <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
   <link rel="stylesheet" href="citizen-dashboard.css" />
 </head>
 <body>
@@ -970,12 +971,11 @@
     <div class="modal-footer">
 
       <button
-        class="btn-submit"
-        onclick="saveMapLocation()">
-
-        Confirm Location
-
-      </button>
+    type="button"
+    class="btn-submit"
+    onclick="saveMapLocation(); return false;">
+    Confirm Location
+</button>
 
     </div>
 

@@ -6,5 +6,8 @@ namespace CitizenConnect.API.Interfaces.Services
     {
         Task UploadBoundaryAsync(
             UploadWardBoundaryDto dto);
+
+        Task<string?> GetBoundaryGeoJsonAsync(
+    int wardId);
     }
 }

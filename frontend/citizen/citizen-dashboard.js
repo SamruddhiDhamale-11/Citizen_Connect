@@ -12,6 +12,8 @@
   const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
   let map;
 let marker;
+let wardBoundaryLayer;
+let wardBoundaryGeoJson;
 
 let selectedLatitude = null;
 let selectedLongitude = null;
@@ -2101,23 +2103,46 @@ escHtml(c.desc) +
                         "&copy; OpenStreetMap"
                 }
             ).addTo(map);
+            loadWardBoundary();
 
-            map.on("click", function (e) {
+           map.on("click", function (e) {
 
-                selectedLatitude =
-                    e.latlng.lat;
+    const clickedPoint =
+        turf.point([
+            e.latlng.lng,
+            e.latlng.lat
+        ]);
 
-                selectedLongitude =
-                    e.latlng.lng;
+    const isInside =
+        turf.booleanPointInPolygon(
+            clickedPoint,
+            wardBoundaryGeoJson
+        );
 
-                if (marker) {
-                    map.removeLayer(marker);
-                }
+    if (!isInside) {
 
-                marker =
-                    L.marker(e.latlng)
-                        .addTo(map);
-            });
+        showToast(
+    "Invalid Location...",
+    "Selected location is outside Ward Boundary."
+);
+
+        return;
+    }
+
+    selectedLatitude =
+        e.latlng.lat;
+
+    selectedLongitude =
+        e.latlng.lng;
+
+    if (marker) {
+        map.removeLayer(marker);
+    }
+
+    marker =
+        L.marker(e.latlng)
+            .addTo(map);
+});
         }
 
         map.invalidateSize();
@@ -2125,6 +2150,56 @@ escHtml(c.desc) +
     }, 200);
 }
 
+async function loadWardBoundary() {
+
+    try {
+
+        const wardId =
+            citizenProfile.wardId;
+
+        const response =
+            await fetch(
+                `https://localhost:7286/api/WardBoundary/${wardId}`
+            );
+
+        const geoJson =
+            await response.json();
+
+            wardBoundaryGeoJson =
+    geoJson;
+
+        if (wardBoundaryLayer) {
+            map.removeLayer(
+                wardBoundaryLayer
+            );
+        }
+
+        wardBoundaryLayer =
+            L.geoJSON(
+                geoJson,
+                {
+                    style: {
+                        color: "#003366",
+                        weight: 4,
+                        fillColor: "#003366",
+                        fillOpacity: 0.30
+                    }
+                }
+            ).addTo(map);
+
+        map.fitBounds(
+            wardBoundaryLayer.getBounds()
+        );
+
+    }
+    catch(error) {
+
+        console.error(
+            "Ward Boundary Error:",
+            error
+        );
+    }
+}
 
 function initMap() {
 
@@ -2227,10 +2302,22 @@ function saveMapLocation() {
         .value =
         selectedLongitude.toFixed(6);
 
-        document
-    .getElementById("selectedLocationText")
-    .classList
-    .remove("hidden");
+        const locationMsg =
+    document.getElementById(
+        "selectedLocationText"
+    );
+
+locationMsg.innerHTML =
+    "✅ Location selected successfully";
+
+locationMsg.classList.remove(
+    "hidden"
+);
+
+showToast(
+    "Location Selected",
+    "Complaint location has been captured."
+);
 
     closeMapModal();
 }

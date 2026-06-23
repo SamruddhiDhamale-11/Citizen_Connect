@@ -40,5 +40,25 @@ namespace CitizenConnect.API.Controllers
                 });
             }
         }
+
+        [HttpGet("{wardId}")]
+        public async Task<IActionResult>
+    GetBoundary(int wardId)
+        {
+            var geoJson =
+                await _wardBoundaryService
+                    .GetBoundaryGeoJsonAsync(
+                        wardId);
+
+            if (string.IsNullOrEmpty(geoJson))
+            {
+                return NotFound(
+                    "Boundary not found.");
+            }
+
+            return Content(
+                geoJson,
+                "application/json");
+        }
     }
 }
