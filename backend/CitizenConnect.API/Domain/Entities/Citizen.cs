@@ -13,7 +13,7 @@ namespace CitizenConnect.Domain.Entities
         public DateTime DateOfBirth { get; set; }
 
         public int WardId { get; set; }
-        public int LocalityId { get; set; }
+        public int? LocalityId { get; set; }
 
         public int ResidenceTypeId { get; set; }
 
