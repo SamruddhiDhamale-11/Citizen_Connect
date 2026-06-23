@@ -1,10 +1,10 @@
 ﻿    using CitizenConnect.API.Domain.Enums;
+using CitizenConnect.API.Interfaces.Services;
+    using CitizenConnect.Application.Interfaces.Services;
     using CitizenConnect.Domain.Entities;
     using CitizenConnect.DTOs.Complaint;
     using CitizenConnect.Infrastructure.Data;
     using CitizenConnect.Interfaces.Services;
-    using CitizenConnect.Application.Interfaces.Services;
-
     using Microsoft.EntityFrameworkCore;
 
     namespace CitizenConnect.Services
@@ -14,19 +14,23 @@
             private readonly ApplicationDbContext _context;
 
             private readonly IWebHostEnvironment _environment;
+        private readonly IWardValidationService _wardValidationService;
 
         private readonly ICloudinaryService _cloudinaryService;
 
         public ComplaintService(
         ApplicationDbContext context,
         IWebHostEnvironment environment,
-        ICloudinaryService cloudinaryService)
+        ICloudinaryService cloudinaryService,
+        IWardValidationService wardValidationService)
     {
         _context = context;
 
         _environment = environment;
 
         _cloudinaryService = cloudinaryService;
+            _wardValidationService = wardValidationService;
+        
     }
 
 
@@ -84,6 +88,23 @@
                     throw new Exception(
                         "Complaint category not found.");
                 }
+
+            // =========================================
+            // WARD LOCATION VALIDATION
+            // =========================================
+
+            var isInsideWard =
+                await _wardValidationService
+                    .IsLocationInsideWardAsync(
+                        dto.WardId,
+                        dto.Latitude,
+                        dto.Longitude);
+
+            if (!isInsideWard)
+            {
+                throw new InvalidOperationException(
+                    $"Complaint location does not belong to Ward {dto.WardId}.");
+            }
 
             // =========================================
             // FIND AVAILABLE OFFICER

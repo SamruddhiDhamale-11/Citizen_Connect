@@ -35,6 +35,7 @@ let selectedLongitude = null;
     loadComplaintLocalities();
     loadSuggestionCategories();
     await loadDepartments();
+    
 
     loadCitizenProfile().then(async function () {
 
@@ -870,109 +871,213 @@ if (civicScore) {
   }
 
   // ---- Submit Complaint ----
-  async function submitComplaint(e) {
-    e.preventDefault();
-    const errEl = document.getElementById("complaintError");
-    errEl.classList.add("hidden");
+ async function submitComplaint(e) {
+e.preventDefault();
 
-    const catSelect = document.getElementById("complaintCategory");
-    const cat       = catSelect.value;
-    const priority = document.getElementById("complaintPriority").value;
-    const title    = document.getElementById("complaintTitle").value.trim();
-    const desc     = document.getElementById("complaintDesc").value.trim();
-    const location = document.getElementById("complaintLocation").value.trim();
 
-    if (!cat || !priority || !title || !desc || !location) {
-      errEl.textContent = "Please fill all required fields before submitting.";
-      errEl.classList.remove("hidden");
-      return;
-    }
+const errEl = document.getElementById("complaintError");
+errEl.classList.add("hidden");
 
-    const citizenId = localStorage.getItem("citizenId") || citizenProfile.citizenId;
-    const wardId = citizenProfile.wardId;
-    if (!citizenId || !wardId) {
-      errEl.textContent = "Unable to verify your profile. Please log in again.";
-      errEl.classList.remove("hidden");
-      return;
-    }
+const catSelect = document.getElementById("complaintCategory");
+const cat = catSelect.value;
 
-    const fileInput = document.getElementById("complaintFile");
-    if (fileInput && fileInput.files && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      const allowed = ["image/jpeg", "image/jpg", "image/png"];
-      if (!allowed.includes(file.type)) {
-        errEl.textContent = "Attachment must be JPG or PNG format only (max 5 MB).";
+const priority =
+    document.getElementById("complaintPriority").value;
+
+const title =
+    document.getElementById("complaintTitle").value.trim();
+
+const desc =
+    document.getElementById("complaintDesc").value.trim();
+
+const location =
+    document.getElementById("complaintAddress").value.trim();
+
+const latitude =
+    document.getElementById("latitude").value.trim();
+
+const longitude =
+    document.getElementById("longitude").value.trim();
+
+if (!cat || !priority || !title || !desc || !location) {
+    errEl.textContent =
+        "Please fill all required fields before submitting.";
+    errEl.classList.remove("hidden");
+    return;
+}
+
+if (!latitude || !longitude) {
+    errEl.textContent =
+        "Please select location on map.";
+    errEl.classList.remove("hidden");
+    return;
+}
+
+const citizenId =
+    localStorage.getItem("citizenId") ||
+    citizenProfile.citizenId;
+
+const wardId =
+    citizenProfile.wardId;
+
+if (!citizenId || !wardId) {
+    errEl.textContent =
+        "Unable to verify your profile. Please log in again.";
+    errEl.classList.remove("hidden");
+    return;
+}
+
+const fileInput =
+    document.getElementById("complaintFile");
+
+if (
+    fileInput &&
+    fileInput.files &&
+    fileInput.files.length > 0
+) {
+    const file = fileInput.files[0];
+
+    const allowed = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png"
+    ];
+
+    if (!allowed.includes(file.type)) {
+        errEl.textContent =
+            "Attachment must be JPG or PNG format only (max 5 MB).";
         errEl.classList.remove("hidden");
         return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        errEl.textContent = "Attachment must not exceed 5 MB.";
-        errEl.classList.remove("hidden");
-        return;
-      }
     }
 
-    const form = document.getElementById("complaintForm");
-    const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+    if (file.size > 5 * 1024 * 1024) {
+        errEl.textContent =
+            "Attachment must not exceed 5 MB.";
+        errEl.classList.remove("hidden");
+        return;
+    }
+}
+
+const form =
+    document.getElementById("complaintForm");
+
+const submitBtn =
+    form
+        ? form.querySelector('button[type="submit"]')
+        : null;
+
+if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+}
+
+const fd = new FormData();
+
+fd.append("CitizenId", citizenId);
+fd.append("WardId", wardId);
+fd.append("ComplaintCategoryId", cat);
+fd.append("Title", title);
+
+const categoryName =
+    catSelect.options[
+        catSelect.selectedIndex
+    ].text;
+
+fd.append("CategoryName", categoryName);
+fd.append("Description", desc);
+fd.append("Address", location);
+
+fd.append("Latitude", latitude);
+fd.append("Longitude", longitude);
+
+fd.append("Priority", priority);
+
+fd.append(
+    "IsAnonymous",
+    document.getElementById("complaintAnon").checked
+        ? "true"
+        : "false"
+);
+
+if (
+    fileInput &&
+    fileInput.files &&
+    fileInput.files.length > 0
+) {
+    fd.append(
+        "Files",
+        fileInput.files[0]
+    );
+}
+
+console.log("Latitude:", latitude);
+console.log("Longitude:", longitude);
+
+try {
+    const response = await fetch(
+        COMPLAINT_API_BASE + "/create",
+        {
+            method: "POST",
+            body: fd
+        }
+    );
+
+    const result =
+        await response.json();
+
+    if (!response.ok) {
+
+    showToast(
+        "Error",
+        result.message ||
+        "Complaint submission failed."
+    );
+
+    return;
+}
+
+    resetComplaintForm();
+
+    await loadCitizenComplaints();
+
+    const complaintNumber =
+        result.complaintNumber ||
+        result.ComplaintNumber ||
+        "";
+
+    showToast(
+        "",
+        "Complaint submitted successfully! ID: " +
+        complaintNumber
+    );
+
+    showPanel(
+        "mycomplaints",
+        document.querySelector(
+            "[onclick*=mycomplaints]"
+        )
+    );
+}
+catch (err) {
+    console.error(err);
+
+    errEl.textContent =
+        err.message ||
+        "Unable to submit complaint.";
+
+    errEl.classList.remove("hidden");
+}
+finally {
     if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitting…";
-    }
-
-    const fd = new FormData();
-    fd.append("CitizenId", citizenId);
-    fd.append("WardId", wardId);
-    fd.append("ComplaintCategoryId", cat);
-    fd.append("Title", title);
-    const categoryName =
-      document.getElementById("complaintCategory")
-              .options[document.getElementById("complaintCategory").selectedIndex]
-              .text;
-
-  fd.append("CategoryName", categoryName);
-    fd.append("Description", desc);
-    fd.append("Address", location);
-    fd.append("Latitude", "0");
-    fd.append("Longitude", "0");
-    fd.append("Priority", priority);
-    fd.append("IsAnonymous", document.getElementById("complaintAnon").checked ? "true" : "false");
-    if (fileInput && fileInput.files && fileInput.files.length > 0) {
-      fd.append("Files", fileInput.files[0]);
-    }
-
-    try {
-      const response = await fetch(COMPLAINT_API_BASE + "/create", {
-        method: "POST",
-        body: fd
-      });
-
-      let result;
-      try {
-        result = await response.json();
-      } catch (_) {
-        throw new Error("Server returned an unexpected response.");
-      }
-
-      if (!response.ok) {
-        throw new Error(result.message || "Complaint submission failed. Please try again.");
-      }
-
-      resetComplaintForm();
-      await loadCitizenComplaints();
-
-      const complaintNumber = result.complaintNumber || result.ComplaintNumber || "";
-      showToast("", "Complaint submitted successfully! ID: " + complaintNumber);
-      showPanel("mycomplaints", document.querySelector("[onclick*=mycomplaints]"));
-    } catch (err) {
-      errEl.textContent = err.message || "Unable to submit complaint. Please try again.";
-      errEl.classList.remove("hidden");
-    } finally {
-      if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Submit Complaint";
-      }
+        submitBtn.textContent =
+            "Submit Complaint";
     }
-  }
+}
+
+
+}
+
 
   function resetComplaintForm() {
     const form = document.getElementById("complaintForm");
@@ -1923,7 +2028,7 @@ escHtml(c.desc) +
 
   });
 
-  async function loadComplaintLocalities() {
+ async function loadComplaintLocalities() {
 
     const ddl =
         document.getElementById(
@@ -1946,21 +2051,78 @@ escHtml(c.desc) +
         ddl.innerHTML +=
         `<option
             value="${item.localityId}"
-            data-pincode="${item.pincode}">
+            data-pincode="${item.pincode || ''}">
             ${item.localityName}
         </option>`;
     });
+
+    // NEW CODE
+    ddl.addEventListener(
+        "change",
+        function() {
+
+            const selectedOption =
+                ddl.options[
+                    ddl.selectedIndex
+                ];
+
+            const pincode =
+                selectedOption.getAttribute(
+                    "data-pincode"
+                );
+
+            document.getElementById(
+                "complaintPincode"
+            ).value =
+                pincode || "";
+        }
+    );
 }
 
 
-  function openMapModal() {
+ function openMapModal() {
 
     document
         .getElementById("mapModal")
         .classList
         .remove("hidden");
 
-    setTimeout(initMap,200);
+    setTimeout(() => {
+
+        if (!map) {
+
+            map = L.map("complaintMap")
+                .setView([18.5204, 73.8567], 13);
+
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    attribution:
+                        "&copy; OpenStreetMap"
+                }
+            ).addTo(map);
+
+            map.on("click", function (e) {
+
+                selectedLatitude =
+                    e.latlng.lat;
+
+                selectedLongitude =
+                    e.latlng.lng;
+
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+
+                marker =
+                    L.marker(e.latlng)
+                        .addTo(map);
+            });
+        }
+
+        map.invalidateSize();
+
+    }, 200);
 }
 
 
@@ -1996,26 +2158,79 @@ function initMap() {
     });
 }
 
-function saveMapLocation() {
+async function loadLocalityPincode() {
 
-    if(!selectedLatitude){
+    const localityId =
+        document.getElementById(
+            "complaintLocality"
+        ).value;
 
-        alert(
-            "Please select location on map."
+    const pincodeBox =
+        document.getElementById(
+            "complaintPincode"
         );
 
+    if (!localityId) {
+        pincodeBox.value = "";
         return;
     }
 
-    document.getElementById(
-        "latitude"
-    ).value =
-        selectedLatitude;
+    try {
 
-    document.getElementById(
-        "longitude"
-    ).value =
-        selectedLongitude;
+        const response =
+            await fetch(
+                `${API_BASE}/localities/${localityId}`
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Unable to load locality."
+            );
+        }
+
+        const locality =
+            await response.json();
+
+        pincodeBox.value =
+            locality.pincode || "";
+
+    }
+    catch (error) {
+
+        console.error(
+            "Pincode Load Error:",
+            error
+        );
+
+        pincodeBox.value = "";
+    }
+}
+function saveMapLocation() {
+
+    if (
+        selectedLatitude === null ||
+        selectedLongitude === null
+    ) {
+        alert(
+            "Please select location on map"
+        );
+        return;
+    }
+
+    document
+        .getElementById("latitude")
+        .value =
+        selectedLatitude.toFixed(6);
+
+    document
+        .getElementById("longitude")
+        .value =
+        selectedLongitude.toFixed(6);
+
+        document
+    .getElementById("selectedLocationText")
+    .classList
+    .remove("hidden");
 
     closeMapModal();
 }

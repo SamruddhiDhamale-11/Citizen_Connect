@@ -26,6 +26,8 @@ namespace CitizenConnect.Infrastructure.Data
         public DbSet<Politician> Politicians => Set<Politician>();
 
         public DbSet<Ward> Wards => Set<Ward>();
+        public DbSet<WardBoundary> WardBoundaries
+    => Set<WardBoundary>();
 
         public DbSet<Jurisdiction> Jurisdictions
             => Set<Jurisdiction>();
@@ -220,6 +222,20 @@ namespace CitizenConnect.Infrastructure.Data
      .WithMany(j => j.Wards)
      .HasForeignKey(w => w.JurisdictionId)
      .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WardBoundary>()
+    .HasOne(x => x.Ward)
+    .WithMany(x => x.WardBoundaries)
+    .HasForeignKey(x => x.WardId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<WardBoundary>()
+    .Property(x => x.GeoJson)
+    .HasColumnType("nvarchar(max)");
+
+            modelBuilder.Entity<WardBoundary>()
+    .HasIndex(x => x.WardId);
             // =====================================================
             // COMPLAINT -> CITIZEN
             // =====================================================

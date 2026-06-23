@@ -345,14 +345,14 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   .quick-actions { grid-template-columns: 1fr; }
 }
 
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.45);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
 }
 
 .hidden {
@@ -555,15 +555,15 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 }
 
 #complaintMap{
-    height:450px;
+    height:500px;
     width:100%;
 }
 
 .map-card{
-    width:90%;
-    max-width:1000px;
-
+    width:900px;
+    max-width:95%;
 }
+
 
 /* ================================================================
    DEPARTMENT SELECTION DASHBOARD  — Government Portal Style

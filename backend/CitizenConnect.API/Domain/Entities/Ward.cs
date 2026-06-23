@@ -51,5 +51,9 @@ namespace CitizenConnect.API.Domain.Entities
         {
             get; set;
         } = new List<Demographic>();
+
+        public ICollection<WardBoundary> WardBoundaries
+        { get; set; }
+    = new List<WardBoundary>();
     }
 }

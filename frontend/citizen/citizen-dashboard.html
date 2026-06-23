@@ -932,25 +932,19 @@
 
   </div>
 
-  <div class="field-row-two">
+ <input type="hidden" id="latitude">
+<input type="hidden" id="longitude">
 
-    <div class="field-group">
-      <label>Latitude</label>
-      <input
-        type="text"
-        id="latitude"
-        readonly>
-    </div>
-
-    <div class="field-group">
-      <label>Longitude</label>
-      <input
-        type="text"
-        id="longitude"
-        readonly>
-    </div>
-
-  </div>
+<div
+    id="selectedLocationText"
+    class="hidden"
+    style="
+        margin-top:10px;
+        color:green;
+        font-weight:600;
+    ">
+    ✅ Location selected successfully
+</div>
   <!-- MAP MODAL -->
 
 <div id="mapModal" class="modal-overlay hidden">

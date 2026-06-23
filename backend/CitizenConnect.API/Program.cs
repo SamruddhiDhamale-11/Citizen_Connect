@@ -58,14 +58,18 @@ builder.Services.AddScoped<
     IFacilityModuleService,
     FacilityModuleService>();
 
-    builder.Services.AddScoped<
-    ILocalityService,
-    LocalityService>();
+builder.Services.AddScoped<
+ILocalityService,
+LocalityService>();
+
+builder.Services.AddScoped<
+    IWardBoundaryService,
+    WardBoundaryService>();
 
 // builder.Services.AddScoped<
 //     IFacilityDataService,
 //     FacilityDataService>();
- builder.Services.AddScoped<
+builder.Services.AddScoped<
      IFacilityDataService,
      FacilityDataService>();
 
@@ -85,6 +89,9 @@ builder.Services.AddScoped<
     IDemographicService,
    DemographicService>();
 
+builder.Services.AddScoped<
+    IWardValidationService,
+    WardValidationService>();
 
 builder.Services
     .AddScoped<ICloudinaryService,
