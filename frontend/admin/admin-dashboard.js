@@ -1206,6 +1206,7 @@ async function loadAdminComplaints() {
       ? data.map(mapAdminComplaintToCard)
       : [];
     renderAdminComplaints(adminComplaints);
+    updateComplaintStatusCards(adminComplaints);
     var statusFilter = document.getElementById('adminComplaintStatusFilter');
     var searchInput = document.getElementById('adminComplaintSearch');
     if (statusFilter && statusFilter.value !== 'all') {
@@ -1218,6 +1219,76 @@ async function loadAdminComplaints() {
     adminComplaints = [];
     list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>Unable to load complaints. Please ensure the server is running.</div></div>';
   }
+}
+
+function updateComplaintStatusCards(complaints) {
+
+    const pending =
+        complaints.filter(x => x.status === "pending").length;
+
+    const inProgress =
+        complaints.filter(x => x.status === "inprogress").length;
+
+    const resolved =
+        complaints.filter(x => x.status === "resolved").length;
+
+    const rejected =
+        complaints.filter(x => x.status === "rejected").length;
+
+    document.getElementById("pendingCount").textContent =
+        pending;
+
+    document.getElementById("inProgressCount").textContent =
+        inProgress;
+
+    document.getElementById("resolvedCount").textContent =
+        resolved;
+
+    document.getElementById("rejectedCount").textContent =
+        rejected;
+
+    document.getElementById("allCount").textContent =
+        complaints.length;
+}
+
+function filterByStatusCard(status) {
+
+    const dropdown =
+        document.getElementById(
+            "adminComplaintStatusFilter"
+        );
+
+    if (dropdown) {
+        dropdown.value = status;
+    }
+
+    filterAdminComplaints(status);
+
+    document
+        .querySelectorAll(".status-card")
+        .forEach(card =>
+            card.classList.remove("active")
+        );
+
+    const activeCard =
+        document.querySelector(
+            '.status-card.' +
+            (
+                status === "pending"
+                    ? "pending"
+                    : status === "inprogress"
+                    ? "progress"
+                    : status === "resolved"
+                    ? "resolved"
+                    : status === "rejected"
+                    ? "rejected"
+                    : "all"
+            )
+        );
+
+    if (activeCard) {
+        activeCard.classList.add("active");
+    }
 }
 
 let allSuggestions = [];
@@ -3166,10 +3237,20 @@ async function saveOfficer() {
       email: document.getElementById('officerEmail').value,
       mobileNumber: document.getElementById('officerMobile').value,
       designation: document.getElementById('officerDesignation').value,
-      departmentId: Number(document.getElementById('officerDepartment').value),
-      categoryId: Number(document.getElementById('officerCategory').value),
-      isAvailable: document.getElementById('officerAvailability').value === 'true'
-    };
+
+      departmentId: Number(
+        document.getElementById('officerDepartment').value
+      ),
+
+      categoryId: Number(
+        document.getElementById('officerCategory').value
+      ),
+
+      wardId: 1,   // only Shivaji Ward
+
+      isAvailable:
+        document.getElementById('officerAvailability').value === 'true'
+};
 
     let response;
 
@@ -3208,9 +3289,8 @@ async function saveOfficer() {
           errorData?.title ||
           JSON.stringify(errorData);
       } catch (e) {
-        errorMessage = await response.text();
-      }
-
+  errorMessage = 'Server error while saving officer.';
+}
       throw new Error(errorMessage);
     }
 
@@ -3260,6 +3340,7 @@ await loadCategoriesByDepartment(officer.departmentId);
 
 document.getElementById('officerCategory').value =
   officer.categoryId;
+  
     document.getElementById('officerAvailability').value = String(officer.isAvailable);
 
     document.getElementById('officerModalOverlay')

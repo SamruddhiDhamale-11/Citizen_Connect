@@ -1988,3 +1988,109 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
   .fef-entry-header { flex-wrap: wrap; gap: 6px; }
   .fef-field-label  { min-width: 90px; }
 }
+
+
+/* Complaint Status Summary Cards */
+
+.complaint-status-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.status-card {
+    padding: 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.status-card:hover {
+    transform: translateY(-4px);
+}
+
+.status-title {
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.95;
+}
+
+.status-count {
+    font-size: 32px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+/* Colors */
+
+.status-card.pending {
+    background: linear-gradient(135deg,#f59e0b,#fbbf24);
+}
+
+.status-card.progress {
+    background: linear-gradient(135deg,#3b82f6,#60a5fa);
+}
+
+.status-card.resolved {
+    background: linear-gradient(135deg,#10b981,#34d399);
+}
+
+.status-card.rejected {
+    background: linear-gradient(135deg,#ef4444,#f87171);
+}
+
+.status-card.all {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+}
+
+.status-card.active {
+    transform: translateY(-4px);
+    border: 3px solid #ffffff;
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,0.25),
+        0 10px 24px rgba(0,0,0,0.18);
+}
+
+.status-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-card-header i {
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+.status-card-label {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.status-count {
+    font-size: 42px;
+    font-weight: 700;
+    margin-top: 16px;
+}
+
+.status-card {
+    position: relative;
+    overflow: hidden;
+}
+.status-card::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.15);
+}

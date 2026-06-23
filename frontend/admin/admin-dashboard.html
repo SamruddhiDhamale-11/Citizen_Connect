@@ -623,6 +623,72 @@
             <p class="page-subtitle">Review, assign, and resolve citizen complaints</p>
           </div>
         </div>
+
+<div class="complaint-status-summary">
+
+  <div class="status-card pending"
+       onclick="filterByStatusCard('pending')">
+
+    <div class="status-card-header">
+      <span class="status-card-label">Pending</span>
+      <i class="fa-solid fa-clock"></i>
+    </div>
+
+    <div class="status-count" id="pendingCount">0</div>
+
+  </div>
+
+  <div class="status-card progress"
+       onclick="filterByStatusCard('inprogress')">
+
+    <div class="status-card-header">
+      <span class="status-card-label">In Progress</span>
+      <i class="fa-solid fa-spinner"></i>
+    </div>
+
+    <div class="status-count" id="inProgressCount">0</div>
+
+  </div>
+
+  <div class="status-card resolved"
+       onclick="filterByStatusCard('resolved')">
+
+    <div class="status-card-header">
+      <span class="status-card-label">Resolved</span>
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+
+    <div class="status-count" id="resolvedCount">0</div>
+
+  </div>
+
+  <div class="status-card rejected"
+       onclick="filterByStatusCard('rejected')">
+
+    <div class="status-card-header">
+      <span class="status-card-label">Rejected</span>
+      <i class="fa-solid fa-circle-xmark"></i>
+    </div>
+
+    <div class="status-count" id="rejectedCount">0</div>
+
+  </div>
+
+  <div class="status-card all"
+       onclick="filterByStatusCard('all')">
+
+    <div class="status-card-header">
+      <span class="status-card-label">All Complaints</span>
+      <i class="fa-solid fa-list"></i>
+    </div>
+
+    <div class="status-count" id="allCount">0</div>
+
+  </div>
+
+</div>
+
+
         <div class="filter-bar">
           <select class="filter-select" id="adminComplaintStatusFilter" onchange="filterAdminComplaints(this.value)">
             <option value="all">All Status</option>

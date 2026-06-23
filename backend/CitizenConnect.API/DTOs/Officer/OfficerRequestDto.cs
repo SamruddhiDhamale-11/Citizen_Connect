@@ -21,6 +21,10 @@
 
         public int CategoryId { get; set; }
 
+
+        public int WardId { get; set; }
+
+
         public bool IsAvailable { get; set; }
             = true;
     }

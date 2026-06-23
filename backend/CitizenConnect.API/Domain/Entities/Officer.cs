@@ -1,4 +1,5 @@
 ﻿using CitizenConnect.Domain.Common;
+using CitizenConnect.API.Domain.Entities;
 
 namespace CitizenConnect.Domain.Entities
 {
@@ -26,7 +27,9 @@ namespace CitizenConnect.Domain.Entities
         public bool IsAvailable { get; set; }
             = true;
 
-        // Navigation Properties
+        public int? WardId { get; set; }
+
+public Ward? Ward { get; set; }
 
         public Department Department { get; set; }
             = null!;
