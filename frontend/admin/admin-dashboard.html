@@ -716,6 +716,66 @@
     </div>
   </div>
 
+
+<div class="complaint-status-summary">
+
+  <div class="status-card pending"
+     onclick="filterSuggestionByCard('pending')">
+    <div class="status-card-header">
+      <span class="status-card-label">Pending</span>
+      <i class="fa-solid fa-clock"></i>
+    </div>
+    <div class="status-count" id="suggestionPendingCount">0</div>
+  </div>
+
+  <div class="status-card progress"
+     onclick="filterSuggestionByCard('under review')">
+    <div class="status-card-header">
+      <span class="status-card-label">Under Review</span>
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
+    <div class="status-count" id="suggestionReviewCount">0</div>
+  </div>
+
+ <div class="status-card resolved"
+     onclick="filterSuggestionByCard('approved')">
+    <div class="status-card-header">
+      <span class="status-card-label">Approved</span>
+      <i class="fa-solid fa-thumbs-up"></i>
+    </div>
+    <div class="status-count" id="suggestionApprovedCount">0</div>
+  </div>
+
+  <div class="status-card implemented"
+     onclick="filterSuggestionByCard('implemented')">
+    <div class="status-card-header">
+      <span class="status-card-label">Implemented</span>
+      <i class="fa-solid fa-lightbulb"></i>
+    </div>
+    <div class="status-count" id="suggestionImplementedCount">0</div>
+  </div>
+
+  <div class="status-card rejected"
+     onclick="filterSuggestionByCard('rejected')">
+    <div class="status-card-header">
+      <span class="status-card-label">Rejected</span>
+      <i class="fa-solid fa-circle-xmark"></i>
+    </div>
+    <div class="status-count" id="suggestionRejectedCount">0</div>
+  </div>
+
+<div class="status-card all"
+     onclick="filterSuggestionByCard('all')">
+    <div class="status-card-header">
+      <span class="status-card-label">All Suggestions</span>
+      <i class="fa-solid fa-list"></i>
+    </div>
+    <div class="status-count" id="suggestionAllCount">0</div>
+  </div>
+
+</div>
+
+
   <!-- FILTER BAR (same like complaints) -->
   <div class="filter-bar">
     <select class="filter-select" id="adminSuggestionStatusFilter" onchange="filterAdminSuggestions(this.value)">
