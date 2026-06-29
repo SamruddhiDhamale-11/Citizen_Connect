@@ -2158,9 +2158,9 @@ async function loadWardBoundary() {
             citizenProfile.wardId;
 
         const response =
-            await fetch(
-                `https://localhost:7286/api/WardBoundary/${wardId}`
-            );
+           await fetch(
+    `http://localhost:5079/api/WardBoundary/${wardId}`
+);
 
         const geoJson =
             await response.json();

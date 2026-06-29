@@ -1946,9 +1946,7 @@ async function openAssignedOfficerPopup(complaintId) {
     const detail = await res.json();
 
     // ✅ CHECK if officer exists
-    const isAssigned =
-  detail.status &&
-  detail.status.toLowerCase() === "assigned";
+   const isAssigned = detail.isAssigned;
 
     let officerHtml = '';
 
@@ -2161,8 +2159,10 @@ ${h.assignedOfficerName
 }
 
 <div class="history-date">
-  ${formatDate(h.createdAt || h.changedAt)}
-</div>
+  ${isCreated
+      ? formatDate(h.createdAt)
+      : formatDate(h.changedAt)}
+</div>  
 
           ${h.remarks
             ? `<div class="history-remarks">📝 ${h.remarks}</div>`

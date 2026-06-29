@@ -27,6 +27,8 @@
         public List<string> Images { get; set; }
             = new List<string>();
 
+        public bool IsAssigned { get; set; }
+
         public string OfficerName { get; set; }
     = string.Empty;
 
