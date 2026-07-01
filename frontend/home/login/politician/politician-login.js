@@ -509,7 +509,7 @@ function generateCaptcha() {
 }
 
 function validateCaptcha(userInput) {
-  return userInput.trim().toLowerCase() === _captchaValue.toLowerCase();
+  return userInput.trim() === _captchaValue;
 }
 
 // ================================================================
@@ -579,7 +579,7 @@ function generateRegCaptcha() {
 }
 
 function validateRegCaptcha(userInput) {
-  return userInput.trim().toLowerCase() === _regCaptchaValue.toLowerCase();
+  return userInput.trim() === _regCaptchaValue;
 }
 
 // Generate captcha on load

@@ -1277,6 +1277,120 @@
     </div>
   </div>
 
+
+
+<!-- ===== EDIT CITIZEN MODAL ===== -->
+
+<div class="modal-overlay hidden"
+     id="editCitizenModal">
+
+  <div class="modal-card officer-modal-card">
+
+    <div class="modal-header">
+
+      <div class="modal-title">
+
+        Edit Citizen
+
+      </div>
+
+      <button class="modal-close"
+              onclick="closeEditCitizenModal()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <input type="hidden"
+             id="editCitizenId">
+
+      <div class="officer-form-grid">
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            First Name
+          </label>
+
+          <input
+              type="text"
+              id="editCitizenFirstName"
+              class="sd-input">
+
+        </div>
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Last Name
+          </label>
+
+          <input
+              type="text"
+              id="editCitizenLastName"
+              class="sd-input">
+
+        </div>
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Email
+          </label>
+
+          <input
+              type="email"
+              id="editCitizenEmail"
+              class="sd-input">
+
+        </div>
+
+        <div class="sd-field-group">
+
+          <label class="sd-field-label">
+            Mobile Number
+          </label>
+
+          <input
+              type="text"
+              id="editCitizenMobile"
+              class="sd-input">
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button
+          class="btn-action btn-ghost"
+          onclick="closeEditCitizenModal()">
+
+        Cancel
+
+      </button>
+
+      <button
+          class="btn-action btn-primary"
+          onclick="updateCitizen()">
+
+        Update Citizen
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
   <!-- ===== TOAST ===== -->
   <div class="toast hidden" id="toast">
     <span class="toast-icon" id="toastIcon">&#x2705;</span>

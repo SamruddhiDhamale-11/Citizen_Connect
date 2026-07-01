@@ -1012,9 +1012,6 @@ if (
     );
 }
 
-console.log("Latitude:", latitude);
-console.log("Longitude:", longitude);
-
 try {
     const response = await fetch(
         COMPLAINT_API_BASE + "/create",
@@ -1140,38 +1137,6 @@ finally {
 
     loadSuggestionCategories();
   }
-
-  // ---- Submit Suggestion ----
-  // function submitSuggestion(e) {
-  //   e.preventDefault();
-  //   const errEl = document.getElementById("suggestionError");
-  //   errEl.classList.add("hidden");
-
-  //   const cat     = document.getElementById("suggestionCategory").value;
-  //   const scope   = document.getElementById("suggestionScope").value;
-  //   const title   = document.getElementById("suggestionTitle").value.trim();
-  //   const desc    = document.getElementById("suggestionDesc").value.trim();
-  //   const benefit = document.getElementById("suggestionBenefit").value.trim();
-
-  //   if (!cat || !scope || !title || !desc || !benefit) {
-  //     errEl.textContent = "Please fill all required fields before submitting.";
-  //     errEl.classList.remove("hidden");
-  //     return;
-  //   }
-
-  //   const newId = "SUG-00" + (SUGGESTIONS.length + 1);
-  //   SUGGESTIONS.unshift({ id: newId, title: title, category: cat, desc: desc, benefit: benefit, date: formatDate(new Date()), status: "review", scope: scope });
-  //   renderSuggestions(SUGGESTIONS);
-
-  //   document.getElementById("suggestionForm").reset();
-  //   document.getElementById("suggestionTitleCount").textContent = "0";
-  //   document.getElementById("suggestionDescCount").textContent = "0";
-  //   document.getElementById("suggestionBenefitCount").textContent = "0";
-  //   document.getElementById("suggestionFileName").classList.add("hidden");
-
-  //   showToast("", "Suggestion submitted successfully! ID: " + newId);
-  //   showPanel("mysuggestions", document.querySelector("[onclick*=mysuggestions]"));
-  // }
 
   // ---- Submit Suggestion ----
   async function submitSuggestion(e) {
