@@ -5,7 +5,7 @@
    Complete implementation with localStorage, progress tracking,
    conditional visibility, confirmation modal, toast system.
    ============================================================ */
-alert("THIS IS MY JS FILE");
+
 'use strict';
 
 /* ============================================================
