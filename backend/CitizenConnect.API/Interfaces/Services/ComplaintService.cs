@@ -450,6 +450,10 @@ Images = c.ComplaintImages
                 .Where(p => !string.IsNullOrWhiteSpace(p))
                 .ToList()
             : new List<string>(),
+
+         IsAssigned =
+             complaint.AssignedOfficer != null,
+
                     OfficerName =
     complaint.AssignedOfficer != null
     ? complaint.AssignedOfficer.FirstName

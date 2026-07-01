@@ -92,16 +92,19 @@ namespace CitizenConnect.Services
                 CreatedAt = c.CreatedAt,
 
                 StatusHistory = c.ComplaintStatusHistories
-                    .OrderByDescending(h => h.ChangedAt)
+                    .OrderBy(h => h.ChangedAt)
                     .Select(h => new ComplaintStatusHistoryDto
-                    {
-                        OldStatus = h.OldStatus,
-                        NewStatus = h.NewStatus,
-                        ChangedBy = "Admin",
-                        Remarks = h.Remarks,
-                        AssignedOfficerName = h.AssignedOfficerName,
-                        ChangedAt = h.ChangedAt
-                    })
+{
+    OldStatus = h.OldStatus.ToString(),
+    NewStatus = h.NewStatus.ToString(),
+    ChangedBy = "Admin",
+    Remarks = h.Remarks,
+    AssignedOfficerName = h.AssignedOfficerName,
+    ChangedAt = h.ChangedAt,
+
+    // NEW
+    CreatedAt = c.CreatedAt
+})
                     .ToList()
             };
         }
@@ -223,18 +226,25 @@ if (officer != null)
         public async Task<List<ComplaintStatusHistoryDto>>
             GetComplaintHistoryAsync(int complaintId)
         {
+
+            var complaint = await _context.Complaints
+    .FirstOrDefaultAsync(x => x.ComplaintId == complaintId);
+
             return await _context.ComplaintStatusHistories
                 .Where(h => h.ComplaintId == complaintId)
-                .Select(h => new ComplaintStatusHistoryDto
-                {
-                    OldStatus = h.OldStatus.ToString(),
-                    NewStatus = h.NewStatus.ToString(),
-                    ChangedBy = "Admin",
-                    Remarks = h.Remarks,
-                    AssignedOfficerName = h.AssignedOfficerName,
-                    ChangedAt = h.ChangedAt
-                })
-                .OrderByDescending(h => h.ChangedAt)
+               .Select(h => new ComplaintStatusHistoryDto
+{
+    OldStatus = h.OldStatus.ToString(),
+    NewStatus = h.NewStatus.ToString(),
+    ChangedBy = "Admin",
+    Remarks = h.Remarks,
+    AssignedOfficerName = h.AssignedOfficerName,
+    ChangedAt = h.ChangedAt,
+
+    // NEW
+    CreatedAt = complaint.CreatedAt
+})
+                .OrderBy(h => h.ChangedAt)
                 .ToListAsync();
         }
 

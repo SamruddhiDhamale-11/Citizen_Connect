@@ -13,5 +13,7 @@
     public string? AssignedOfficerName { get; set; }
 
     public DateTime ChangedAt { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
 }
 }
