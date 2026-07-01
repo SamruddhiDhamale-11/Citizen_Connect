@@ -97,6 +97,8 @@ builder.Services
     .AddScoped<ICloudinaryService,
                CloudinaryService>();
 
+builder.Services.AddScoped<IWardRepresentativeService, WardRepresentativeService>();
+
 // ==============================
 // CORS - Allow frontend origins
 // ==============================

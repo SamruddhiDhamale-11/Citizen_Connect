@@ -1,4 +1,5 @@
 ﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.API.DTOs.FacilityFieldOptionDto;
 using CitizenConnect.Application.DTOs.Facility;
 using CitizenConnect.Application.Services.Interfaces;
 using CitizenConnect.Infrastructure.Data;
@@ -96,15 +97,13 @@ namespace CitizenConnect.Application.Services
         }
 
         public async Task<IEnumerable<FacilityFieldResponseDto>>
-            GetByModuleIdAsync(int facilityModuleId)
+      GetByModuleIdAsync(int facilityModuleId)
         {
             return await _context.FacilityFields
                 .Where(x =>
-                    x.FacilityModuleId ==
-                    facilityModuleId &&
+                    x.FacilityModuleId == facilityModuleId &&
                     x.IsActive)
-                .OrderBy(x =>
-                    x.DisplayOrder)
+                .OrderBy(x => x.DisplayOrder)
                 .Select(x =>
                     new FacilityFieldResponseDto
                     {
@@ -130,7 +129,31 @@ namespace CitizenConnect.Application.Services
                             x.Placeholder,
 
                         IsActive =
-                            x.IsActive
+                            x.IsActive,
+
+                        Options =
+                            x.FacilityFieldOptions
+                                .Where(o => o.IsActive)
+                                .OrderBy(o => o.DisplayOrder)
+                                .Select(o =>
+                                    new FacilityFieldOptionResponseDto
+                                    {
+                                        FacilityFieldOptionId =
+                                            o.FacilityFieldOptionId,
+
+                                        FacilityFieldId =
+                                            o.FacilityFieldId,
+
+                                        OptionText =
+                                            o.OptionText,
+
+                                        DisplayOrder =
+                                            o.DisplayOrder,
+
+                                        IsActive =
+                                            o.IsActive
+                                    })
+                                .ToList()
                     })
                 .ToListAsync();
         }

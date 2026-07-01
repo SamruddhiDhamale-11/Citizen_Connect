@@ -1,4 +1,5 @@
 ﻿using CitizenConnect.API.Domain.Enums;
+using CitizenConnect.API.DTOs.FacilityFieldOptionDto;
 
 namespace CitizenConnect.Application.DTOs.Facility
 {
@@ -20,5 +21,11 @@ namespace CitizenConnect.Application.DTOs.Facility
         public string? Placeholder { get; set; }
 
         public bool IsActive { get; set; }
+
+        public List<FacilityFieldOptionResponseDto> Options
+        {
+            get;
+            set;
+        } = new();
     }
 }

@@ -26,7 +26,7 @@ namespace CitizenConnect.API.Domain.Entities
 
         public Jurisdiction Jurisdiction { get; set; }
 
-        public ICollection<Citizen> Citizens { get; set; }= new List<Citizen>();
+        public ICollection<Citizen> Citizens { get; set; } = new List<Citizen>();
 
         public ICollection<Politician> Politicians { get; set; }
             = new List<Politician>();
@@ -55,5 +55,8 @@ namespace CitizenConnect.API.Domain.Entities
         public ICollection<WardBoundary> WardBoundaries
         { get; set; }
     = new List<WardBoundary>();
+
+        public virtual ICollection<WardRepresentative> WardRepresentatives { get; set; }
+        = new List<WardRepresentative>();
     }
 }

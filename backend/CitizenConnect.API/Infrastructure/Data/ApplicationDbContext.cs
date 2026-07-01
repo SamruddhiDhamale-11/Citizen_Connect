@@ -115,7 +115,9 @@ namespace CitizenConnect.Infrastructure.Data
 
         public DbSet<Demographic> Demographics { get; set; }
 
-        
+        public DbSet<WardRepresentative> WardRepresentatives { get; set; }
+
+
         // =====================================================
         // MODEL CONFIGURATION
         // =====================================================
@@ -211,6 +213,13 @@ namespace CitizenConnect.Infrastructure.Data
     .HasOne(j => j.JurisdictionType)
     .WithMany()
     .HasForeignKey(j => j.JurisdictionTypeId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<WardRepresentative>()
+    .HasOne(wr => wr.Ward)
+    .WithMany(w => w.WardRepresentatives)
+    .HasForeignKey(wr => wr.WardId)
     .OnDelete(DeleteBehavior.Restrict);
 
             // =====================================================

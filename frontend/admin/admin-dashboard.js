@@ -5,7 +5,7 @@
    Complete implementation with localStorage, progress tracking,
    conditional visibility, confirmation modal, toast system.
    ============================================================ */
-
+alert("THIS IS MY JS FILE");
 'use strict';
 
 /* ============================================================
@@ -31,6 +31,9 @@ const OFFICER_API_BASE =
   'http://localhost:5079/api/officers';
 
 var adminComplaintsData = [];
+
+const WARD_REPRESENTATIVE_API =
+    "http://localhost:5079/api/WardRepresentative";
 
 
 const DEPARTMENT_API_BASE =
@@ -649,9 +652,75 @@ function openSection(sectionId) {
 
   // Navigate
   showPanel('section-detail', null);
+  if(sectionId === "representatives"){
+    loadRepresentativeData();
+}
 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function loadRepresentativeData() {
+
+    const response = await fetch(
+        `${WARD_REPRESENTATIVE_API}/ward/1`
+    );
+
+    if (!response.ok)
+        return;
+
+    const members = await response.json();
+
+    const data = {
+
+        members: members.map(function (m) {
+
+            return {
+
+                name: m.representativeName,
+
+                role: m.designation,
+
+                mobile: m.mobileNumber,
+
+                email: m.email,
+
+                address: m.address
+            };
+
+        })
+    };
+
+    lsSet("representatives", data);
+
+    refreshMembersList(data.members);
+
+    renderSectionPreview("representatives");
+}
+
+function renderRepresentativePreview(members) {
+
+    var previewBody = document.getElementById("sdPreviewBody");
+
+    if (!previewBody)
+        return;
+
+    var html = "";
+
+    members.forEach(function (m, i) {
+
+        html += `
+            <div class="sd-preview-member-card">
+                <div class="sd-preview-member-name">${m.representativeName}</div>
+                <div>Role: ${m.designation}</div>
+                <div>Mobile: ${m.mobileNumber}</div>
+                <div>Email: ${m.email ?? ""}</div>
+                <div>Address: ${m.address ?? ""}</div>
+            </div>
+        `;
+    });
+
+    previewBody.innerHTML = html;
 }
 
 /* ---- CLOSE SECTION DETAIL ---- */
@@ -840,46 +909,65 @@ function createMemberItem(member, idx) {
 }
 
 function addMember() {
-  if (!currentSectionId) return;
-  var data = lsGet(currentSectionId);
-  if (!data.members) data.members = [];
-  data.members.push({ name:'', role:'', mobile:'', email:'', address:'' });
-  lsSet(currentSectionId, data);
-  refreshMembersList(data.members);
-  showToast('Member row added.', 'info');
-}
 
-function deleteMember(idx) {
-  if (!currentSectionId) return;
-  showConfirm('Delete Member', 'Remove this member from the list?', function() {
+    if (!currentSectionId) return;
+
     var data = lsGet(currentSectionId);
-    if (!data.members) return;
-    data.members.splice(idx, 1);
+
+    if (!data.members)
+        data.members = [];
+
+    data.members.push({
+        name: "",
+        role: "",
+        mobile: "",
+        email: "",
+        address: ""
+    });
+
     lsSet(currentSectionId, data);
+
     refreshMembersList(data.members);
+
     renderSectionPreview(currentSectionId);
-    syncSectionMeta(currentSectionId);
-    showToast('Member deleted.', 'info');
-  });
+
+    showToast("Member added.", "success");
 }
 
-function updateMemberField(idx, key, value) {
-  if (!currentSectionId) return;
-  var data = lsGet(currentSectionId);
-  if (!data.members || !data.members[idx]) return;
-  data.members[idx][key] = value;
+function deleteMember(index) {
 
-  // Update the item title live
-  var items = document.querySelectorAll('#membersList .sd-member-item');
-  if (items[idx]) {
-    var titleEl = items[idx].querySelector('.sd-member-item-title');
-    if (titleEl && key === 'name') {
-      titleEl.textContent = value.trim() || 'Member ' + (idx + 1);
-    }
-  }
+    if (!currentSectionId) return;
 
-  lsSet(currentSectionId, data);
-  renderSectionPreview(currentSectionId);
+    var data = lsGet(currentSectionId);
+
+    if (!data.members)
+        return;
+
+    data.members.splice(index, 1);
+
+    lsSet(currentSectionId, data);
+
+    refreshMembersList(data.members);
+
+    renderSectionPreview(currentSectionId);
+
+    showToast("Member deleted.", "success");
+}
+
+function updateMemberField(index, key, value) {
+
+    if (!currentSectionId) return;
+
+    var data = lsGet(currentSectionId);
+
+    if (!data.members)
+        data.members = [];
+
+    data.members[index][key] = value;
+
+    lsSet(currentSectionId, data);
+
+    renderSectionPreview(currentSectionId);
 }
 
 function refreshMembersList(members) {
@@ -964,21 +1052,11 @@ function renderSectionPreview(sectionId) {
    SECTION DETAIL — COLLECT FORM DATA
    ============================================================ */
 function collectFormData() {
-  if (!currentSectionId) return null;
-  var formConfig = SECTION_FORMS[currentSectionId];
-  if (!formConfig) return null;
 
-  var existing = lsGet(currentSectionId);
-  var data = Object.assign({}, existing);
+    if (!currentSectionId)
+        return null;
 
-  formConfig.fields.forEach(function(field) {
-    if (field.type !== 'members') {
-      var input = document.getElementById('field-' + field.key);
-      if (input) data[field.key] = input.value;
-    }
-  });
-
-  return data;
+    return lsGet(currentSectionId);
 }
 
 /* ============================================================
@@ -1050,20 +1128,38 @@ function saveSectionDraft() {
   // Save Draft does NOT clear the form — values stay in inputs
 }
 
-function submitSectionData() {
-  if (!currentSectionId) return;
-  var data = collectFormData();
-  if (!data) return;
-  var ts = nowTimestamp();
-  data._lastUpdated = ts.date;
-  data._lastSaved   = ts.time;
-  data._submitted   = true;
-  lsSet(currentSectionId, data);
-  syncSectionMeta(currentSectionId);
-  renderSectionPreview(currentSectionId);
-  syncAreaSummary();                          // refresh top summary
-  clearSectionForm();                         // reset form inputs after submit
-  showToast('Section submitted and marked as Completed!', 'success');
+async function submitSectionData() {
+
+    console.log("submitSectionData called");
+
+    console.log("currentSectionId =", currentSectionId);
+
+    var data = collectFormData();
+
+    console.log("data =", data);
+
+    if (!currentSectionId){
+        console.log("RETURN-1");
+        return;
+    }
+
+    if (!data){
+        console.log("RETURN-2");
+        return;
+    }
+
+    if (currentSectionId === "representatives"){
+
+        console.log("Inside representatives");
+
+        await saveWardRepresentatives(data);
+
+        console.log("API Finished");
+
+        return;
+    }
+
+    console.log("Current section is:", currentSectionId);
 }
 
 function updateSectionData() {
@@ -4008,7 +4104,7 @@ function closeWardModal() {
 /* ============================================================
    WARD SECTION DETAIL — OPEN
    ============================================================ */
-function openWardSection(sectionId) {
+async function openWardSection(sectionId) {
   var section = WARD_SECTIONS.find(function(s) { return s.id === sectionId; });
   if (!section) return;
   var formConfig = WARD_SECTION_FORMS[sectionId];
@@ -5302,3 +5398,63 @@ document.addEventListener('keydown', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
   rehydrateWardFacilities();
 });
+
+
+async function saveWardRepresentatives(data) {
+
+    const payload = {
+
+        wardId: 1,
+
+        representatives: (data.members || []).map(function (m) {
+
+            return {
+
+                representativeName: m.name,
+
+                designation: m.role,
+
+                mobileNumber: m.mobile,
+
+                email: m.email,
+
+                address: m.address
+            };
+
+        })
+    };
+
+    console.log(payload);
+
+    const response = await fetch(WARD_REPRESENTATIVE_API, {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+
+        const error = await response.text();
+
+        throw new Error(error);
+    }
+
+    return await response.json();
+}
+
+async function loadWardRepresentatives() {
+
+    const response = await fetch(
+        `${WARD_REPRESENTATIVE_API}/ward/1`
+    );
+
+    if (!response.ok)
+        return [];
+
+    return await response.json();
+}

@@ -33,5 +33,10 @@ namespace CitizenConnect.API.Interfaces.Services
 
         Task<bool> DeleteAsync(
             int facilityRecordId);
+
+        Task<FacilityRecordDetailsDto?>
+    GetDetailsAsync(int facilityRecordId);
+
+       
     }
 }

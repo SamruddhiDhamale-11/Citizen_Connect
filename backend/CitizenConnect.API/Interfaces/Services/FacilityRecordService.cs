@@ -1,4 +1,5 @@
 ﻿using CitizenConnect.API.Domain.Entities;
+using CitizenConnect.API.DTOs.FacilityFieldOptionDto;
 using CitizenConnect.API.DTOs.FacilityRecordDto;
 using CitizenConnect.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -353,6 +354,78 @@ namespace CitizenConnect.API.Interfaces.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<FacilityRecordDetailsDto?>
+     GetDetailsAsync(int facilityRecordId)
+        {
+            var record = await _context.FacilityRecords
+                .Include(x => x.FacilityModule)
+                .Include(x => x.Jurisdiction)
+                .Include(x => x.Ward)
+                .FirstOrDefaultAsync(x =>
+                    x.FacilityRecordId == facilityRecordId);
+
+            if (record == null)
+            {
+                return null;
+            }
+
+            var fieldValues = await _context.FacilityDatas
+    .Where(x => x.FacilityRecordId == facilityRecordId)
+    .Include(x => x.FacilityField)
+        .ThenInclude(x => x.FacilityFieldOptions)
+    .ToListAsync();
+
+            // We will continue here in the next step.
+
+            return new FacilityRecordDetailsDto
+            {
+                FacilityRecordId = record.FacilityRecordId,
+
+                FacilityModuleId = record.FacilityModuleId,
+
+                FacilityModuleName = record.FacilityModule.ModuleName,
+
+                JurisdictionId = record.JurisdictionId,
+
+                JurisdictionName = record.Jurisdiction.JurisdictionName,
+
+                WardId = record.WardId,
+
+                WardName = record.Ward?.WardName,
+
+                IsActive = record.IsActive,
+
+                Fields = fieldValues.Select(x => new FacilityFieldDetailsDto
+                {
+                    FacilityFieldId = x.FacilityFieldId,
+
+                    FieldName = x.FacilityField.FieldName,
+
+                    FieldType = x.FacilityField.FieldType,
+
+                    IsRequired = x.FacilityField.IsRequired,
+
+                    Placeholder = x.FacilityField.Placeholder,
+
+                    FieldValue = x.FieldValue,
+
+                    Options = x.FacilityField.FacilityFieldOptions
+                        .Where(o => o.IsActive)
+                        .OrderBy(o => o.DisplayOrder)
+                        .Select(o => new FacilityFieldOptionResponseDto
+                        {
+                            FacilityFieldOptionId = o.FacilityFieldOptionId,
+                            FacilityFieldId = o.FacilityFieldId,
+                            OptionText = o.OptionText,
+                            DisplayOrder = o.DisplayOrder,
+                            IsActive = o.IsActive
+                        })
+                        .ToList()
+
+                }).ToList()
+            };
         }
     }
 }

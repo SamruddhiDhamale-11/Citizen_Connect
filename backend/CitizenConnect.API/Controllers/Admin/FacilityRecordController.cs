@@ -189,5 +189,25 @@ namespace CitizenConnect.API.Controllers.Admin
                     "Facility Record deleted successfully."
             });
         }
+
+        /// <summary>
+        /// Get Facility Record Details
+        /// </summary>
+        [HttpGet("{id}/details")]
+        public async Task<IActionResult> GetDetails(int id)
+        {
+            var result =
+                await _service.GetDetailsAsync(id);
+
+            if (result == null)
+            {
+                return NotFound(new
+                {
+                    Message = "Facility Record not found."
+                });
+            }
+
+            return Ok(result);
+        }
     }
 }
