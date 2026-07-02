@@ -27,12 +27,11 @@ namespace CitizenConnect.API.Interfaces.Services
                     x.ComplaintStatusMaster
                      .StatusName == "Resolved");
 
-            var openComplaints =
+           var openComplaints =
     await _context.Complaints
     .CountAsync(x =>
         x.ComplaintStatusMaster.StatusName == "Pending" ||
-        x.ComplaintStatusMaster.StatusName == "Assigned" ||
-        x.ComplaintStatusMaster.StatusName == "In Progress");
+        x.ComplaintStatusMaster.StatusName == "Assigned");
 
             var assignedComplaints =
                 await _context.Complaints

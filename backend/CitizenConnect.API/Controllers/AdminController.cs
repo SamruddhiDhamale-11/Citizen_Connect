@@ -77,17 +77,21 @@ namespace CitizenConnect.Controllers
         /// <summary>
         /// Update complaint status (Pending / InProgress / Resolved)
         /// </summary>
-        [HttpPut("update-status")]
-        public async Task<IActionResult>
-            UpdateComplaintStatus(
-                [FromBody] UpdateComplaintStatusDto dto)
-        {
-            var result =
-                await _adminService
-                    .UpdateComplaintStatusAsync(dto);
+       [HttpPut("update-status")]
+public async Task<IActionResult> UpdateComplaintStatus(
+    [FromBody] UpdateComplaintStatusDto dto)
+{
+    var result =
+        await _adminService
+            .UpdateComplaintStatusAsync(dto);
 
-            return Ok(result);
-        }
+    if (result.StartsWith("Cannot"))
+    {
+        return BadRequest(result);
+    }
+
+    return Ok(result);
+}
 
         // =====================================================
         // COMPLAINT HISTORY

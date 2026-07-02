@@ -95,10 +95,10 @@ function initCharts() {
     new Chart(ctxStatus, {
       type: "doughnut",
       data: {
-        labels: ["Resolved", "In Progress", "Pending"],
-        datasets: [{
-          data: [89, 21, 17],
-          backgroundColor: [GREEN, BLUE, RED],
+        labels: ["Resolved", "Assigned", "Pending"],
+datasets: [{
+    data: [89, 21, 17],
+    backgroundColor: [GREEN, BLUE, RED],
           borderWidth: 2, borderColor: "#fff"
         }]
       },

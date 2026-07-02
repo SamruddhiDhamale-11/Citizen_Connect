@@ -1,4 +1,9 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+﻿.hidden {
+    display: none !important;
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -179,6 +184,74 @@ body { font-family: 'Inter','Segoe UI',Arial,sans-serif; background: var(--bg); 
 .btn-primary { background: var(--red); color: #fff; border: 1.5px solid var(--red); box-shadow: 0 2px 8px rgba(194,24,7,0.20); }
 .btn-primary:hover { background: var(--red-dark); box-shadow: 0 4px 14px rgba(194,24,7,0.28); }
 
+/* ==========================================================
+   PROFESSIONAL CONFIRM BUTTONS
+========================================================== */
+
+.confirm-actions{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:16px;
+
+    margin-top:28px;
+
+}
+
+.confirm-actions button{
+
+    min-width:140px;
+
+    padding:12px 22px;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:all .25s ease;
+
+}
+
+.btn-ghost{
+
+    background:#F9FAFB;
+
+    color:#374151;
+
+    border:1px solid #D1D5DB;
+
+}
+
+.btn-ghost:hover{
+
+    background:#E5E7EB;
+
+}
+
+.btn-primary{
+
+    background:#C62828;
+
+    color:#fff;
+
+    border:none;
+
+}
+
+.btn-primary:hover{
+
+    background:#B71C1C;
+
+    transform:translateY(-1px);
+
+}
+
 /* ---- AREA INFO CARD ---- */
 .area-info-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
 .area-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -250,11 +323,6 @@ body { font-family: 'Inter','Segoe UI',Arial,sans-serif; background: var(--bg); 
 .placeholder-icon { font-size: 3rem; margin-bottom: 16px; }
 .placeholder-title { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
 .placeholder-desc { font-size: 0.86rem; color: var(--text-muted); max-width: 420px; margin: 0 auto; line-height: 1.6; }
-
-/* ---- TOAST ---- */
-.toast { position: fixed; bottom: 28px; right: 28px; background: var(--text); color: #fff; padding: 13px 20px; border-radius: 8px; font-size: 0.86rem; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.18); z-index: 999; animation: toastIn 0.3s ease both; }
-@keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.hidden { display: none !important; }
 
 /* ---- MODAL ---- */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease both; }
@@ -463,12 +531,6 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 /* ============================================================
    ADDITIONAL STYLES FOR COMPLETE IMPLEMENTATION
    ============================================================ */
-
-/* ---- TOAST VARIANTS ---- */
-.toast-success { background: #16a34a; }
-.toast-warning { background: #D97706; }
-.toast-error   { background: #C21807; }
-.toast-info    { background: #2563EB; }
 
 /* ---- CONFIRMATION MODAL ---- */
 .confirm-card { max-width: 460px; }
@@ -707,7 +769,10 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
 .item-card-date { font-size: 0.74rem; color: var(--text-muted); }
 .status-pill { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 .status-pill.pending { background: #FEF3C7; color: #92400E; }
-.status-pill.inprogress { background: #DBEAFE; color: #1E40AF; }
+.status-pill.assigned {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
 .status-pill.resolved { background: #D1FAE5; color: #065F46; }
 .status-pill.rejected { background: #FEE2E2; color: #991B1B; }
 .priority-pill { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
@@ -2265,7 +2330,7 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
     background: linear-gradient(135deg,#f59e0b,#fbbf24);
 }
 
-.status-card.progress {
+.status-card.assigned {
     background: linear-gradient(135deg,#3b82f6,#60a5fa);
 }
 
@@ -2339,4 +2404,345 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
         #14b8a6,
         #2dd4bf
     );
+}
+
+/* ==========================================================
+   MODERN CUSTOM ALERT
+========================================================== */
+
+.custom-alert-overlay{
+
+    position:fixed;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(0,0,0,.45);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+
+    z-index:99999;
+
+    animation:fadeIn .25s ease;
+}
+
+.custom-alert-box{
+
+    position:relative;
+
+    width:390px;
+    max-width:90%;
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    overflow:visible;
+
+    padding-top:55px;
+
+    text-align:center;
+
+    box-shadow:
+        0 18px 45px rgba(15,23,42,.18);
+
+    border:1px solid #e5e7eb;
+
+    animation:popupScale .28s ease;
+}
+/* Floating Icon */
+
+.custom-alert-icon{
+
+    position:absolute;
+
+    top:-42px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:84px;
+    height:84px;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:40px;
+
+    color:#fff;
+
+    border:6px solid #fff;
+
+    box-shadow:
+        0 12px 28px rgba(0,0,0,.18);
+
+    animation:iconBounce .45s ease;
+}
+.custom-alert-content{
+
+    padding:20px 35px 30px;
+}
+
+.custom-alert-content h2{
+
+    margin:0;
+
+    font-size:28px;
+
+    font-weight:600;
+
+    color:#1f2937;
+
+    letter-spacing:.2px;
+}
+.custom-alert-content p{
+
+    margin-top:14px;
+
+    font-size:17px;
+
+    line-height:1.7;
+
+    color:#6b7280;
+
+    padding:0 8px;
+}
+.custom-alert-footer{
+
+    border-top:1px solid #ececec;
+
+    padding:20px;
+
+    background:#fafafa;
+
+    border-radius:0 0 18px 18px;
+}
+.custom-alert-btn{
+
+    width:160px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:8px;
+
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:none;
+}
+.custom-alert-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 12px 22px rgba(0,0,0,.18);
+}
+
+.custom-alert-btn:hover{
+
+    transform:translateY(-2px);
+
+    opacity:.95;
+}
+
+/* SUCCESS */
+
+.custom-alert-success .custom-alert-icon,
+.custom-alert-success .custom-alert-btn{
+
+    background:#22c55e;
+}
+
+/* ERROR */
+
+.custom-alert-error .custom-alert-icon,
+.custom-alert-error .custom-alert-btn{
+
+    background:#dc2626;
+}
+
+/* WARNING */
+
+.custom-alert-warning .custom-alert-icon,
+.custom-alert-warning .custom-alert-btn{
+
+    background:#f59e0b;
+}
+
+/* INFO */
+
+.custom-alert-info .custom-alert-icon,
+.custom-alert-info .custom-alert-btn{
+
+    background:#2563eb;
+}
+
+@keyframes popupScale{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.85);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+    }
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+    }
+
+    to{
+
+        opacity:1;
+    }
+}
+
+@keyframes iconBounce{
+
+    0%{
+
+        transform:
+            translateX(-50%)
+            scale(.65);
+    }
+
+    70%{
+
+        transform:
+            translateX(-50%)
+            scale(1.08);
+    }
+
+    100%{
+
+        transform:
+            translateX(-50%)
+            scale(1);
+    }
+}
+
+.custom-alert-close{
+
+    position:absolute;
+
+    top:18px;
+    right:18px;
+
+    width:34px;
+    height:34px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#f3f4f6;
+
+    color:#6b7280;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    transition:.25s;
+}
+
+.custom-alert-close:hover{
+
+    background:#e5e7eb;
+
+    color:#111827;
+
+    transform:rotate(90deg);
+}
+
+/* ==========================================================
+   CONFIRMATION MODAL (PROFESSIONAL)
+========================================================== */
+
+.confirm-header{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:14px;
+
+    padding:28px 24px 16px;
+
+    position:relative;
+
+}
+
+.confirm-icon{
+
+    width:72px;
+
+    height:72px;
+
+    border-radius:50%;
+
+    background:#FEF2F2;
+
+    color:#DC2626;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:30px;
+
+    border:4px solid #FEE2E2;
+
+}
+
+.confirm-header .modal-title{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#1F2937;
+
+    text-align:center;
+
+}
+
+.confirm-header .modal-close{
+
+    position:absolute;
+
+    right:18px;
+
+    top:18px;
+
 }

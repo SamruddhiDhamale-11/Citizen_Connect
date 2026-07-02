@@ -638,17 +638,17 @@
 
   </div>
 
-  <div class="status-card progress"
-       onclick="filterByStatusCard('inprogress')">
+  <div class="status-card assigned"
+     onclick="filterByStatusCard('assigned')">
 
     <div class="status-card-header">
-      <span class="status-card-label">In Progress</span>
-      <i class="fa-solid fa-spinner"></i>
+      <span class="status-card-label">Assigned</span>
+      <i class="fa-solid fa-user-check"></i>
     </div>
 
-    <div class="status-count" id="inProgressCount">0</div>
+    <div class="status-count" id="assignedCount">0</div>
 
-  </div>
+</div>
 
   <div class="status-card resolved"
        onclick="filterByStatusCard('resolved')">
@@ -692,10 +692,10 @@
         <div class="filter-bar">
           <select class="filter-select" id="adminComplaintStatusFilter" onchange="filterAdminComplaints(this.value)">
             <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="inprogress">In Progress</option>
-            <option value="resolved">Resolved</option>
-            <option value="rejected">Rejected</option>
+<option value="pending">Pending</option>
+<option value="assigned">Assigned</option>
+<option value="resolved">Resolved</option>
+<option value="rejected">Rejected</option>
           </select>
           <input type="text" class="filter-search" id="adminComplaintSearch" placeholder="Search complaints..." oninput="searchAdminComplaints(this.value)" />
         </div>
@@ -1007,10 +1007,13 @@
             First Name
           </label>
 
-          <input type="text"
-                 id="officerFirstName"
-                 class="sd-input"
-                 placeholder="Enter first name" />
+        <input
+    type="text"
+    id="officerFirstName"
+    class="sd-input"
+    placeholder="Enter first name"
+    maxlength="50"
+    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
 
         </div>
 
@@ -1022,10 +1025,13 @@
             Last Name
           </label>
 
-          <input type="text"
-                 id="officerLastName"
-                 class="sd-input"
-                 placeholder="Enter last name" />
+          <input
+    type="text"
+    id="officerLastName"
+    class="sd-input"
+    placeholder="Enter last name"
+    maxlength="50"
+    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
 
         </div>
 
@@ -1037,10 +1043,12 @@
             Email
           </label>
 
-          <input type="email"
-                 id="officerEmail"
-                 class="sd-input"
-                 placeholder="Enter email address" />
+          <input
+    type="email"
+    id="officerEmail"
+    class="sd-input"
+    placeholder="Enter email"
+    maxlength="150">
 
         </div>
 
@@ -1052,10 +1060,15 @@
             Mobile Number
           </label>
 
-          <input type="text"
-                 id="officerMobile"
-                 class="sd-input"
-                 placeholder="Enter mobile number" />
+        <input
+    type="tel"
+    id="officerMobile"
+    class="sd-input"
+    placeholder="Enter 10-digit mobile number"
+    maxlength="10"
+    inputmode="numeric"
+    pattern="[0-9]{10}"
+    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
 
         </div>
 
@@ -1067,10 +1080,12 @@
             Designation
           </label>
 
-          <input type="text"
-                 id="officerDesignation"
-                 class="sd-input"
-                 placeholder="Enter designation" />
+         <input
+    type="text"
+    id="officerDesignation"
+    class="sd-input"
+    placeholder="Enter designation"
+    maxlength="100">
 
         </div>
 
@@ -1390,13 +1405,6 @@
 
 </div>
 
-
-  <!-- ===== TOAST ===== -->
-  <div class="toast hidden" id="toast">
-    <span class="toast-icon" id="toastIcon">&#x2705;</span>
-    <span id="toastMsg">Action completed successfully!</span>
-  </div>
-
   <!-- ===== QUICK VIEW MODAL ===== -->
   <div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal()">
     <div class="modal-card" onclick="event.stopPropagation()">
@@ -1411,20 +1419,106 @@
   <!-- ===== CONFIRMATION MODAL ===== -->
   <div class="modal-overlay hidden" id="confirmOverlay" onclick="confirmNo()">
     <div class="modal-card confirm-card" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title" id="confirmTitle">Confirm Action</div>
-        <button class="modal-close" onclick="confirmNo()">&#x2715;</button>
-      </div>
+      
+      
+    <div class="modal-header confirm-header">
+
+    <div class="confirm-icon">
+
+        <i class="fa-solid fa-right-from-bracket"></i>
+
+    </div>
+
+    <div class="modal-title" id="confirmTitle">
+
+        Confirm Action
+
+    </div>
+
+    <button
+        class="modal-close"
+        onclick="confirmNo()">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+</div>
+
+
       <div class="modal-body">
         <p class="confirm-message" id="confirmMessage">Are you sure?</p>
         <div class="confirm-actions">
-          <button class="btn-action btn-ghost" onclick="confirmNo()">Cancel</button>
-          <button class="btn-action btn-primary" onclick="confirmYes()">Confirm</button>
+          <button
+    id="confirmCancelBtn"
+    class="btn-action btn-ghost"
+    onclick="confirmNo()">
+
+    Cancel
+
+</button>
+
+<button
+    id="confirmOkBtn"
+    class="btn-action btn-primary"
+    onclick="confirmYes()">
+
+    Confirm
+
+</button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="admin-dashboard.js"></script>
+
+
+<div id="customAlertOverlay" class="custom-alert-overlay hidden">
+
+    <div id="customAlertBox" class="custom-alert-box">
+
+      <button
+    id="customAlertClose"
+    class="custom-alert-close"
+    onclick="closeCustomAlert()">
+
+    <i class="fa-solid fa-xmark"></i>
+
+</button>
+
+        <div id="customAlertIcon" class="custom-alert-icon">
+            ✓
+        </div>
+
+        <div class="custom-alert-content">
+
+            <h2 id="customAlertTitle">
+                Success
+            </h2>
+
+            <p id="customAlertMessage">
+                Message
+            </p>
+
+        </div>
+
+        <div class="custom-alert-footer">
+
+            <button
+                id="customAlertButton"
+                class="custom-alert-btn"
+                onclick="closeCustomAlert()">
+
+                OK
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 </body>
 </html>

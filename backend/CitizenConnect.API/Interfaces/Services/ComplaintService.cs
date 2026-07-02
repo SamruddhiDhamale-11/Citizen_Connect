@@ -133,11 +133,22 @@ using CitizenConnect.API.Interfaces.Services;
                 .FirstOrDefaultAsync();
 
             // =========================================
-            // GENERATE COMPLAINT NUMBER
-            // =========================================
+// GENERATE COMPLAINT NUMBER
+// =========================================
 
-            string complaintNumber =
-                    $"CC-{DateTime.UtcNow:yyyyMMddHHmmss}";
+string departmentCode =
+    GetDepartmentCode(category.Department.DepartmentName);
+
+string today =
+    DateTime.Now.ToString("yyyyMMdd");
+
+int count =
+    await _context.Complaints.CountAsync(c =>
+        c.DepartmentId == category.DepartmentId &&
+        c.CreatedAt.Date == DateTime.Today);
+
+string complaintNumber =
+    $"CC-{today}-{departmentCode}-{(count + 1):D3}";
 
                 // =========================================
                 // CREATE COMPLAINT
@@ -513,6 +524,33 @@ Images = c.ComplaintImages
                     .ToListAsync();
             }
 
+
+private string GetDepartmentCode(string departmentName)
+{
+    return departmentName switch
+    {
+        "Water Supply & Leakage" => "WTR",
+        "Roads & Potholes" => "RDS",
+        "Garbage & Sanitation" => "SAN",
+        "Drainage & Sewage" => "DRN",
+        "Streetlights & Electricity" => "STL",
+        "Public Electricity Issues" => "PEL",
+        "Traffic & Parking Issues" => "TRF",
+        "Illegal Construction & Encroachment" => "ENC",
+        "Noise Pollution" => "NOS",
+        "Other Civic Issues" => "OTH",
+        "Waterlogging & Flooding" => "FLD",
+        "Public Safety & Security" => "SEC",
+        "Parks & Public Spaces" => "PRK",
+        "Animal & Stray Dog Issues" => "ANM",
+        "Air Pollution" => "AIR",
+        "Government Property Damage" => "GPD",
+        "Smart City Projects" => "SCP",
+        "Digital Services" => "DIG",
+        "Education & Schools" => "EDU",
+        _ => "OTH"
+    };
+}
 
 
         

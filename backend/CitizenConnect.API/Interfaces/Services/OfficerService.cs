@@ -91,7 +91,7 @@ var officer = new Officer
 
             _context.Officers.Add(officer);
 
-            await _context.SaveChangesAsync();
+await _context.SaveChangesAsync();
 
             var mapping = new OfficerCategoryMapping
             {
@@ -100,9 +100,9 @@ var officer = new Officer
                 IsActive = true
             };
 
-            _context.OfficerCategoryMappings.Add(mapping);
+           _context.OfficerCategoryMappings.Add(mapping);
 
-            await _context.SaveChangesAsync();
+await _context.SaveChangesAsync();
 
             var department =
                 await _context.Departments
