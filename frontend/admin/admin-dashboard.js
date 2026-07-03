@@ -369,11 +369,30 @@ function showToast(msg, type) {
 /* ============================================================
    CONFIRMATION MODAL
    ============================================================ */
-function showConfirm(title, message, onConfirm) {
-  document.getElementById('confirmTitle').textContent   = title;
-  document.getElementById('confirmMessage').textContent = message;
-  confirmCallback = onConfirm;
-  document.getElementById('confirmOverlay').classList.remove('hidden');
+function showConfirm(
+    title,
+    message,
+    onConfirm,
+    confirmText = "Confirm",
+    cancelText = "Cancel"
+) {
+
+    document.getElementById("confirmTitle").textContent = title;
+
+    document.getElementById("confirmMessage").textContent = message;
+
+    document.getElementById("confirmOkBtn").textContent =
+        confirmText;
+
+    document.getElementById("confirmCancelBtn").textContent =
+        cancelText;
+
+    confirmCallback = onConfirm;
+
+    document
+        .getElementById("confirmOverlay")
+        .classList
+        .remove("hidden");
 }
 
 function confirmYes() {
@@ -585,9 +604,26 @@ function resetAreaData() {
    LOGOUT
    ============================================================ */
 function logout() {
-  showConfirm('Logout', 'Are you sure you want to logout?', function() {
-    window.location.href = "../home/login/admin/admin-login.html";
-  });
+
+    showConfirm(
+
+        "Logout",
+
+        "Are you sure you want to logout from Citizen Connect?",
+
+        function () {
+
+            window.location.href =
+                "../home/login/admin/admin-login.html";
+
+        },
+
+        "Logout",
+
+        "Stay Logged In"
+
+    );
+
 }
 
 /* ============================================================
@@ -1322,8 +1358,8 @@ function updateComplaintStatusCards(complaints) {
     const pending =
         complaints.filter(x => x.status === "pending").length;
 
-    const inProgress =
-        complaints.filter(x => x.status === "inprogress").length;
+    const assigned =
+    complaints.filter(x => x.status === "assigned").length;
 
     const resolved =
         complaints.filter(x => x.status === "resolved").length;
@@ -1334,8 +1370,8 @@ function updateComplaintStatusCards(complaints) {
     document.getElementById("pendingCount").textContent =
         pending;
 
-    document.getElementById("inProgressCount").textContent =
-        inProgress;
+    document.getElementById("assignedCount").textContent =
+        assigned;
 
     document.getElementById("resolvedCount").textContent =
         resolved;
@@ -1464,20 +1500,20 @@ function filterByStatusCard(status) {
         );
 
     const activeCard =
-        document.querySelector(
-            '.status-card.' +
-            (
-                status === "pending"
-                    ? "pending"
-                    : status === "inprogress"
-                    ? "progress"
-                    : status === "resolved"
-                    ? "resolved"
-                    : status === "rejected"
-                    ? "rejected"
-                    : "all"
-            )
-        );
+    document.querySelector(
+        '.status-card.' +
+        (
+            status === "pending"
+                ? "pending"
+                : status === "assigned"
+                ? "assigned"
+                : status === "resolved"
+                ? "resolved"
+                : status === "rejected"
+                ? "rejected"
+                : "all"
+        )
+    );
 
     if (activeCard) {
         activeCard.classList.add("active");
@@ -1751,17 +1787,26 @@ async function updateSuggestionStatus(id, status) {
         const result = await response.json();
 
         if (result.success) {
-            alert("Status updated successfully");
+           showAlert(
+    "success",
+    "Suggestion status updated successfully."
+);
 
             // reload list
             loadAdminSuggestions();
         } else {
-            alert("Failed to update");
+            showAlert(
+    "error",
+    "Failed to update suggestion status."
+);
         }
 
     } catch (error) {
         console.error(error);
-        alert("Error updating suggestion");
+       showAlert(
+    "error",
+    "An unexpected error occurred while updating the suggestion."
+);
     }
 }
 
@@ -1874,17 +1919,26 @@ function resolveComplaintImageUrl(path) {
 }
 
 function normalizeAdminComplaintStatus(status) {
+
   if (!status) return 'pending';
+
   var s = String(status).toLowerCase().replace(/\s+/g, '');
-  if (s === 'inprogress') return 'inprogress';
+
+  if (s === 'assigned') return 'assigned';
   if (s === 'pending') return 'pending';
   if (s === 'resolved') return 'resolved';
   if (s === 'rejected') return 'rejected';
+
   return s;
 }
 
 function adminStatusLabel(s) {
-  var map = { pending: 'Pending', inprogress: 'In Progress', resolved: 'Resolved', rejected: 'Rejected' };
+  var map = {
+    pending: 'Pending',
+    assigned: 'Assigned',
+    resolved: 'Resolved',
+    rejected: 'Rejected'
+  };
   return map[s] || s;
 }
 
@@ -2268,12 +2322,12 @@ function getComplaintStatusLabel(status) {
   var s = String(status).toLowerCase().trim();
 
   if (s === '1') return 'Pending';
-  if (s === '2') return 'In Progress';
-  if (s === '3') return 'Resolved';
-  if (s === '4') return 'Rejected';
+  if (s === '2') return 'Assigned';
+  if (s === '4') return 'Resolved';
+  if (s === '5') return 'Rejected';
 
   if (s === 'pending') return 'Pending';
-  if (s === 'inprogress') return 'In Progress';
+  if (s === 'assigned') return 'Assigned';
   if (s === 'resolved') return 'Resolved';
   if (s === 'rejected') return 'Rejected';
 
@@ -2889,49 +2943,104 @@ async function submitSuggestionStatusUpdate(suggestionId) {
 }
 
 async function submitAdminStatusUpdate() {
-  if (!activeComplaintId) return;
 
-  var userId = localStorage.getItem('userId');
-  if (!userId) {
-    showToast('Please log in again to update status.', 'warning');
-    return;
-  }
+    if (!activeComplaintId) return;
 
-  var statusEl = document.getElementById('adminStatusSelect');
-  var remarksEl = document.getElementById('adminStatusRemarks');
-  var newStatus = statusEl ? statusEl.value : 'Pending';
-  var remarks = remarksEl ? remarksEl.value.trim() : '';
+    var userId = localStorage.getItem("userId");
 
-  var selectedOfficer =
-    document.querySelector(
-        'input[name="assignedOfficer"]:checked'
-    );
+    if (!userId) {
 
-var assignedOfficerId =
-    selectedOfficer
-        ? parseInt(selectedOfficer.value, 10)
-        : null;
+        showAlert(
+            "warning",
+            "Please log in again."
+        );
 
-  try {
-    var response = await fetch('http://localhost:5079/api/Admin' + '/update-status', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({
-  complaintId: activeComplaintId,
-  complaintStatusMasterId: parseInt(newStatus, 10),
-  assignedOfficerId: assignedOfficerId,
-  remarks: remarks || null
-})
-    });
+        return;
+    }
 
-    if (!response.ok) throw new Error('Update failed');
-    var msg = await response.text();
-    showToast(msg || 'Complaint status updated.', 'success');
-    closeModal();
-    await loadAdminComplaints();
-  } catch (_) {
-    showToast('Unable to update complaint status.', 'error');
-  }
+    var statusEl =
+        document.getElementById("adminStatusSelect");
+
+    var remarksEl =
+        document.getElementById("adminStatusRemarks");
+
+    var newStatus =
+        statusEl
+            ? statusEl.value
+            : "Pending";
+
+    var remarks =
+        remarksEl
+            ? remarksEl.value.trim()
+            : "";
+
+    var selectedOfficer =
+        document.querySelector(
+            'input[name="assignedOfficer"]:checked'
+        );
+
+    var assignedOfficerId =
+        selectedOfficer
+            ? parseInt(selectedOfficer.value)
+            : null;
+
+    try {
+
+        var response =
+            await fetch(
+                "http://localhost:5079/api/Admin/update-status",
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+
+                        complaintId:
+                            activeComplaintId,
+
+                        complaintStatusMasterId:
+                            parseInt(newStatus),
+
+                        assignedOfficerId:
+                            assignedOfficerId,
+
+                        remarks:
+                            remarks || null
+                    })
+                });
+
+        var msg =
+            await response.text();
+
+        if (!response.ok) {
+
+            showAlert(
+                "error",
+                msg
+            );
+
+            return;
+        }
+
+        showAlert(    
+            "success",
+            msg
+        );
+
+        closeModal();
+
+        await loadAdminComplaints();
+
+    }
+    catch (error) {
+
+        showAlert(
+            "error",
+            "Unable to update complaint status."
+        );
+    }
 }
 
 /* ============================================================
@@ -3027,6 +3136,7 @@ async function loadCitizens() {
     renderCitizens(allCitizens);
 
   } catch (err) {
+
     console.error("Error loading citizens", err);
 
     document.getElementById("citizenTableBody").innerHTML = `
@@ -3036,7 +3146,13 @@ async function loadCitizens() {
         </td>
       </tr>
     `;
-  }
+
+    showAlert(
+        "error",
+        "Unable to load citizens. Please try again."
+    );
+
+}
 }
 
 /* RENDER TABLE */
@@ -3124,14 +3240,16 @@ function openEditCitizen(citizenId){
         x => x.citizenId === citizenId
     );
 
-    if(!citizen){
+   if (!citizen) {
 
-        alert("Citizen not found.");
+    showAlert(
+        "error",
+        "Citizen not found."
+    );
 
-        return;
+    return;
 
-    }
-
+}
     document.getElementById("editCitizenId").value =
         citizen.citizenId;
 
@@ -3205,7 +3323,10 @@ async function updateCitizen(){
 
     if(result.success){
 
-       showToast("Citizen updated successfully!", "success");
+    showAlert(
+    "success",
+    "Citizen details updated successfully."
+);
 
         closeEditCitizenModal();
 
@@ -3214,7 +3335,10 @@ async function updateCitizen(){
     }
     else{
 
-        alert(result.message || "Unable to update citizen.");
+      showAlert(
+    "error",
+    result.message || "Unable to update citizen."
+);
 
     }
 
@@ -3326,10 +3450,10 @@ async function loadOfficers() {
 
     console.error(error);
 
-    showToast(
-      'Unable to load officers.',
-      'error'
-    );
+    showAlert(
+    "error",
+    "Unable to load officers."
+);
   }
 }
 
@@ -3500,90 +3624,296 @@ function renderDepartmentDropdowns() {
 
 async function saveOfficer() {
 
-  try {
+    try {
 
-    const payload = {
-      firstName: document.getElementById('officerFirstName').value,
-      lastName: document.getElementById('officerLastName').value,
-      email: document.getElementById('officerEmail').value,
-      mobileNumber: document.getElementById('officerMobile').value,
-      designation: document.getElementById('officerDesignation').value,
+      const errors = [];
 
-      departmentId: Number(
-        document.getElementById('officerDepartment').value
-      ),
+        /* ---------- FIRST NAME ---------- */
 
-      categoryId: Number(
-        document.getElementById('officerCategory').value
-      ),
+        const firstName =
+            document
+                .getElementById("officerFirstName")
+                .value
+                .trim();
 
-      wardId: 1,   // only Shivaji Ward
+       if (!firstName) {
 
-      isAvailable:
-        document.getElementById('officerAvailability').value === 'true'
-};
-
-    let response;
-
-    if (selectedOfficerId) {
-
-      response = await fetch(
-        `${OFFICER_API_BASE}/${selectedOfficerId}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }
-      );
-
-    } else {
-
-      response = await fetch(
-        OFFICER_API_BASE,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }
-      );
-    }
-
-    // ✅ ERROR HANDLING (fixed)
-    if (!response.ok) {
-
-      let errorMessage = 'Failed to save officer.';
-
-      try {
-        const errorData = await response.json();
-        errorMessage =
-          errorData?.message ||
-          errorData?.title ||
-          JSON.stringify(errorData);
-      } catch (e) {
-  errorMessage = 'Server error while saving officer.';
-}
-      throw new Error(errorMessage);
-    }
-
-    // ✅ SUCCESS FLOW
-    showToast('Officer saved successfully.', 'success');
-
-    closeOfficerModal();
-    loadOfficers();
-
-    selectedOfficerId = null;
-
-  } catch (error) {
-
-    console.error(error);
-
-    showToast(
-      error.message || 'Unable to save officer.',
-      'error'
+    errors.push(
+        "• First Name is required."
     );
-  }
+
 }
 
+        /* ---------- LAST NAME ---------- */
+
+        const lastName =
+            document
+                .getElementById("officerLastName")
+                .value
+                .trim();
+
+       if (!lastName) {
+
+    errors.push(
+        "• Last Name is required."
+    );
+
+}
+
+        /* ---------- EMAIL ---------- */
+
+        const email =
+            document
+                .getElementById("officerEmail")
+                .value
+                .trim();
+
+        if (!email) {
+
+    errors.push(
+        "• Email Address is required."
+    );
+
+}
+
+        const emailPattern =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email && !emailPattern.test(email)) {
+
+    errors.push(
+        "• Please enter a valid email address."
+    );
+
+}
+
+        /* ---------- MOBILE ---------- */
+
+        const mobileNumber =
+            document
+                .getElementById("officerMobile")
+                .value
+                .trim();
+
+       if (!mobileNumber) {
+
+    errors.push(
+        "• Mobile Number is required."
+    );
+
+}
+
+       if (mobileNumber && !/^\d{10}$/.test(mobileNumber)) {
+
+    errors.push(
+        "• Mobile Number must contain exactly 10 digits."
+    );
+
+}
+
+        /* ---------- DESIGNATION ---------- */
+
+        const designation =
+            document
+                .getElementById("officerDesignation")
+                .value
+                .trim();
+
+       if (!designation) {
+
+    errors.push(
+        "• Designation is required."
+    );
+
+}
+
+        /* ---------- DEPARTMENT ---------- */
+
+        const departmentId =
+            Number(
+                document
+                    .getElementById("officerDepartment")
+                    .value
+            );
+
+       if (!departmentId) {
+
+    errors.push(
+        "• Please select a department."
+    );
+
+}
+
+        /* ---------- CATEGORY ---------- */
+
+        const categoryId =
+            Number(
+                document
+                    .getElementById("officerCategory")
+                    .value
+            );
+
+        if (!categoryId) {
+
+    errors.push(
+        "• Please select a complaint category."
+    );
+
+}
+
+        /* ---------- AVAILABILITY ---------- */
+
+        const isAvailable =
+            document
+                .getElementById("officerAvailability")
+                .value === "true";
+
+/* ---------- VALIDATION RESULT ---------- */
+
+if (errors.length > 0) {
+
+    showAlert(
+    "error",
+    "Please correct the following:<br><br>" +
+    errors.join("<br>"),
+    "Validation Failed"
+);
+
+    return;
+
+}
+
+
+        /* ---------- PAYLOAD ---------- */
+
+        const payload = {
+
+            firstName: firstName,
+
+            lastName: lastName,
+
+            email: email,
+
+            mobileNumber: mobileNumber,
+
+            designation: designation,
+
+            departmentId: departmentId,
+
+            categoryId: categoryId,
+
+            wardId: 1,
+
+            isAvailable: isAvailable
+
+        };
+
+        let response;
+
+        if (selectedOfficerId) {
+
+            response = await fetch(
+
+                `${OFFICER_API_BASE}/${selectedOfficerId}`,
+
+                {
+
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(payload)
+
+                }
+
+            );
+
+        } else {
+
+            response = await fetch(
+
+                OFFICER_API_BASE,
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(payload)
+
+                }
+
+            );
+
+        }
+
+        /* ---------- RESPONSE ---------- */
+
+        if (!response.ok) {
+
+            let errorMessage =
+                "Failed to save officer.";
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                errorMessage =
+                    errorData.message ||
+                    errorData.title ||
+                    "Unable to save officer.";
+
+            }
+            catch {
+
+                errorMessage =
+                    "Server error while saving officer.";
+
+            }
+
+            throw new Error(errorMessage);
+
+        }
+
+        /* ---------- SUCCESS ---------- */
+
+        showAlert(
+
+            "success",
+
+            "Officer details have been saved successfully."
+
+        );
+
+        closeOfficerModal();
+
+        await loadOfficers();
+
+        selectedOfficerId = null;
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        showAlert(
+
+            "error",
+
+            error.message ||
+            "Unable to save officer."
+
+        );
+
+    }
+
+}
 /* ============================================================
    EDIT OFFICER
    ============================================================ */
@@ -3630,7 +3960,13 @@ document.getElementById('officerCategory').value =
 
 function deleteOfficer(id) {
 
-  showConfirm('Delete Officer', 'Are you sure?', async function() {
+showConfirm(
+
+    "Delete Officer",
+
+    "Are you sure you want to permanently delete this officer?<br><br><strong>This action cannot be undone.</strong>",
+
+    async function () {
 
     try {
 
@@ -3643,7 +3979,10 @@ function deleteOfficer(id) {
         throw new Error('Delete failed.');
       }
 
-      showToast('Officer deleted.', 'success');
+     showAlert(
+    "success",
+    "Officer deleted successfully."
+);
       loadOfficers();
 
     } catch (error) {
@@ -3651,7 +3990,10 @@ function deleteOfficer(id) {
       console.error(error);
 
     }
-  });
+  },
+"Delete",
+
+    "Cancel");
 }
 
 /* ============================================================
@@ -5522,3 +5864,153 @@ async function loadWardRepresentatives() {
 
     return await response.json();
 }
+/* ==========================================================
+   CUSTOM ALERT
+========================================================== */
+
+function showAlert(type, message, title) {
+
+    const overlay =
+        document.getElementById("customAlertOverlay");
+
+    const box =
+        overlay.querySelector(".custom-alert-box");
+
+    const icon =
+        document.getElementById("customAlertIcon");
+
+    const alertTitle =
+        document.getElementById("customAlertTitle");
+
+    const alertMessage =
+        document.getElementById("customAlertMessage");
+
+        const alertButton =
+    document.getElementById("customAlertButton");
+
+const closeButton =
+    document.getElementById("customAlertClose");
+
+    box.classList.remove(
+        "custom-alert-success",
+        "custom-alert-error",
+        "custom-alert-warning",
+        "custom-alert-info"
+    );
+
+    switch(type){
+
+        case "success":
+
+            box.classList.add("custom-alert-success");
+
+            icon.innerHTML =
+    '<i class="fa-solid fa-circle-check"></i>';
+
+            alertTitle.innerHTML=
+                title || "Success";
+
+                alertButton.innerHTML = "Done";
+
+            break;
+
+        case "error":
+
+            box.classList.add("custom-alert-error");
+
+           icon.innerHTML =
+    '<i class="fa-solid fa-circle-xmark"></i>';
+
+            alertTitle.innerHTML=
+                title || "Error";
+
+                alertButton.innerHTML = "OK";
+
+            break;
+
+        case "warning":
+
+            box.classList.add("custom-alert-warning");
+
+           icon.innerHTML =
+    '<i class="fa-solid fa-triangle-exclamation"></i>';
+
+            alertTitle.innerHTML=
+                title || "Warning";
+
+                alertButton.innerHTML = "Continue";
+
+            break;
+
+        default:
+
+            box.classList.add("custom-alert-info");
+
+            icon.innerHTML =
+    '<i class="fa-solid fa-circle-info"></i>';
+
+            alertTitle.innerHTML=
+                title || "Information";
+
+                alertButton.innerHTML = "Close";
+
+            break;
+    }
+
+ alertMessage.innerHTML = message;
+
+overlay.classList.remove("hidden");
+
+/* Success */
+
+if (type === "success") {
+
+  closeButton.style.display = "none";
+
+    alertButton.style.display = "none";
+
+    setTimeout(function () {
+
+        closeCustomAlert();
+
+    }, 2000);
+
+}
+
+/* Others */
+
+else {
+
+  closeButton.style.display = "block";
+
+    alertButton.style.display = "inline-block";
+
+}
+}
+
+function closeCustomAlert(){
+
+    document
+        .getElementById("customAlertOverlay")
+        .classList
+        .add("hidden");
+}
+
+// Close alert when clicking outside the popup
+document.addEventListener("click", function (e) {
+
+    const overlay =
+        document.getElementById("customAlertOverlay");
+
+    const box =
+        document.querySelector(".custom-alert-box");
+
+    if (
+        overlay &&
+        !overlay.classList.contains("hidden") &&
+        e.target === overlay
+    ) {
+        closeCustomAlert();
+    }
+
+});

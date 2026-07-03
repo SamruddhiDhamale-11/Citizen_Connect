@@ -10,6 +10,10 @@
  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
   <link rel="stylesheet" href="citizen-dashboard.css" />
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
 </head>
 <body>
 
@@ -1181,8 +1185,9 @@
           <select class="filter-select" onchange="filterItems('complaint', this.value)">
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
-            <option value="inprogress">In Progress</option>
-            <option value="resolved">Resolved</option>
+<option value="assigned">Assigned</option>
+<option value="resolved">Resolved</option>
+<option value="rejected">Rejected</option>
           </select>
           <input type="text" class="filter-search" placeholder="Search complaints..." oninput="searchItems('complaint', this.value)" />
         </div>
@@ -1291,12 +1296,6 @@
     </main>
   </div>
 
-  <!-- ===== SUCCESS TOAST ===== -->
-  <div class="toast hidden" id="toast">
-    <span class="toast-icon" id="toastIcon">✅</span>
-    <span id="toastMsg">Submitted successfully!</span>
-  </div>
-
   <div id="officerModal"
      class="hidden">
 
@@ -1366,5 +1365,58 @@
 
 </div>
   <script src="citizen-dashboard.js"></script>
+
+
+<!-- ==========================================================
+     CUSTOM ALERT
+========================================================== -->
+
+<div id="customAlertOverlay" class="custom-alert-overlay hidden">
+
+    <div id="customAlertBox" class="custom-alert-box">
+
+        <button
+            id="customAlertClose"
+            class="custom-alert-close"
+            onclick="closeCustomAlert()">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+        <div id="customAlertIcon" class="custom-alert-icon">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div class="custom-alert-content">
+
+            <h2 id="customAlertTitle">
+                Success
+            </h2>
+
+            <p id="customAlertMessage">
+                Message
+            </p>
+
+        </div>
+
+        <div class="custom-alert-footer">
+
+            <button
+                id="customAlertButton"
+                class="custom-alert-btn"
+                onclick="closeCustomAlert()">
+
+                Close
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 </body>
 </html>

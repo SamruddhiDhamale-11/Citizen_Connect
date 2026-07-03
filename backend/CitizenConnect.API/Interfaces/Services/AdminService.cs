@@ -155,12 +155,20 @@ namespace CitizenConnect.Services
                 .Select(x => x.StatusName)
                 .FirstOrDefaultAsync();
 
-            complaint.ComplaintStatusMasterId = dto.ComplaintStatusMasterId;
 
             string? assignedOfficerName = null;
 
             if (newStatus == "Assigned")
             {
+
+                Console.WriteLine("Assigned Officer Id = " + dto.AssignedOfficerId);
+
+if (dto.AssignedOfficerId == null || dto.AssignedOfficerId == 0)
+{
+    Console.WriteLine("No officer available.");
+    return "Cannot change status to Assigned because no officer is available.";
+}
+
                 complaint.AssignedOfficerId = dto.AssignedOfficerId;
                 complaint.AssignedAt = DateTime.UtcNow;
 
@@ -197,6 +205,8 @@ if (officer != null)
 
     complaint.IsAssignedEmailSent = true;
 }         }
+
+ complaint.ComplaintStatusMasterId = dto.ComplaintStatusMasterId;
 
             if (newStatus == "Resolved")
             {

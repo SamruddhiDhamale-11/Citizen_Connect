@@ -558,7 +558,7 @@ if (civicScore) {
   function normalizeComplaintStatus(status) {
     if (!status) return "pending";
     const s = String(status).toLowerCase().replace(/\s+/g, "");
-    if (s === "inprogress") return "inprogress";
+    if (s === "assigned") return "assigned";
     if (s === "pending") return "pending";
     if (s === "resolved") return "resolved";
     if (s === "rejected") return "rejected";
@@ -571,8 +571,8 @@ if (civicScore) {
       return c.status === "resolved";
     }).length;
     const pending = complaints.filter(function (c) {
-      return c.status === "pending" || c.status === "inprogress";
-    }).length;
+  return c.status === "pending" || c.status === "assigned";
+}).length;
 
     const statComplaints = document.getElementById("statComplaints");
     const statResolved = document.getElementById("statResolved");
@@ -1026,11 +1026,11 @@ try {
 
     if (!response.ok) {
 
-    showToast(
-        "Error",
-        result.message ||
-        "Complaint submission failed."
-    );
+    showAlert(
+    "error",
+    result.message ||
+    "Complaint submission failed."
+);
 
     return;
 }
@@ -1044,11 +1044,11 @@ try {
         result.ComplaintNumber ||
         "";
 
-    showToast(
-        "",
-        "Complaint submitted successfully! ID: " +
-        complaintNumber
-    );
+    showAlert(
+    "success",
+    "Complaint submitted successfully!<br><br><b>Complaint Number:</b> " +
+    complaintNumber
+);
 
     showPanel(
         "mycomplaints",
@@ -1288,10 +1288,10 @@ finally {
 
           await loadCitizenSuggestions();
 
-          showToast(
-      "",
-      "Suggestion submitted successfully"
-  );
+         showAlert(
+    "success",
+    "Suggestion submitted successfully."
+);
 
           showPanel(
               "mysuggestions",
@@ -1370,16 +1370,16 @@ escHtml(c.desc) +
           c.priority.toUpperCase() +
       '</span>' +
 
-      (
-          c.status === "inprogress" ||
-          c.status === "resolved"
-      ?
-      '<button class="btn-outline officer-btn" ' +
-      'onclick="showOfficerDetails(\'' + c.id + '\')">' +
-      '👮 View Officer' +
-      '</button>'
-      : ''
-      ) +
+     (
+    c.status === "assigned" ||
+    c.status === "resolved"
+?
+'<button class="btn-outline officer-btn" ' +
+'onclick="showOfficerDetails(\'' + c.id + '\')">' +
+'👮 View Officer' +
+'</button>'
+: ''
+) +
 
   '</div>'+
       '</div>';
@@ -1500,15 +1500,16 @@ escHtml(c.desc) +
 
   // ---- Helpers ----
   function statusLabel(s) {
-    const map = {
-      pending: "Pending",
-      inprogress: "In Progress",
-      resolved: "Resolved",
-      review: "Under Review",
-      approved: "Approved",
-      implemented: "Implemented",
-      rejected: "Rejected"
-    };
+   const map = {
+    pending: "Pending",
+    assigned: "Assigned",
+    resolved: "Resolved",
+    rejected: "Rejected",
+
+    review: "Under Review",
+    approved: "Approved",
+    implemented: "Implemented"
+};
 
     return map[s] || s;
   }
@@ -1530,14 +1531,6 @@ escHtml(c.desc) +
 
   function formatDate(d) {
     return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-  }
-
-  function showToast(icon, msg) {
-    const toast = document.getElementById("toast");
-    document.getElementById("toastIcon").textContent = icon;
-    document.getElementById("toastMsg").textContent = msg;
-    toast.classList.remove("hidden");
-    setTimeout(function () { toast.classList.add("hidden"); }, 4000);
   }
 
   function showOfficerDetails(complaintId)
@@ -2086,9 +2079,10 @@ escHtml(c.desc) +
 
     if (!isInside) {
 
-        showToast(
-    "Invalid Location...",
-    "Selected location is outside Ward Boundary."
+       showAlert(
+    "warning",
+    "Selected location is outside the ward boundary.",
+    "Invalid Location"
 );
 
         return;
@@ -2251,9 +2245,11 @@ function saveMapLocation() {
         selectedLatitude === null ||
         selectedLongitude === null
     ) {
-        alert(
-            "Please select location on map"
-        );
+        showAlert(
+    "warning",
+    "Please select a location on the map.",
+    "Location Required"
+);
         return;
     }
 
@@ -2279,11 +2275,11 @@ locationMsg.classList.remove(
     "hidden"
 );
 
-showToast(
-    "Location Selected",
-    "Complaint location has been captured."
+showAlert(
+    "success",
+    "Complaint location has been captured.",
+    "Location Selected"
 );
-
     closeMapModal();
 }
 
@@ -2319,3 +2315,154 @@ function closeMapModal(){
   window.closeSuggestionHistory = closeSuggestionHistory;
   window.viewSuggestionHistory  = viewSuggestionHistory;
   window.updateProfile = updateProfile;
+
+  /* ==========================================================
+   CUSTOM ALERT
+========================================================== */
+
+function showAlert(type, message, title) {
+
+    const overlay =
+        document.getElementById("customAlertOverlay");
+
+    const box =
+        document.getElementById("customAlertBox");
+
+    const icon =
+        document.getElementById("customAlertIcon");
+
+    const alertTitle =
+        document.getElementById("customAlertTitle");
+
+    const alertMessage =
+        document.getElementById("customAlertMessage");
+
+    const alertButton =
+        document.getElementById("customAlertButton");
+
+    const closeButton =
+        document.getElementById("customAlertClose");
+
+    box.classList.remove(
+        "custom-alert-success",
+        "custom-alert-error",
+        "custom-alert-warning",
+        "custom-alert-info"
+    );
+
+    switch(type){
+
+        case "success":
+
+            box.classList.add("custom-alert-success");
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-circle-check"></i>';
+
+            alertTitle.innerHTML =
+                title || "Success";
+
+            alertButton.innerHTML = "Done";
+
+            break;
+
+        case "error":
+
+            box.classList.add("custom-alert-error");
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-circle-xmark"></i>';
+
+            alertTitle.innerHTML =
+                title || "Error";
+
+            alertButton.innerHTML = "Close";
+
+            break;
+
+        case "warning":
+
+            box.classList.add("custom-alert-warning");
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-triangle-exclamation"></i>';
+
+            alertTitle.innerHTML =
+                title || "Warning";
+
+            alertButton.innerHTML = "Close";
+
+            break;
+
+        default:
+
+            box.classList.add("custom-alert-info");
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-circle-info"></i>';
+
+            alertTitle.innerHTML =
+                title || "Information";
+
+            alertButton.innerHTML = "Close";
+
+            break;
+    }
+
+    alertMessage.innerHTML = message;
+
+    overlay.classList.remove("hidden");
+
+    if(type === "success"){
+
+        alertButton.style.display = "none";
+
+        closeButton.style.display = "none";
+
+        setTimeout(function(){
+
+            closeCustomAlert();
+
+        },2000);
+
+    }
+    else{
+
+        alertButton.style.display = "inline-block";
+
+        closeButton.style.display = "block";
+    }
+}
+
+function closeCustomAlert(){
+
+    document
+        .getElementById("customAlertOverlay")
+        .classList
+        .add("hidden");
+}
+
+document.addEventListener("click",function(e){
+
+    const overlay =
+        document.getElementById("customAlertOverlay");
+
+    if(
+        overlay &&
+        !overlay.classList.contains("hidden") &&
+        e.target === overlay
+    ){
+        closeCustomAlert();
+    }
+
+});
+
+document.addEventListener("keydown",function(e){
+
+    if(e.key==="Escape"){
+
+        closeCustomAlert();
+
+    }
+
+});
