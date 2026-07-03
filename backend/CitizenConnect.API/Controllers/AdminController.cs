@@ -224,5 +224,33 @@ public async Task<IActionResult> GetOfficerByCategory(int categoryId)
     return Ok(officers);
 }
 
+
+//admin edit citizens
+[HttpPut("citizens/{citizenId}")]
+public async Task<IActionResult> UpdateCitizen(
+    int citizenId,
+    [FromBody] UpdateCitizenDto dto)
+{
+    var result =
+        await _adminService.UpdateCitizenAsync(
+            citizenId,
+            dto);
+
+    if (!result)
+    {
+        return NotFound(new
+        {
+            success = false,
+            message = "Citizen not found."
+        });
+    }
+
+    return Ok(new
+    {
+        success = true,
+        message = "Citizen updated successfully."
+    });
+}
+
     }
 }

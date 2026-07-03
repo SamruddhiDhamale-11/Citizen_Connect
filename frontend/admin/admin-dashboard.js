@@ -1439,11 +1439,6 @@ function filterSuggestionByCard(status) {
             )
         );
 
-console.log("Selected Status =", status);
-console.log("Active Card =", activeCard);
-
-console.log(activeCard.className);
-
     if (activeCard) {
         activeCard.classList.add("active");
     }
@@ -1500,8 +1495,6 @@ async function loadAdminSuggestions() {
 
         const result = await response.json();
 
-        console.log(result);
-
         allSuggestions = (result.data || []).map(function(s) {
     return {
         ...s,
@@ -1510,8 +1503,6 @@ async function loadAdminSuggestions() {
             s.isAnonymous === "true"
     };
 });
-
-        console.log(allSuggestions);
 
 updateSuggestionSummaryCards(allSuggestions);
 
@@ -1918,7 +1909,6 @@ function buildComplaintImagesHtml(complaint) {
 
 function renderAdminComplaints(data) {
   adminComplaintsData = data;
-  console.log(data[0]);
   var list = document.getElementById('adminComplaintsList');
   if (!list) return;
   
@@ -2161,7 +2151,6 @@ async function loadComplaintHistoryInline(complaintId, containerId) {
 );
 
     const history = await res.json();
-    console.log("COMPLAINT HISTORY API RESPONSE:", history);
 
     const container = document.getElementById(containerId);
 
@@ -2362,7 +2351,6 @@ if (visibleCount === 0) {
 async function openAdminComplaintDetail(event, complaintId) {
   if (event) event.stopPropagation();
   var complaint = adminComplaints.find(function(c) { return c.complaintId === complaintId; });
-  console.log("COMPLAINT OBJECT", complaint);
   if (!complaint) return;
 
   activeComplaintId = complaintId;
@@ -2374,11 +2362,6 @@ window.currentComplaintCategoryId =
     var detailRes = await fetch('http://localhost:5079/api/Complaint/' + encodeURIComponent(complaintId));
     if (detailRes.ok) {
       var detail = await detailRes.json();
-      console.log("Officer Name =", detail.officerName);
-console.log("Officer Designation =", detail.officerDesignation);
-console.log("Officer Mobile =", detail.officerMobileNumber);
-console.log("Officer Email =", detail.officerEmail);
-console.log("FULL DETAIL =", detail);
       complaint.desc = pickComplaintField(detail, 'description', 'Description') || complaint.desc;
       complaint.location = pickComplaintField(detail, 'address', 'Address') || complaint.location;
       complaint.citizen = pickComplaintField(detail, 'citizenName', 'CitizenName') || complaint.citizen;
@@ -2567,8 +2550,6 @@ async function loadSuggestionStatuses() {
 
     const result = await response.json();
 
-    console.log('Suggestion Statuses =', result);
-
     suggestionStatuses = result.data || [];
 
   } catch (error) {
@@ -2582,9 +2563,6 @@ async function loadSuggestionStatuses() {
 
 async function openAdminSuggestionDetail(suggestionId) {
 
-    console.log("FUNCTION CALLED");
-console.log("ID =", suggestionId);
-
 var suggestion = allSuggestions.find(function(s) {
     return Number(s.suggestionId) === Number(suggestionId);
 });
@@ -2593,10 +2571,6 @@ if (!suggestion) {
     console.error("Suggestion Not Found");
     return;
 }
-
-console.log("FULL SUGGESTION =", suggestion);
-console.log("IMAGES =", suggestion.images);
-console.log(JSON.stringify(suggestion, null, 2));
 
   var statusClass = '';
 
@@ -2893,8 +2867,6 @@ async function submitSuggestionStatusUpdate(suggestionId) {
 
         const result = await response.json();
 
-        console.log(result);
-
         if (result.success) {
 
             alert('Suggestion status updated successfully');
@@ -2939,11 +2911,6 @@ var assignedOfficerId =
     selectedOfficer
         ? parseInt(selectedOfficer.value, 10)
         : null;
-
-console.log(
-    'Selected Officer Id:',
-    assignedOfficerId
-);
 
   try {
     var response = await fetch('http://localhost:5079/api/Admin' + '/update-status', {
@@ -3055,8 +3022,6 @@ async function loadCitizens() {
     const res = await fetch("http://localhost:5079/api/Admin/citizens");
     const data = await res.json();
 
-    console.log("CITIZENS =", data);
-
     allCitizens = data.data || data || [];
 
     renderCitizens(allCitizens);
@@ -3137,9 +3102,11 @@ function renderCitizens(list) {
 
     <td>
       <div class="citizen-actions">
-        <button class="citizen-btn edit">
-          ✏️
-        </button>
+        <button
+    class="citizen-btn edit"
+    onclick="openEditCitizen(${c.citizenId})">
+    ✏️
+</button>
       </div>
     </td>
 
@@ -3150,6 +3117,108 @@ function renderCitizens(list) {
   tbody.innerHTML = html;
 }
 
+
+function openEditCitizen(citizenId){
+
+    const citizen = allCitizens.find(
+        x => x.citizenId === citizenId
+    );
+
+    if(!citizen){
+
+        alert("Citizen not found.");
+
+        return;
+
+    }
+
+    document.getElementById("editCitizenId").value =
+        citizen.citizenId;
+
+    document.getElementById("editCitizenFirstName").value =
+        citizen.firstName;
+
+    document.getElementById("editCitizenLastName").value =
+        citizen.lastName;
+
+    document.getElementById("editCitizenEmail").value =
+        citizen.email;
+
+    document.getElementById("editCitizenMobile").value =
+        citizen.mobile;
+
+    document
+        .getElementById("editCitizenModal")
+        .classList
+        .remove("hidden");
+
+}
+
+function closeEditCitizenModal(){
+
+    document
+        .getElementById("editCitizenModal")
+        .classList
+        .add("hidden");
+
+}
+
+async function updateCitizen(){
+
+    const citizenId =
+        document.getElementById("editCitizenId").value;
+
+    const data = {
+
+        firstName:
+            document.getElementById("editCitizenFirstName").value.trim(),
+
+        lastName:
+            document.getElementById("editCitizenLastName").value.trim(),
+
+        email:
+            document.getElementById("editCitizenEmail").value.trim(),
+
+        mobile:
+            document.getElementById("editCitizenMobile").value.trim()
+
+    };
+
+    const response = await fetch(
+    `http://localhost:5079/api/Admin/citizens/${citizenId}`,
+
+        {
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(data)
+
+        }
+
+    );
+
+    const result = await response.json();
+
+    if(result.success){
+
+       showToast("Citizen updated successfully!", "success");
+
+        closeEditCitizenModal();
+
+        loadCitizens();
+
+    }
+    else{
+
+        alert(result.message || "Unable to update citizen.");
+
+    }
+
+}
 /* SEARCH */
 function searchCitizens(query) {
 
@@ -3654,10 +3723,7 @@ document.addEventListener('change', function (e) {
 
 async function loadCategoriesByDepartment(departmentId) {
     try {
-        console.log("STEP 1 - Department selected:", departmentId);
-
         const url = `${COMPLAINT_API_BASE}/categories/by-department/${departmentId}`;
-        console.log("Calling API:", url);
 
         const response = await fetch(url);
 
@@ -3667,8 +3733,6 @@ async function loadCategoriesByDepartment(departmentId) {
         }
 
         const result = await response.json();
-
-        console.log("STEP 1 - FILTERED CATEGORIES:", result);
 
         const dropdown = document.getElementById("officerCategory");
         dropdown.innerHTML = `<option value="">Select Category</option>`;

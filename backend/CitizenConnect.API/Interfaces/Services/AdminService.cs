@@ -285,6 +285,29 @@ if (officer != null)
             return true;
         }
 
+
+        public async Task<bool> UpdateCitizenAsync(
+    int citizenId,
+    UpdateCitizenDto dto)
+{
+    var citizen = await _context.Citizens
+        .Include(c => c.User)
+        .FirstOrDefaultAsync(c => c.CitizenId == citizenId);
+
+    if (citizen == null)
+        return false;
+
+    citizen.User.FirstName = dto.FirstName;
+    citizen.User.LastName = dto.LastName;
+    citizen.User.Email = dto.Email;
+    citizen.User.MobileNo = dto.Mobile;
+
+    await _context.SaveChangesAsync();
+
+    return true;
+}
+
+
         public async Task<List<ComplaintStatusDto>> GetComplaintStatusesAsync()
         {
             return await _context.ComplaintStatusMasters

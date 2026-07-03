@@ -94,7 +94,7 @@ function generateCaptcha() {
 }
 
 function validateCaptcha(userInput) {
-  return userInput.trim().toLowerCase() === _captchaValue.toLowerCase();
+  return userInput.trim() === _captchaValue;
 }
 
 // Generate captcha on load
