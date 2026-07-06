@@ -2823,27 +2823,38 @@ async function submitSuggestionStatusUpdate(suggestionId) {
             }
         );
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (result.success) {
+if (result.success) {
 
-            alert('Suggestion status updated successfully');
+    showAlert(
+        "success",
+        "Suggestion status updated successfully."
+    );
 
-            closeModal();
+    closeModal();
 
-            await loadAdminSuggestions();
+    await loadAdminSuggestions();
 
-        } else {
+} else {
 
-            alert(result.message || 'Update failed');
-        }
+    showAlert(
+        "error",
+        result.message || "Update failed."
+    );
 
-    } catch (error) {
+}
 
-        console.error(error);
+} catch (error) {
 
-        alert('Error updating suggestion status');
-    }
+    console.error(error);
+
+    showAlert(
+        "error",
+        "Error updating suggestion status."
+    );
+}
+        
 }
 
 async function submitAdminStatusUpdate() {
