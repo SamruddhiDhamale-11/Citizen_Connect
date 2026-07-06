@@ -1578,16 +1578,10 @@ function renderAdminSuggestions(data) {
 
   var list = document.getElementById('adminSuggestionsList');
   if (!list) return;
-if (!data || data.length === 0) {
-
-  list.innerHTML = `
-    <div class="empty-state">
-      No suggestions found.
-    </div>
-  `;
-
-  return;
-}
+if (!data.length) {
+    list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>No suggestions found.</div></div>';
+    return;
+  }
   let html = '';
 
   data.forEach(function(s) {
@@ -1967,7 +1961,7 @@ function renderAdminComplaints(data) {
   if (!list) return;
   
   if (!data.length) {
-    list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>No complaints found.</div></div>';
+   list.innerHTML = '<div class="item-empty"><div class="item-empty-icon">&#x1F4CB;</div><div>No complaints found.</div></div>';
     return;
   }
   list.innerHTML = data.map(function(c) {
@@ -2391,7 +2385,7 @@ if (emptyMsg) {
   emptyMsg.remove();
 }
 
-if (visibleCount === 0) {
+/*if (visibleCount === 0) {
   list.insertAdjacentHTML(
     'beforeend',
     '<div id="complaintEmptyMessage" class="item-empty">' +
@@ -2399,7 +2393,7 @@ if (visibleCount === 0) {
       '<div>No complaints found.</div>' +
     '</div>'
   );
-}
+}*/
 }
 
 async function openAdminComplaintDetail(event, complaintId) {
