@@ -588,8 +588,13 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     }
 
     localStorage.setItem('userId', data.userId);
-    localStorage.setItem('role',   data.role);
-    window.location.href = '../../../citizen/citizen-dashboard.html';
+localStorage.setItem('role', data.role);
+
+showLoginSuccess(
+    "Login Successful!",
+    "Welcome to Grampanchayat Ambale!",
+    "../../../citizen/citizen-dashboard.html"
+);
 
   } catch (err) {
     showError('loginError', err.message || 'Unable to connect to the server. Please check your connection and try again.');
@@ -952,4 +957,47 @@ function loginSpeakCaptcha(btn) {
   _loginSpeak('The captcha code is: ' + spoken, function () {
     if (statusEl) statusEl.textContent = '';
   });
+}
+
+function showLoginSuccess(title, message, redirectUrl) {
+
+    document.getElementById('registerCard').classList.add('hidden');
+    document.getElementById('loginCard').classList.add('hidden');
+
+    const card = document.getElementById('successCard');
+
+    card.classList.remove('hidden');
+
+    // Change title
+    const titleEl = card.querySelector('.success-title');
+    if (titleEl) {
+        titleEl.textContent = title;
+    }
+
+    // Change message
+    const subEl = card.querySelector('.success-sub');
+    if (subEl) {
+        subEl.textContent = message;
+    }
+
+    // Stop progress bar
+   const progress = document.getElementById('progressBarWrap');
+if (progress) {
+    progress.style.display = "none";
+}
+
+const redirectText = document.getElementById('successRedirectText');
+if (redirectText) {
+    redirectText.style.display = "none";
+}
+    // Show OK button
+   const okBtn = document.getElementById('successOkBtn');
+
+if (okBtn) {
+    okBtn.style.display = "none";
+}
+
+setTimeout(() => {
+    window.location.href = redirectUrl;
+}, 6500);
 }

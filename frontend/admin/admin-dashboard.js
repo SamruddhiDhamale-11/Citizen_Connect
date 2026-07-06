@@ -2385,7 +2385,9 @@ if (emptyMsg) {
   emptyMsg.remove();
 }
 
-/*if (visibleCount === 0) {
+if (!list) return;
+
+if (visibleCount === 0) {
   list.insertAdjacentHTML(
     'beforeend',
     '<div id="complaintEmptyMessage" class="item-empty">' +
@@ -2393,7 +2395,7 @@ if (emptyMsg) {
       '<div>No complaints found.</div>' +
     '</div>'
   );
-}*/
+}
 }
 
 async function openAdminComplaintDetail(event, complaintId) {
