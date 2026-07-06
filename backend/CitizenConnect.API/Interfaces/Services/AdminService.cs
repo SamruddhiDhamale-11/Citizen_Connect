@@ -155,6 +155,7 @@ namespace CitizenConnect.Services
                 .Select(x => x.StatusName)
                 .FirstOrDefaultAsync();
 
+Officer? officer = null;
 
             string? assignedOfficerName = null;
 
@@ -177,8 +178,10 @@ if (dto.AssignedOfficerId == null || dto.AssignedOfficerId == 0)
                     .Select(o => o.FirstName + " " + o.LastName)
                     .FirstOrDefaultAsync();
 
-                var officer = await _context.Officers
+            officer = await _context.Officers
+    .Include(o => o.Department)
     .FirstOrDefaultAsync(o => o.OfficerId == dto.AssignedOfficerId);
+
 
 if (officer != null)
 {
@@ -187,21 +190,32 @@ if (officer != null)
         .Select(c => c.Citizen.User.FirstName + " " + c.Citizen.User.LastName)
         .FirstOrDefaultAsync();
 
+    var citizenDetails = await _context.Complaints
+    .Where(c => c.ComplaintId == complaint.ComplaintId)
+    .Select(c => new
+    {
+        Email = c.Citizen.User.Email,
+        Mobile = c.Citizen.User.MobileNo
+    })
+    .FirstOrDefaultAsync();
+
     var imageUrl = await _context.Complaints
         .Where(c => c.ComplaintId == complaint.ComplaintId)
         .SelectMany(c => c.ComplaintImages)
         .Select(i => i.ImagePath)
         .FirstOrDefaultAsync();
 
-    await _emailService.SendComplaintAssignedEmail(
-        officer.Email,
-        assignedOfficerName,
-        complaint.Title,
-        complaint.Description,
-        citizenName,
-        newStatus,
-        imageUrl
-    );
+   await _emailService.SendComplaintAssignedEmail(
+    officer.Email,
+    assignedOfficerName,
+    complaint.Title,
+    complaint.Description,
+    citizenName,
+    citizenDetails?.Email ?? "",
+    citizenDetails?.Mobile ?? "",
+    newStatus,
+    imageUrl
+);
 
     complaint.IsAssignedEmailSent = true;
 }         }
@@ -223,10 +237,74 @@ if (officer != null)
                 ChangedAt = DateTime.UtcNow
             };
 
-            await _context.ComplaintStatusHistories.AddAsync(history);
-            await _context.SaveChangesAsync();
+           await _context.ComplaintStatusHistories.AddAsync(history);
+await _context.SaveChangesAsync();
 
-            return "Complaint status updated successfully";
+
+// ======================================
+// Send email to Citizen
+// ======================================
+
+var citizen = await _context.Citizens
+    .Include(c => c.User)
+    .FirstOrDefaultAsync(c => c.CitizenId == complaint.CitizenId);
+
+if (citizen != null &&
+    !string.IsNullOrWhiteSpace(citizen.User.Email))
+{
+    var citizenName =
+        $"{citizen.User.FirstName} {citizen.User.LastName}";
+
+
+
+Console.WriteLine("========== EMAIL DEBUG ==========");
+Console.WriteLine($"Status: {newStatus}");
+Console.WriteLine($"AssignedOfficerId: {dto.AssignedOfficerId}");
+Console.WriteLine($"Officer Exists: {officer != null}");
+
+if (officer != null)
+{
+    Console.WriteLine($"Officer Name: {officer.FirstName} {officer.LastName}");
+    Console.WriteLine($"Designation: {officer.Designation}");
+    Console.WriteLine($"Department: {officer.Department?.DepartmentName}");
+    Console.WriteLine($"Email: {officer.Email}");
+    Console.WriteLine($"Mobile: {officer.MobileNumber}");
+}
+
+Console.WriteLine("=================================");
+
+
+    await _emailService.SendComplaintStatusUpdatedEmail(
+    citizen.User.Email,
+    citizenName,
+    complaint.ComplaintNumber,
+    oldStatus ?? "",
+    newStatus ?? "",
+    dto.Remarks,
+
+    newStatus == "Assigned"
+        ? officer?.FirstName + " " + officer?.LastName
+        : null,
+
+    newStatus == "Assigned"
+        ? officer?.Designation
+        : null,
+
+    newStatus == "Assigned"
+        ? officer?.Department?.DepartmentName
+        : null,
+
+    newStatus == "Assigned"
+        ? officer?.Email
+        : null,
+
+    newStatus == "Assigned"
+        ? officer?.MobileNumber
+        : null
+);
+}
+
+return "Complaint status updated successfully";
         }
 
         // =========================================
