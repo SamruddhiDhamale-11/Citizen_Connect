@@ -702,7 +702,6 @@ select {
   justify-content: center;
   margin: 0 auto 28px;
   box-shadow: 0 6px 24px rgba(22,163,74,.28);
-  animation: popIn ...
 }
 
 .success-title { font-size: 1.65rem; font-weight: 800; color: #15803d; margin-bottom: 10px; letter-spacing: -0.01em; }

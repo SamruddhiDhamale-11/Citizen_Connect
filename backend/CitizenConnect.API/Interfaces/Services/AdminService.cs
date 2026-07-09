@@ -133,6 +133,9 @@ namespace CitizenConnect.Services
 
         public async Task<string> UpdateComplaintStatusAsync(UpdateComplaintStatusDto dto)
         {
+
+                Console.WriteLine("========== UPDATE METHOD HIT ==========");
+
             var complaint = await _context.Complaints
                 .FirstOrDefaultAsync(c => c.ComplaintId == dto.ComplaintId);
 
@@ -227,6 +230,8 @@ if (officer != null)
                 complaint.ResolvedAt = DateTime.UtcNow;
             }
 
+            Console.WriteLine(">>> SAVING COMPLAINT HISTORY <<<");
+
             var history = new ComplaintStatusHistory
             {
                 ComplaintId = complaint.ComplaintId,
@@ -237,8 +242,12 @@ if (officer != null)
                 ChangedAt = DateTime.UtcNow
             };
 
-           await _context.ComplaintStatusHistories.AddAsync(history);
+          await _context.ComplaintStatusHistories.AddAsync(history);
 await _context.SaveChangesAsync();
+
+Console.WriteLine("SAVE COMPLETED");
+Console.WriteLine("Assigned Officer = " + complaint.AssignedOfficerId);
+Console.WriteLine("Complaint Status = " + complaint.ComplaintStatusMasterId);
 
 
 // ======================================

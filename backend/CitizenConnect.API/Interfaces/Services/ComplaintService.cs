@@ -462,8 +462,11 @@ Images = c.ComplaintImages
                 .ToList()
             : new List<string>(),
 
-         IsAssigned =
-             complaint.AssignedOfficer != null,
+     IsAssigned =
+    complaint.ComplaintStatusHistories != null &&
+    complaint.ComplaintStatusHistories.Any(h =>
+        h.NewStatus != null &&
+        h.NewStatus.Trim().Equals("Assigned", StringComparison.OrdinalIgnoreCase)),
 
                     OfficerName =
     complaint.AssignedOfficer != null
