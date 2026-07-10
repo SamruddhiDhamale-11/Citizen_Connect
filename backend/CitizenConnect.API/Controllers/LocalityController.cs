@@ -131,6 +131,18 @@ GetByPincode(string pincode)
 
     return Ok(result);
 }
+
+        [HttpGet("ward/{wardId}")]
+        public async Task<IActionResult>
+GetLocalitiesByWard(int wardId)
+        {
+            var result =
+                await _localityService
+                    .GetLocalitiesByWardAsync(
+                        wardId);
+
+            return Ok(result);
+        }
     }
 
    

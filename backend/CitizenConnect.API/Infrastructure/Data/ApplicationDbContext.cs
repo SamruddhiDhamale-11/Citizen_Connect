@@ -117,6 +117,9 @@ namespace CitizenConnect.Infrastructure.Data
 
         public DbSet<WardRepresentative> WardRepresentatives { get; set; }
 
+        public DbSet<LocalityBoundary> LocalityBoundaries
+    => Set<LocalityBoundary>();
+
 
         // =====================================================
         // MODEL CONFIGURATION
@@ -348,6 +351,12 @@ namespace CitizenConnect.Infrastructure.Data
                 .WithMany(x => x.Localities)
                 .HasForeignKey(x => x.LocalityTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LocalityBoundary>()
+    .HasOne(lb => lb.Locality)
+    .WithOne(l => l.LocalityBoundary)
+    .HasForeignKey<LocalityBoundary>(lb => lb.LocalityId)
+    .OnDelete(DeleteBehavior.Cascade);
 
             // =====================================================
             // OFFICER -> DEPARTMENT

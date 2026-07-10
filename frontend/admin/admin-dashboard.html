@@ -7,6 +7,18 @@
   <link rel="stylesheet" href="admin-dashboard.css" />
   <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link
+rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 </head>
 <body>
 
@@ -53,6 +65,20 @@
           <span class="nav-icon">&#x1F3D8;&#xFE0F;</span>
           <span class="nav-label">Ward / Village Management</span>
         </a>
+
+        <a href="#"
+   class="nav-item"
+   onclick="showPanel('gis-management', this)">
+
+    <span class="nav-icon">
+        🗺️
+    </span>
+
+    <span class="nav-label">
+        GIS Management
+    </span>
+
+</a>
         <a href="#" class="nav-item" onclick="showPanel('citizen-management', this)">
           <span class="nav-icon">&#x1F465;</span>
           <span class="nav-label">Citizen Management</span>
@@ -561,6 +587,192 @@
 
         </div>
       </div>
+
+      <div class="panel" id="panel-gis-management">
+
+    <!-- Page Header -->
+    <div class="page-header">
+
+        <div>
+            <h1 class="page-title">
+                GIS Management
+            </h1>
+
+            <p class="page-subtitle">
+                Manage Ward and Locality Boundaries using an interactive GIS map.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- GIS Summary -->
+
+    <div class="area-info-card">
+
+        <div class="area-info-grid">
+
+            <div class="area-info-item">
+
+                <div class="area-info-label">
+                    Selected Ward
+                </div>
+
+                <div class="area-info-value"
+                     id="gisSelectedWard">
+
+                    -
+
+                </div>
+
+            </div>
+
+            <div class="area-info-item">
+
+                <div class="area-info-label">
+                    Selected Locality
+                </div>
+
+                <div class="area-info-value"
+                     id="gisSelectedLocality">
+
+                    -
+
+                </div>
+
+            </div>
+
+            <div class="area-info-item">
+
+                <div class="area-info-label">
+                    Boundary Status
+                </div>
+
+                <div class="area-info-value">
+
+                    <span
+                        class="area-status-badge draft"
+                        id="gisBoundaryStatus">
+
+                        Not Available
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="section-title">
+
+    GIS Configuration
+
+</div>
+
+<div class="sd-form-card">
+
+    <div class="sd-form-body">
+
+        <div class="officer-form-grid">
+
+            <div class="sd-field-group">
+
+                <label class="sd-field-label">
+
+                    Ward
+
+                </label>
+
+                <select
+                    id="gisWard"
+                    class="sd-select">
+
+                    <option value="">
+
+                        Select Ward
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="sd-field-group">
+
+                <label class="sd-field-label">
+
+                    Locality
+
+                </label>
+
+                <select
+                    id="gisLocality"
+                    class="sd-select">
+
+                    <option value="">
+
+                        Select Locality
+
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="section-title">
+
+    GIS Map
+
+</div>
+
+<div class="sd-preview-card">
+
+    <div
+        id="gisMap"
+        style="
+            height:600px;
+            border-radius:12px;">
+    </div>
+
+</div>
+
+<div
+    style="
+        display:flex;
+        gap:15px;
+        margin-top:20px;">
+
+    <button
+        class="btn-action btn-outline-red"
+        id="btnLoadBoundary">
+
+        Load Boundary
+
+    </button>
+
+    <button
+        class="btn-action btn-ghost"
+        id="btnDrawBoundary" onclick="drawBoundary()">
+
+        Draw Boundary
+
+    </button>
+
+    <button
+        class="btn-action btn-primary"
+        id="btnSaveBoundary" onclick="saveCurrentBoundary()">
+
+        Save Boundary
+
+    </button>
+
+</div>
 
       <!-- ============================================================
            PANEL: CITIZEN MANAGEMENT

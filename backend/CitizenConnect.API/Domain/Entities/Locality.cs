@@ -38,5 +38,7 @@ namespace CitizenConnect.API.Domain.Entities
         public ICollection<Complaint> Complaints
         { get; set; }
             = new List<Complaint>();
+
+        public LocalityBoundary? LocalityBoundary { get; set; }
     }
 }

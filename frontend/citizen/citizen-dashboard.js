@@ -8,7 +8,8 @@
 
   const SUGGESTION_API_BASE = "http://localhost:5079/api/suggestions";
   const DEPARTMENT_API_BASE = "http://localhost:5079/api/departments";
-
+  const LOCALITY_BOUNDARY_API =
+    "http://localhost:5079/api/LocalityBoundary";
   const citizenProfile = { citizenId: null, wardId: null, wardDisplay: "" };
   let map;
 let marker;
@@ -18,8 +19,13 @@ let wardBoundaryGeoJson;
 let selectedLatitude = null;
 let selectedLongitude = null;
 
+let localityBoundaryLayer;
+let localityLabelLayer;
+let selectedLocality;
+
   let complaintData = [];
   let suggestionData = [];
+  let wardLocalities = [];
 
   // ---- Init ----
   document.addEventListener(
@@ -554,6 +560,70 @@ if (civicScore) {
       priority: (c.priority || "medium").toLowerCase()
     };
   }
+
+  async function loadWardLocalities(wardId) {
+
+    try {
+
+        const response = await fetch(
+            `${LOCALITY_BOUNDARY_API}/ward/${wardId}`
+        );
+
+        if (!response.ok)
+            throw new Error();
+
+        wardLocalities = await response.json();
+
+        wardLocalities.forEach(function(locality){
+
+            const layer = L.geoJSON(
+
+                JSON.parse(locality.geoJson),
+
+                {
+                    style:{
+
+                        color:"#2196F3",
+                        weight:2,
+                        fillColor:"#2196F3",
+                        fillOpacity:0.25
+
+                    }
+                }
+
+            ).addTo(map);
+
+            const center =
+                layer.getBounds().getCenter();
+
+            L.marker(center,{
+
+                icon:L.divIcon({
+
+                    className:"locality-label",
+
+                    html:
+                    `<div class="locality-name">
+
+                        ${locality.localityName}
+
+                    </div>`
+
+                })
+
+            }).addTo(map);
+
+        });
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
 
   function normalizeComplaintStatus(status) {
     if (!status) return "pending";
@@ -2040,14 +2110,14 @@ escHtml(c.desc) +
 }
 
 
- function openMapModal() {
+async function openMapModal() {
 
     document
         .getElementById("mapModal")
         .classList
         .remove("hidden");
 
-    setTimeout(() => {
+    setTimeout(async() => {
 
         if (!map) {
 
@@ -2061,7 +2131,8 @@ escHtml(c.desc) +
                         "&copy; OpenStreetMap"
                 }
             ).addTo(map);
-            loadWardBoundary();
+         await loadWardBoundary();
+            await loadWardLocalities(citizenProfile.wardId);
 
            map.on("click", function (e) {
 
@@ -2077,16 +2148,35 @@ escHtml(c.desc) +
             wardBoundaryGeoJson
         );
 
-    if (!isInside) {
+    // Find which locality was clicked
+let clickedLocality = null;
 
-       showAlert(
-    "warning",
-    "Selected location is outside the ward boundary.",
-    "Invalid Location"
-);
+for (const locality of wardLocalities) {
 
-        return;
+    const polygon =
+        JSON.parse(locality.geoJson);
+
+    if (
+        turf.booleanPointInPolygon(
+            clickedPoint,
+            polygon
+        )
+    ) {
+        clickedLocality = locality;
+        break;
     }
+}
+
+if (!clickedLocality) {
+
+    showAlert(
+        "warning",
+        "Please click inside a valid locality.",
+        "Invalid Location"
+    );
+
+    return;
+}
 
     selectedLatitude =
         e.latlng.lat;
@@ -2094,13 +2184,35 @@ escHtml(c.desc) +
     selectedLongitude =
         e.latlng.lng;
 
+        // Auto fill locality
+document.getElementById(
+    "complaintLocality"
+).value =
+clickedLocality.localityId;
+
+// Auto fill pincode
+document.getElementById(
+    "complaintPincode"
+).value =
+clickedLocality.pincode || "";
+
+// Auto fill landmark (if you have this textbox)
+document.getElementById(
+    "complaintAddress"
+).value =
+clickedLocality.landmark || "";
+
     if (marker) {
         map.removeLayer(marker);
     }
 
-    marker =
-        L.marker(e.latlng)
-            .addTo(map);
+   marker = L.marker(e.latlng)
+    .addTo(map)
+    .bindPopup(
+        `<b>${clickedLocality.localityName}</b><br/>
+         Pincode : ${clickedLocality.pincode}`
+    )
+    .openPopup();
 });
         }
 

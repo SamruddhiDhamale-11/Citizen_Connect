@@ -45,5 +45,9 @@ namespace CitizenConnect.Application.Interfaces.Services
                 int localityId);
 
                 Task<List<object>> GetLocalitiesByPincodeAsync(string pincode);
+
+        Task<List<LocalityResponseDto>>
+    GetLocalitiesByWardAsync(
+        int wardId);
     }
 }
