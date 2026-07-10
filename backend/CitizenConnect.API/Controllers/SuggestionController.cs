@@ -230,30 +230,30 @@ public async Task<IActionResult> GetSuggestionHistory(int suggestionId)
         // UPDATE SUGGESTION STATUS
         // =====================================================
 
-        [HttpPut("status")]
-        public async Task<IActionResult> UpdateSuggestionStatus(
-            [FromBody] UpdateSuggestionStatusDto request)
-        {
-            try
+            [HttpPut("status")]
+            public async Task<IActionResult> UpdateSuggestionStatus(
+                [FromBody] UpdateSuggestionStatusDto request)
             {
-                await _suggestionService
-                    .UpdateSuggestionStatusAsync(request);
+                try
+                {
+                    await _suggestionService
+                        .UpdateSuggestionStatusAsync(request);
 
-                return Ok(new
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Suggestion status updated successfully."
+                    });
+                }
+                catch (Exception ex)
                 {
-                    success = true,
-                    message = "Suggestion status updated successfully."
-                });
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = ex.Message
+                    });
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = ex.Message
-                });
-            }
-        }
 
     }
 }

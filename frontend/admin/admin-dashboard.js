@@ -2425,7 +2425,9 @@ if (emptyMsg) {
   emptyMsg.remove();
 }
 
-/*if (visibleCount === 0) {
+if (!list) return;
+
+if (visibleCount === 0) {
   list.insertAdjacentHTML(
     'beforeend',
     '<div id="complaintEmptyMessage" class="item-empty">' +
@@ -2433,7 +2435,7 @@ if (emptyMsg) {
       '<div>No complaints found.</div>' +
     '</div>'
   );
-}*/
+}
 }
 
 async function openAdminComplaintDetail(event, complaintId) {
@@ -2489,8 +2491,10 @@ window.currentComplaintCategoryId =
   '<select id="adminStatusSelect"></select>' +
   '<div id="assignedOfficerBox" style="display:none;margin-top:10px;"></div>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
-      '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
-    '</div>';
+'<button id="updateComplaintStatusBtn" type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">' +
+'Update Status' +
+'</button>' +
+'</div>';
 
 document.getElementById('modalTitle').textContent = 'Complaint Details';
 document.getElementById('modalBody').innerHTML = bodyHtml;
@@ -2782,7 +2786,7 @@ if (!suggestion) {
 
     '<textarea id="adminSuggestionRemarks" placeholder="Remarks (optional)"></textarea>' +
 
-    '<button type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
+    '<button id="updateSuggestionStatusBtn" type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
       suggestion.suggestionId +
     ')">' +
       'Update Status' +
@@ -2916,6 +2920,11 @@ function getSuggestionStatusClass(status) {
 
 async function submitSuggestionStatusUpdate(suggestionId) {
 
+  const updateBtn =
+    document.getElementById(
+        "updateSuggestionStatusBtn"
+    );
+
     try {
 
         const statusId =
@@ -2927,6 +2936,11 @@ async function submitSuggestionStatusUpdate(suggestionId) {
             document.getElementById(
                 'adminSuggestionRemarks'
             ).value;
+
+            startButtonLoading(
+    updateBtn,
+    "Updating..."
+);
 
         const response = await fetch(
             'http://localhost:5079/api/admin/suggestions/' +
@@ -2953,27 +2967,45 @@ async function submitSuggestionStatusUpdate(suggestionId) {
             }
         );
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (result.success) {
+if (result.success) {
 
-            alert('Suggestion status updated successfully');
+    showAlert(
+        "success",
+        "Suggestion status updated successfully."
+    );
 
-            closeModal();
+    closeModal();
 
-            await loadAdminSuggestions();
+    await loadAdminSuggestions();
 
-        } else {
+} else {
 
-            alert(result.message || 'Update failed');
-        }
+    showAlert(
+        "error",
+        result.message || "Update failed."
+    );
 
-    } catch (error) {
+}
 
-        console.error(error);
+}catch (error) {
 
-        alert('Error updating suggestion status');
-    }
+    console.error(error);
+
+    showAlert(
+        "error",
+        "Error updating suggestion status."
+    );
+}
+finally {
+
+    stopButtonLoading(
+        updateBtn
+    );
+
+}
+        
 }
 
 async function submitAdminStatusUpdate() {
@@ -2981,6 +3013,13 @@ async function submitAdminStatusUpdate() {
     if (!activeComplaintId) return;
 
     var userId = localStorage.getItem("userId");
+
+    const updateBtn =
+    document.getElementById(
+        "updateComplaintStatusBtn"
+    );
+
+    console.log(updateBtn);
 
     if (!userId) {
 
@@ -3019,6 +3058,13 @@ async function submitAdminStatusUpdate() {
             : null;
 
     try {
+
+console.log("Loading started");
+
+      startButtonLoading(
+    updateBtn,
+    "Updating..."
+);
 
         var response =
             await fetch(
@@ -3068,13 +3114,20 @@ async function submitAdminStatusUpdate() {
         await loadAdminComplaints();
 
     }
-    catch (error) {
+   catch (error) {
 
-        showAlert(
-            "error",
-            "Unable to update complaint status."
-        );
-    }
+    showAlert(
+        "error",
+        "Unable to update complaint status."
+    );
+}
+finally {
+
+    stopButtonLoading(
+        updateBtn
+    );
+
+}
 }
 
 /* ============================================================

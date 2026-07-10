@@ -239,20 +239,28 @@ function validateStep(step) {
 // LOADING STATE
 // ================================================================
 function setRegisterLoading(isLoading) {
-  const btn = document.querySelector('#step3 button.btn-primary');
-  if (!btn) return;
-  if (isLoading) {
-    btn.disabled         = true;
-    btn.dataset.origText = btn.textContent;
-    btn.textContent      = 'Registering…';
-    btn.style.opacity    = '0.75';
-    btn.style.cursor     = 'not-allowed';
-  } else {
-    btn.disabled      = false;
-    btn.textContent   = btn.dataset.origText || 'Register';
-    btn.style.opacity = '';
-    btn.style.cursor  = '';
-  }
+
+    const btn =
+        document.querySelector(
+            '#step3 button.btn-primary'
+        );
+
+    if (!btn) return;
+
+    if (isLoading) {
+
+        startButtonLoading(
+            btn,
+            "Registering..."
+        );
+
+    }
+    else {
+
+        stopButtonLoading(btn);
+
+    }
+
 }
 
 // ================================================================
@@ -530,19 +538,27 @@ function validateRegCaptcha(userInput) {
 // LOGIN FORM SUBMIT
 // ================================================================
 function setLoginLoading(isLoading) {
-  const btn = document.querySelector('#loginForm button[type="submit"]');
-  if (!btn) return;
-  if (isLoading) {
-    btn.disabled        = true;
-    btn.textContent     = 'Logging in…';
-    btn.style.opacity   = '0.75';
-    btn.style.cursor    = 'not-allowed';
-  } else {
-    btn.disabled        = false;
-    btn.textContent     = 'Login to Portal';
-    btn.style.opacity   = '';
-    btn.style.cursor    = '';
-  }
+
+    const btn =
+        document.querySelector(
+            '#loginForm button[type="submit"]'
+        );
+
+    if (!btn) return;
+
+    if (isLoading) {
+
+        startButtonLoading(
+            btn,
+            "Logging in..."
+        );
+
+    }
+    else {
+
+        stopButtonLoading(btn);
+
+    }
 }
 
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
@@ -588,8 +604,13 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     }
 
     localStorage.setItem('userId', data.userId);
-    localStorage.setItem('role',   data.role);
-    window.location.href = '../../../citizen/citizen-dashboard.html';
+localStorage.setItem('role', data.role);
+
+showLoginSuccess(
+    "Login Successful!",
+    "Welcome to Grampanchayat Ambale!",
+    "../../../citizen/citizen-dashboard.html"
+);
 
   } catch (err) {
     showError('loginError', err.message || 'Unable to connect to the server. Please check your connection and try again.');
@@ -952,4 +973,47 @@ function loginSpeakCaptcha(btn) {
   _loginSpeak('The captcha code is: ' + spoken, function () {
     if (statusEl) statusEl.textContent = '';
   });
+}
+
+function showLoginSuccess(title, message, redirectUrl) {
+
+    document.getElementById('registerCard').classList.add('hidden');
+    document.getElementById('loginCard').classList.add('hidden');
+
+    const card = document.getElementById('successCard');
+
+    card.classList.remove('hidden');
+
+    // Change title
+    const titleEl = card.querySelector('.success-title');
+    if (titleEl) {
+        titleEl.textContent = title;
+    }
+
+    // Change message
+    const subEl = card.querySelector('.success-sub');
+    if (subEl) {
+        subEl.textContent = message;
+    }
+
+    // Stop progress bar
+   const progress = document.getElementById('progressBarWrap');
+if (progress) {
+    progress.style.display = "none";
+}
+
+const redirectText = document.getElementById('successRedirectText');
+if (redirectText) {
+    redirectText.style.display = "none";
+}
+    // Show OK button
+   const okBtn = document.getElementById('successOkBtn');
+
+if (okBtn) {
+    okBtn.style.display = "none";
+}
+
+setTimeout(() => {
+    window.location.href = redirectUrl;
+}, 6500);
 }

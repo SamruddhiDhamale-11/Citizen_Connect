@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Citizen Connect — Citizen Login</title>
   <link rel="stylesheet" href="citizen-login.css" />
+  <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
@@ -134,7 +136,9 @@
     <div class="card hidden" id="successCard">
       <div class="card-header">
         <div class="header-logo-row">
-          <div class="header-emblem">✔</div>
+          <div class="header-emblem">
+    <i class="fa-solid fa-landmark"></i>
+</div>
           <div class="header-text-block">
             <span class="gov-badge">Government of India</span>
             <h1 class="portal-title">Citizen Connect</h1>
@@ -144,13 +148,70 @@
         <div class="divider"></div>
       </div>
       <div class="success-content">
-        <div class="success-check">✔</div>
-        <h2 class="success-title">Login Successful</h2>
-        <p class="success-sub">Welcome back to Citizen Connect.</p>
-        <p class="success-redirect">Redirecting to dashboard<span class="dots"></span></p>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" id="progressBar"></div>
+     <div class="success-animation">
+
+    <div class="success-ring">
+
+        <div class="success-check">
+            <i class="fa-solid fa-landmark success-gov-icon"></i>
         </div>
+
+    </div>
+
+    <div class="success-sparkles">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+</div>
+
+<h2 class="success-welcome-title">
+
+    Welcome to
+
+</h2>
+
+<h1 class="success-welcome">
+
+    Gram Panchayat Ambale
+
+</h1>
+
+<p class="success-tagline">
+
+    Smart Governance Portal
+
+</p>
+
+<div class="success-divider"></div>
+
+<p class="success-title">
+
+    <i class="fa-solid fa-circle-check"></i>
+
+    Login Successful
+
+</p>
+       
+        <p class="success-redirect" id="successRedirectText">
+    Redirecting to dashboard<span class="dots"></span>
+</p>
+
+<div class="progress-bar-wrap" id="progressBarWrap">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<button
+    id="successOkBtn"
+    class="btn btn-primary"
+    style="display:none;margin-top:20px;">
+    OK
+</button>
+
       </div>
     </div>
 
@@ -164,6 +225,7 @@
 
   </div><!-- end page-wrapper -->
 
+    <script src="../../shared/button-loading.js"></script>
   <script src="citizen-login.js"></script>
   <script src="../../shared/voice-assistant.js"></script>
 </body>
