@@ -968,10 +968,10 @@ const submitBtn =
         ? form.querySelector('button[type="submit"]')
         : null;
 
-if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-}
+startButtonLoading(
+    submitBtn,
+    "Submitting..."
+);
 
 const fd = new FormData();
 
@@ -1067,11 +1067,9 @@ catch (err) {
     errEl.classList.remove("hidden");
 }
 finally {
-    if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent =
-            "Submit Complaint";
-    }
+   stopButtonLoading(
+    submitBtn
+);
 }
 
 
@@ -1264,6 +1262,25 @@ finally {
           );
       }
 
+
+
+
+const form =
+    document.getElementById("suggestionForm");
+
+const submitBtn =
+    form
+        ? form.querySelector('button[type="submit"]')
+        : null;
+
+startButtonLoading(
+    submitBtn,
+    "Submitting..."
+);
+
+
+
+
       try {
 
           const response =
@@ -1310,6 +1327,14 @@ finally {
               "hidden"
           );
       }
+
+      finally {
+
+    stopButtonLoading(
+        submitBtn
+    );
+
+}
   }
 
   // ---- Reset form ----

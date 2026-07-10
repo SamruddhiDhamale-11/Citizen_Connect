@@ -291,6 +291,131 @@ You can login to Citizen Connect to view the latest updates.
 
 
 
+public async Task SendSuggestionStatusUpdatedEmail(
+    string toEmail,
+    string citizenName,
+    string suggestionNumber,
+    string oldStatus,
+    string newStatus,
+    string? remarks)
+{
+    var email = new MimeMessage();
+
+    email.From.Add(new MailboxAddress(
+        _config["EmailSettings:SenderName"],
+        _config["EmailSettings:SenderEmail"]));
+
+    email.To.Add(MailboxAddress.Parse(toEmail));
+
+    string emailSubject = newStatus switch
+    {
+        "Pending" => $"🟡 Suggestion Pending - {suggestionNumber}",
+        "Under Review" => $"🔵 Suggestion Under Review - {suggestionNumber}",
+        "Approved" => $"🟢 Suggestion Approved - {suggestionNumber}",
+        "Rejected" => $"🔴 Suggestion Rejected - {suggestionNumber}",
+        "Implemented" => $"🟣 Suggestion Implemented - {suggestionNumber}",
+        _ => $"📢 Suggestion Status Updated - {suggestionNumber}"
+    };
+
+    email.Subject = emailSubject;
+
+    string badgeColor = "#6c757d";
+
+    switch (newStatus.Trim().ToLower())
+    {
+        case "pending":
+            badgeColor = "#f39c12";
+            break;
+
+        case "under review":
+            badgeColor = "#0d6efd";
+            break;
+
+        case "approved":
+            badgeColor = "#28a745";
+            break;
+
+        case "rejected":
+            badgeColor = "#dc3545";
+            break;
+
+        case "implemented":
+            badgeColor = "#6f42c1";
+            break;
+    }
+
+    email.Body = new TextPart("html")
+    {
+        Text = GetEmailLayout($@"
+
+<p>Hello <b>{citizenName}</b>,</p>
+
+<p>Your suggestion status has been updated successfully.</p>
+
+<h3 style='color:#1f4e79;'>💡 Suggestion Details</h3>
+
+<table style='width:100%;border-collapse:collapse;'>
+
+<tr>
+<td style='padding:8px;font-weight:bold;'>Suggestion Number</td>
+<td style='padding:8px;'>{suggestionNumber}</td>
+</tr>
+
+<tr>
+<td style='padding:8px;font-weight:bold;'>Previous Status</td>
+<td style='padding:8px;'>{oldStatus}</td>
+</tr>
+
+<tr>
+<td style='padding:8px;font-weight:bold;'>Current Status</td>
+<td style='padding:8px;'>
+
+<span style='background:{badgeColor};
+color:white;
+padding:5px 12px;
+border-radius:20px;
+font-weight:bold;'>
+
+{newStatus}
+
+</span>
+
+</td>
+</tr>
+
+<tr>
+<td style='padding:8px;font-weight:bold;'>Remarks</td>
+<td style='padding:8px;'>{remarks}</td>
+</tr>
+
+</table>
+
+<br/>
+
+<p>
+You can login to Citizen Connect to view the latest updates.
+</p>
+
+")
+    };
+
+    using var smtp = new SmtpClient();
+
+    await smtp.ConnectAsync(
+        _config["EmailSettings:SmtpServer"],
+        int.Parse(_config["EmailSettings:Port"]),
+        false);
+
+    await smtp.AuthenticateAsync(
+        _config["EmailSettings:SenderEmail"],
+        _config["EmailSettings:Password"]);
+
+    await smtp.SendAsync(email);
+
+    await smtp.DisconnectAsync(true);
+}
+
+
 
 private string GetEmailLayout(string bodyContent)
 {
@@ -328,7 +453,6 @@ private string GetEmailLayout(string bodyContent)
 
 </div>";
 }
-
 
 
     }

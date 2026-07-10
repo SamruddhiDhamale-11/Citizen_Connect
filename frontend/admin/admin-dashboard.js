@@ -2451,8 +2451,10 @@ window.currentComplaintCategoryId =
   '<select id="adminStatusSelect"></select>' +
   '<div id="assignedOfficerBox" style="display:none;margin-top:10px;"></div>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
-      '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
-    '</div>';
+'<button id="updateComplaintStatusBtn" type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">' +
+'Update Status' +
+'</button>' +
+'</div>';
 
 document.getElementById('modalTitle').textContent = 'Complaint Details';
 document.getElementById('modalBody').innerHTML = bodyHtml;
@@ -2744,7 +2746,7 @@ if (!suggestion) {
 
     '<textarea id="adminSuggestionRemarks" placeholder="Remarks (optional)"></textarea>' +
 
-    '<button type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
+    '<button id="updateSuggestionStatusBtn" type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
       suggestion.suggestionId +
     ')">' +
       'Update Status' +
@@ -2878,6 +2880,11 @@ function getSuggestionStatusClass(status) {
 
 async function submitSuggestionStatusUpdate(suggestionId) {
 
+  const updateBtn =
+    document.getElementById(
+        "updateSuggestionStatusBtn"
+    );
+
     try {
 
         const statusId =
@@ -2889,6 +2896,11 @@ async function submitSuggestionStatusUpdate(suggestionId) {
             document.getElementById(
                 'adminSuggestionRemarks'
             ).value;
+
+            startButtonLoading(
+    updateBtn,
+    "Updating..."
+);
 
         const response = await fetch(
             'http://localhost:5079/api/admin/suggestions/' +
@@ -2937,7 +2949,7 @@ if (result.success) {
 
 }
 
-} catch (error) {
+}catch (error) {
 
     console.error(error);
 
@@ -2945,6 +2957,13 @@ if (result.success) {
         "error",
         "Error updating suggestion status."
     );
+}
+finally {
+
+    stopButtonLoading(
+        updateBtn
+    );
+
 }
         
 }
@@ -2954,6 +2973,13 @@ async function submitAdminStatusUpdate() {
     if (!activeComplaintId) return;
 
     var userId = localStorage.getItem("userId");
+
+    const updateBtn =
+    document.getElementById(
+        "updateComplaintStatusBtn"
+    );
+
+    console.log(updateBtn);
 
     if (!userId) {
 
@@ -2992,6 +3018,13 @@ async function submitAdminStatusUpdate() {
             : null;
 
     try {
+
+console.log("Loading started");
+
+      startButtonLoading(
+    updateBtn,
+    "Updating..."
+);
 
         var response =
             await fetch(
@@ -3041,13 +3074,20 @@ async function submitAdminStatusUpdate() {
         await loadAdminComplaints();
 
     }
-    catch (error) {
+   catch (error) {
 
-        showAlert(
-            "error",
-            "Unable to update complaint status."
-        );
-    }
+    showAlert(
+        "error",
+        "Unable to update complaint status."
+    );
+}
+finally {
+
+    stopButtonLoading(
+        updateBtn
+    );
+
+}
 }
 
 /* ============================================================

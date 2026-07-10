@@ -115,19 +115,28 @@ function validateCaptcha(userInput) {
 // LOGIN LOADING STATE
 // ================================================================
 function setLoginLoading(isLoading) {
-  const btn = document.querySelector('#loginForm button[type="submit"]');
-  if (!btn) return;
-  if (isLoading) {
-    btn.disabled      = true;
-    btn.textContent   = 'Logging in…';
-    btn.style.opacity = '0.75';
-    btn.style.cursor  = 'not-allowed';
-  } else {
-    btn.disabled      = false;
-    btn.textContent   = 'Login to Portal';
-    btn.style.opacity = '';
-    btn.style.cursor  = '';
-  }
+
+    const btn =
+        document.querySelector(
+            '#loginForm button[type="submit"]'
+        );
+
+    if (!btn) return;
+
+    if (isLoading) {
+
+        startButtonLoading(
+            btn,
+            "Logging in..."
+        );
+
+    }
+    else {
+
+        stopButtonLoading(btn);
+
+    }
+
 }
 
 // ================================================================

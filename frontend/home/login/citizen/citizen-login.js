@@ -239,20 +239,28 @@ function validateStep(step) {
 // LOADING STATE
 // ================================================================
 function setRegisterLoading(isLoading) {
-  const btn = document.querySelector('#step3 button.btn-primary');
-  if (!btn) return;
-  if (isLoading) {
-    btn.disabled         = true;
-    btn.dataset.origText = btn.textContent;
-    btn.textContent      = 'Registering…';
-    btn.style.opacity    = '0.75';
-    btn.style.cursor     = 'not-allowed';
-  } else {
-    btn.disabled      = false;
-    btn.textContent   = btn.dataset.origText || 'Register';
-    btn.style.opacity = '';
-    btn.style.cursor  = '';
-  }
+
+    const btn =
+        document.querySelector(
+            '#step3 button.btn-primary'
+        );
+
+    if (!btn) return;
+
+    if (isLoading) {
+
+        startButtonLoading(
+            btn,
+            "Registering..."
+        );
+
+    }
+    else {
+
+        stopButtonLoading(btn);
+
+    }
+
 }
 
 // ================================================================
@@ -530,19 +538,27 @@ function validateRegCaptcha(userInput) {
 // LOGIN FORM SUBMIT
 // ================================================================
 function setLoginLoading(isLoading) {
-  const btn = document.querySelector('#loginForm button[type="submit"]');
-  if (!btn) return;
-  if (isLoading) {
-    btn.disabled        = true;
-    btn.textContent     = 'Logging in…';
-    btn.style.opacity   = '0.75';
-    btn.style.cursor    = 'not-allowed';
-  } else {
-    btn.disabled        = false;
-    btn.textContent     = 'Login to Portal';
-    btn.style.opacity   = '';
-    btn.style.cursor    = '';
-  }
+
+    const btn =
+        document.querySelector(
+            '#loginForm button[type="submit"]'
+        );
+
+    if (!btn) return;
+
+    if (isLoading) {
+
+        startButtonLoading(
+            btn,
+            "Logging in..."
+        );
+
+    }
+    else {
+
+        stopButtonLoading(btn);
+
+    }
 }
 
 document.getElementById('loginForm').addEventListener('submit', async function (e) {

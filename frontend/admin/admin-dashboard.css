@@ -2760,3 +2760,13 @@ textarea.sd-textarea { resize: vertical; min-height: 80px; }
     top:18px;
 
 }
+
+#updateComplaintStatusBtn{
+    min-width:180px;
+    width:auto;
+    padding:12px 24px;
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    white-space:nowrap;
+}
