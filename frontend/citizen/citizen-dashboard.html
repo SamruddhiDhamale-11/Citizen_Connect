@@ -1296,42 +1296,64 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     </main>
   </div>
 
-  <div id="officerModal"
-     class="hidden">
+  
+<div id="officerModal" class="modal-overlay hidden">
 
-  <div class="officer-modal-card">
+    <div class="officer-modal-card">
 
-    <h2>Assigned Officer</h2>
+        <button
+            class="officer-close-btn"
+            onclick="closeOfficerModal()">
 
-    <p>
-      <strong>Name:</strong>
-      <span id="officerName"></span>
-    </p>
+            <i class="fa-solid fa-xmark"></i>
 
-    <p>
-      <strong>Designation:</strong>
-      <span id="officerDesignation"></span>
-    </p>
+        </button>
 
-    <p>
-      <strong>Mobile:</strong>
-      <span id="officerMobile"></span>
-    </p>
+        <div class="officer-top">
 
-    <p>
-      <strong>Email:</strong>
-      <span id="officerEmail"></span>
-    </p>
+            <div class="officer-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
 
-    <button
-      class="btn-submit"
-      onclick="closeOfficerModal()">
-      Close
-    </button>
+            <h2 id="officerName"></h2>
 
-  </div>
+            <p id="officerDesignation"></p>
+
+        </div>
+
+        <div class="officer-info">
+
+            <!-- Mobile -->
+            <div class="officer-info-card">
+                <div class="officer-icon">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+
+                <div>
+                    <label>Mobile Number</label>
+                    <span id="officerMobile"></span>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="officer-info-card">
+                <div class="officer-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+
+                <div>
+                    <label>Email Address</label>
+                    <span id="officerEmail"></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
+
+
 
 <!-- ==========================================
      SUGGESTION HISTORY MODAL
@@ -1364,6 +1386,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     </div>
 
 </div>
+ <script src="../home/shared/button-loading.js"></script>
   <script src="citizen-dashboard.js"></script>
 
 

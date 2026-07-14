@@ -81,6 +81,8 @@ builder.Services.AddScoped<
     IFacilityFieldService,
     FacilityFieldService>();
 
+
+
 builder.Services.AddScoped<
     IFacilityRecordService,
     FacilityRecordService>();
@@ -92,6 +94,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IWardValidationService,
     WardValidationService>();
+
+builder.Services.AddScoped<
+    ILocalityBoundaryService,
+    LocalityBoundaryService>();
 
 builder.Services
     .AddScoped<ICloudinaryService,

@@ -376,10 +376,34 @@ return "Complaint status updated successfully";
                 ChangedAt = DateTime.UtcNow
             };
 
-            _context.SuggestionStatusHistories.Add(history);
-            await _context.SaveChangesAsync();
+           _context.SuggestionStatusHistories.Add(history);
+await _context.SaveChangesAsync();
 
-            return true;
+// ======================================
+// Send email to Citizen
+// ======================================
+
+var citizen = await _context.Citizens
+    .Include(c => c.User)
+    .FirstOrDefaultAsync(c => c.CitizenId == suggestion.CitizenId);
+
+if (citizen != null &&
+    !string.IsNullOrWhiteSpace(citizen.User.Email))
+{
+    var citizenName =
+        $"{citizen.User.FirstName} {citizen.User.LastName}";
+
+    await _emailService.SendSuggestionStatusUpdatedEmail(
+        citizen.User.Email,
+        citizenName,
+        suggestion.SuggestionNumber,
+        oldStatus,
+        newStatus ?? "",
+        request.Remarks
+    );
+}
+
+return true;
         }
 
 

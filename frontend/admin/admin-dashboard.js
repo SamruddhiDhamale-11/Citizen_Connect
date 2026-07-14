@@ -24,9 +24,42 @@ let departments = [];
 let selectedOfficerId = null;
 var activeComplaintId = null;
 var activeSuggestionId = null;
+let currentBoundaryType = null;
 var SUGGESTION_API_BASE = 'http://localhost:5079/api/Admin' + '/suggestions';
 let suggestionStatuses = [];
+let wardLocalities = [];
 
+// =========================
+// GIS MANAGEMENT
+// =========================
+
+let gisMap = null;
+
+let gisWardLayer = null;
+
+let gisLocalityLayer = null;
+
+let drawnItems = null;
+
+let drawControl = null;
+
+const GIS_API = {
+
+    WARD:
+        "http://localhost:5079/api/WardBoundary",
+
+    LOCALITY:
+        "http://localhost:5079/api/LocalityBoundary",
+
+    WARDS:
+        "http://localhost:5079/api/Wards",
+
+    LOCALITIES:
+        "http://localhost:5079/api/Localities"
+
+};
+
+let selectedGeoJson = null;
 const OFFICER_API_BASE =
   'http://localhost:5079/api/officers';
 
@@ -307,6 +340,13 @@ function showPanel(panelId, navEl) {
   if (panelId === 'complaints-management') {
     loadAdminComplaints();
   }
+
+  if (panelId === "gis-management") {
+
+    loadGISManagement();
+
+}
+
   closeSidebar();
   return false;
 }
@@ -2451,8 +2491,10 @@ window.currentComplaintCategoryId =
   '<select id="adminStatusSelect"></select>' +
   '<div id="assignedOfficerBox" style="display:none;margin-top:10px;"></div>' +
       '<textarea id="adminStatusRemarks" placeholder="Remarks (optional)"></textarea>' +
-      '<button type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">Update Status</button>' +
-    '</div>';
+'<button id="updateComplaintStatusBtn" type="button" class="btn-action btn-primary" onclick="submitAdminStatusUpdate()">' +
+'Update Status' +
+'</button>' +
+'</div>';
 
 document.getElementById('modalTitle').textContent = 'Complaint Details';
 document.getElementById('modalBody').innerHTML = bodyHtml;
@@ -2744,7 +2786,7 @@ if (!suggestion) {
 
     '<textarea id="adminSuggestionRemarks" placeholder="Remarks (optional)"></textarea>' +
 
-    '<button type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
+    '<button id="updateSuggestionStatusBtn" type="button" class="btn-action btn-primary" onclick="submitSuggestionStatusUpdate(' +
       suggestion.suggestionId +
     ')">' +
       'Update Status' +
@@ -2878,6 +2920,11 @@ function getSuggestionStatusClass(status) {
 
 async function submitSuggestionStatusUpdate(suggestionId) {
 
+  const updateBtn =
+    document.getElementById(
+        "updateSuggestionStatusBtn"
+    );
+
     try {
 
         const statusId =
@@ -2889,6 +2936,11 @@ async function submitSuggestionStatusUpdate(suggestionId) {
             document.getElementById(
                 'adminSuggestionRemarks'
             ).value;
+
+            startButtonLoading(
+    updateBtn,
+    "Updating..."
+);
 
         const response = await fetch(
             'http://localhost:5079/api/admin/suggestions/' +
@@ -2937,7 +2989,7 @@ if (result.success) {
 
 }
 
-} catch (error) {
+}catch (error) {
 
     console.error(error);
 
@@ -2945,6 +2997,13 @@ if (result.success) {
         "error",
         "Error updating suggestion status."
     );
+}
+finally {
+
+    stopButtonLoading(
+        updateBtn
+    );
+
 }
         
 }
@@ -2954,6 +3013,13 @@ async function submitAdminStatusUpdate() {
     if (!activeComplaintId) return;
 
     var userId = localStorage.getItem("userId");
+
+    const updateBtn =
+    document.getElementById(
+        "updateComplaintStatusBtn"
+    );
+
+    console.log(updateBtn);
 
     if (!userId) {
 
@@ -2992,6 +3058,13 @@ async function submitAdminStatusUpdate() {
             : null;
 
     try {
+
+console.log("Loading started");
+
+      startButtonLoading(
+    updateBtn,
+    "Updating..."
+);
 
         var response =
             await fetch(
@@ -3041,13 +3114,20 @@ async function submitAdminStatusUpdate() {
         await loadAdminComplaints();
 
     }
-    catch (error) {
+   catch (error) {
 
-        showAlert(
-            "error",
-            "Unable to update complaint status."
-        );
-    }
+    showAlert(
+        "error",
+        "Unable to update complaint status."
+    );
+}
+finally {
+
+    stopButtonLoading(
+        updateBtn
+    );
+
+}
 }
 
 /* ============================================================
@@ -6021,3 +6101,641 @@ document.addEventListener("click", function (e) {
     }
 
 });
+
+
+/*=========================================
+    GIS MANAGEMENT
+=========================================*/
+
+async function loadGISManagement() {
+
+    if (!gisMap) {
+
+        initGISMap();
+        registerGISEvents(); 
+
+    }
+
+    await loadGISWards();
+
+}
+
+function initGISMap() {
+
+    gisMap = L.map("gisMap");
+
+    gisMap.setView([18.41, 74.16], 13);
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution:"© OpenStreetMap"
+        }
+    ).addTo(gisMap);
+     drawnItems = new L.FeatureGroup();
+
+    gisMap.addLayer(drawnItems);
+    gisMap.on(
+    L.Draw.Event.CREATED,
+    function (e) {
+
+        drawnItems.clearLayers();
+
+        drawnItems.addLayer(e.layer);
+
+        selectedGeoJson =
+            e.layer.toGeoJSON();
+
+        console.log(selectedGeoJson);
+
+    }
+);
+
+}
+
+async function loadGISWards(){
+
+    try{
+
+        const response =
+            await fetch(GIS_API.WARDS);
+
+        if(!response.ok){
+
+            throw new Error(
+                "Unable to load wards."
+            );
+
+        }
+
+        const wards =
+            await response.json();
+
+        const ddl =
+            document.getElementById(
+                "gisWard"
+            );
+
+        ddl.innerHTML =
+            '<option value="">Select Ward</option>';
+
+        wards.forEach(function(ward){
+
+            ddl.innerHTML +=
+            `
+            <option value="${ward.wardId}">
+                ${ward.wardName}
+            </option>
+            `;
+
+        });
+
+    }
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+async function loadGISLocalities(wardId) {
+
+    try {
+      const ddl =
+            document.getElementById("gisLocality");
+
+        ddl.innerHTML =
+            '<option value="">Loading...</option>';
+
+        const response =
+            await fetch(
+                `${GIS_API.LOCALITIES}/ward/${wardId}`
+            );
+
+        if (!response.ok)
+            throw new Error(
+                "Unable to load localities."
+            );
+
+        wardLocalities =
+await response.json();
+
+       
+        ddl.innerHTML =
+            '<option value="">Select Locality</option>';
+
+        wardLocalities.forEach(function(item){
+
+    ddl.innerHTML += `
+        <option value="${item.localityId}">
+            ${item.localityName}
+        </option>
+    `;
+
+});
+
+    }
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+function registerGISEvents() {
+
+    // Ward Changed
+    document.getElementById("gisWard").addEventListener(
+    "change",
+    async function () {
+
+        const wardId = this.value;
+
+        const localityDDL =
+            document.getElementById("gisLocality");
+
+        localityDDL.innerHTML =
+            '<option value="">Select Locality</option>';
+
+        if (!wardId)
+            return;
+
+        document.getElementById("gisSelectedWard").textContent =
+            this.options[this.selectedIndex].text;
+
+        // STEP 1
+        await loadGISLocalities(wardId);
+
+        // STEP 2
+        await loadWardBoundary(wardId);
+
+        // STEP 3
+        await loadAllLocalityBoundaries(wardId);
+
+    }
+);
+
+
+    // Locality Changed
+    document
+        .getElementById("gisLocality")
+        .addEventListener(
+            "change",
+            async function () {
+
+                const localityId = this.value;
+
+                if (!localityId)
+                    return;
+
+                document.getElementById("gisSelectedLocality").textContent =
+                    this.options[this.selectedIndex].text;
+
+                await loadSelectedLocalityBoundary(localityId);
+
+            }
+        );
+
+}
+
+async function loadSelectedLocalityBoundary(localityId) {
+
+    try {
+
+        const response =
+            await fetch(
+                `${GIS_API.LOCALITY}/${localityId}`
+            );
+
+        if (!response.ok) {
+
+            updateBoundaryStatus(false);
+
+            return;
+        }
+
+        const geoJson =
+            await response.json();
+
+        drawLocalityBoundary(
+            geoJson
+        );
+
+        updateBoundaryStatus(true);
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        updateBoundaryStatus(false);
+
+    }
+
+}
+
+function drawLocalityBoundary(geoJson){
+
+    if(gisLocalityLayer){
+
+        gisMap.removeLayer(
+            gisLocalityLayer
+        );
+
+    }
+
+    gisLocalityLayer =
+        L.geoJSON(
+            geoJson,
+            {
+                style:{
+
+                    color:"#2196F3",
+
+                    weight:3,
+
+                    fillColor:"#2196F3",
+
+                    fillOpacity:0.30
+
+                }
+            }
+        ).addTo(gisMap);
+
+    gisMap.fitBounds(
+
+        gisLocalityLayer
+            .getBounds()
+
+    );
+
+}
+
+function updateBoundaryStatus(exists){
+
+    const badge =
+        document.getElementById(
+            "gisBoundaryStatus"
+        );
+
+    if(exists){
+
+        badge.innerHTML =
+            "Available";
+
+        badge.className =
+            "area-status-badge active";
+
+    }
+    else{
+
+        badge.innerHTML =
+            "Not Available";
+
+        badge.className =
+            "area-status-badge inactive";
+
+    }
+
+}
+
+function enableDrawing() {
+
+}
+
+function disableDrawing() {
+
+}
+
+function clearCurrentDrawing() {
+
+}
+
+async function saveCurrentBoundary() {
+
+    if (!selectedGeoJson) {
+
+        alert("Please draw a boundary first.");
+
+        return;
+    }
+
+    const localityId =
+        document.getElementById("gisLocality").value;
+
+    if (!localityId) {
+
+        alert("Please select a locality.");
+
+        return;
+    }
+
+    const payload = {
+
+        localityId: parseInt(localityId),
+
+        geoJson: JSON.stringify(
+            selectedGeoJson.geometry
+        )
+
+    };
+
+    try {
+
+        const response =
+            await fetch(
+                `${GIS_API.LOCALITY}/upload`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to save boundary."
+            );
+
+        }
+
+        alert("Boundary saved successfully.");
+
+        await loadSelectedLocalityBoundary(localityId);
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert("Boundary save failed.");
+
+    }
+
+}
+
+function drawBoundary() {
+
+    if(drawControl){
+
+        gisMap.removeControl(drawControl);
+
+    }
+
+    drawControl = new L.Control.Draw({
+
+        draw:{
+
+            polygon:true,
+
+            rectangle:false,
+
+            circle:false,
+
+            circlemarker:false,
+
+            marker:false,
+
+            polyline:false
+
+        },
+
+        edit:{
+
+            featureGroup: drawnItems
+
+        }
+
+    });
+
+    gisMap.addControl(drawControl);
+
+}
+
+function drawWardBoundary(geoJson) {
+
+    if (gisWardLayer) {
+
+        gisMap.removeLayer(gisWardLayer);
+
+    }
+
+    gisWardLayer = L.geoJSON(geoJson, {
+
+        style: {
+
+            color: "#003366",
+            weight: 2,
+            fillColor: "#99ccff",
+            fillOpacity: 0.30
+
+        }
+
+    }).addTo(gisMap);
+
+    // Automatically zoom to the ward
+    gisMap.fitBounds(gisWardLayer.getBounds());
+
+}
+async function loadWardBoundary(wardId) {
+
+    try {
+
+        const response =
+            await fetch(
+                `${GIS_API.WARD}/${wardId}`
+            );
+
+        if (!response.ok)
+            return;
+
+        const geoJson =
+            await response.json();
+
+        drawWardBoundary(geoJson);
+
+    }
+    catch (e) {
+
+        console.log(e);
+
+    }
+
+}
+
+async function loadAllLocalityBoundaries(wardId) {
+
+    try {
+
+        // Remove old locality layers before loading new ones
+        if (window.localityBoundaryGroup) {
+            gisMap.removeLayer(window.localityBoundaryGroup);
+        }
+
+        if (window.localityLabelGroup) {
+            gisMap.removeLayer(window.localityLabelGroup);
+        }
+
+        window.localityBoundaryGroup = L.featureGroup().addTo(gisMap);
+        window.localityLabelGroup = L.featureGroup().addTo(gisMap);
+
+        const response = await fetch(
+            `${GIS_API.LOCALITY}/ward/${wardId}`
+        );
+
+        if (!response.ok) {
+            console.log("No locality boundaries found.");
+            return;
+        }
+
+        const boundaries = await response.json();
+
+        console.log("Boundaries :", boundaries);
+
+        boundaries.forEach(function (item) {
+
+            // Create locality polygon
+            const layer = L.geoJSON(
+                JSON.parse(item.geoJson),
+                {
+                    style: {
+                        color: "#2196F3",
+                        weight: 2,
+                        fillColor: "#64B5F6",
+                        fillOpacity: 0.35
+                    }
+                }
+            );
+
+            layer.addTo(window.localityBoundaryGroup);
+
+            // Calculate center of polygon
+            const center =
+                layer.getBounds().getCenter();
+
+            // Display locality name
+            const label = L.marker(center, {
+
+                interactive: false,
+
+                icon: L.divIcon({
+
+                    className: "locality-label",
+
+                    html: `
+                        <div class="locality-name">
+                            ${item.localityName}
+                        </div>
+                    `
+
+                })
+
+            });
+
+            label.addTo(window.localityLabelGroup);
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            "Error loading locality boundaries:",
+            error
+        );
+
+    }
+
+}
+function drawLocalityMarkers() {
+
+    // Remove previous markers
+    localityMarkers.forEach(function(marker){
+        gisMap.removeLayer(marker);
+    });
+
+    localityMarkers = [];
+
+    wardLocalities.forEach(function(locality){
+
+        const marker = L.marker(
+    [
+        locality.latitude,
+        locality.longitude
+    ],
+    {
+        icon: L.divIcon({
+
+            className: "locality-label",
+
+            html: `
+                <div class="locality-name">
+                    ${locality.localityName}
+                </div>
+            `
+
+        })
+    }
+).addTo(gisMap);
+
+        marker.bindPopup(
+            `<b>${locality.localityName}</b>`
+        );
+
+        localityMarkers.push(marker);
+
+    });
+
+}
+
+async function displayWardLocalities() {
+
+    for(const locality of wardLocalities){
+
+        const response =
+        await fetch(
+
+`${GIS_API.LOCALITY}/${locality.localityId}`
+
+        );
+
+        if(response.ok){
+
+            const geoJson =
+            await response.json();
+
+            drawLocalityPolygon(
+                geoJson
+            );
+
+        }
+        else{
+
+            drawLocalityMarker(
+                locality
+            );
+
+        }
+
+    }
+  }
+
+
+function clearLocalityLayers(){
+
+    if(localityBoundaryLayer){
+
+        gisMap.removeLayer(localityBoundaryLayer);
+
+    }
+
+    localityBoundaryLayer =
+        L.featureGroup().addTo(gisMap);
+
+}

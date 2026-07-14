@@ -25,5 +25,13 @@ namespace CitizenConnect.Interfaces.Services
     string? departmentName = null,
     string? officerEmail = null,
     string? officerMobile = null);
+
+    Task SendSuggestionStatusUpdatedEmail(
+    string toEmail,
+    string citizenName,
+    string suggestionNumber,
+    string oldStatus,
+    string newStatus,
+    string? remarks);
     }
 }

@@ -363,6 +363,34 @@ GetLocalitiesByPincodeAsync(string pincode)
         .Cast<object>()
         .ToListAsync();
 }
+
+
+        public async Task<List<LocalityResponseDto>>
+GetLocalitiesByWardAsync(int wardId)
+        {
+            return await _context.Localities
+
+                .Where(x =>
+                    x.WardId == wardId)
+
+                .Select(x =>
+                    new LocalityResponseDto
+                    {
+                        LocalityId = x.LocalityId,
+
+                        LocalityName = x.LocalityName,
+
+                        Latitude = x.Latitude,
+
+                        Longitude = x.Longitude,
+
+                        Pincode = x.Pincode,
+
+                        Landmark = x.Landmark
+                    })
+
+                .ToListAsync();
+        }
     }
 
     
