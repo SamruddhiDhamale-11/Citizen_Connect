@@ -1,25 +1,23 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard — Citizen Connect</title>
   <link rel="stylesheet" href="admin-dashboard.css" />
-  <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link
-rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 </head>
+
 <body>
 
   <!-- ===== TOP NAVBAR ===== -->
@@ -66,19 +64,17 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <span class="nav-label">Ward / Village Management</span>
         </a>
 
-        <a href="#"
-   class="nav-item"
-   onclick="showPanel('gis-management', this)">
+        <a href="#" class="nav-item" onclick="showPanel('gis-management', this)">
 
-    <span class="nav-icon">
-        🗺️
-    </span>
+          <span class="nav-icon">
+            🗺️
+          </span>
 
-    <span class="nav-label">
-        GIS Management
-    </span>
+          <span class="nav-label">
+            GIS Management
+          </span>
 
-</a>
+        </a>
         <a href="#" class="nav-item" onclick="showPanel('citizen-management', this)">
           <span class="nav-icon">&#x1F465;</span>
           <span class="nav-label">Citizen Management</span>
@@ -144,7 +140,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <div class="stat-card">
             <div class="stat-icon" style="background:#FEF3C7; color:#D97706;">&#x1F4CB;</div>
             <div class="stat-body">
-             <div class="stat-number" id="openComplaintsCount">0</div>
+              <div class="stat-number" id="openComplaintsCount">0</div>
               <div class="stat-label">Open Complaints</div>
             </div>
             <div class="stat-badge pending">Needs Action</div>
@@ -152,7 +148,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <div class="stat-card">
             <div class="stat-icon" style="background:#F0FDF4; color:#16a34a;">&#x2705;</div>
             <div class="stat-body">
-             <div class="stat-number" id="resolvedComplaintsCount">0</div>
+              <div class="stat-number" id="resolvedComplaintsCount">0</div>
               <div class="stat-label">Resolved Complaints</div>
             </div>
             <div class="stat-badge resolved">77% Rate</div>
@@ -168,7 +164,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <div class="stat-card">
             <div class="stat-icon" style="background:#F5F3FF; color:#7C3AED;">&#x1F477;</div>
             <div class="stat-body">
-             <div class="stat-number" id="totalStaffCount">0</div>
+              <div class="stat-number" id="totalStaffCount">0</div>
               <div class="stat-label">Staff Members</div>
             </div>
             <div class="stat-badge gold">Active</div>
@@ -202,15 +198,18 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <!-- Quick Actions -->
         <div class="section-title">Quick Actions</div>
         <div class="quick-actions">
-          <button class="quick-btn" onclick="showPanel('area-overview', document.querySelector('[onclick*=area-overview]'))">
+          <button class="quick-btn"
+            onclick="showPanel('area-overview', document.querySelector('[onclick*=area-overview]'))">
             <span class="quick-icon">&#x1F5FA;&#xFE0F;</span>
             <span>Area Overview Setup</span>
           </button>
-          <button class="quick-btn" onclick="showPanel('complaints-management', document.querySelector('[onclick*=complaints-management]'))">
+          <button class="quick-btn"
+            onclick="showPanel('complaints-management', document.querySelector('[onclick*=complaints-management]'))">
             <span class="quick-icon">&#x1F4CB;</span>
             <span>Manage Complaints</span>
           </button>
-          <button class="quick-btn" onclick="showPanel('announcements', document.querySelector('[onclick*=announcements]'))">
+          <button class="quick-btn"
+            onclick="showPanel('announcements', document.querySelector('[onclick*=announcements]'))">
             <span class="quick-icon">&#x1F4E2;</span>
             <span>Post Announcement</span>
           </button>
@@ -272,35 +271,40 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
             <div class="activity-dot complaint"></div>
             <div class="activity-body">
               <div class="activity-title">New complaint filed — Broken road near Ward 7 market</div>
-              <div class="activity-meta">2 minutes ago &middot; <span class="badge-status pending-text">Pending</span></div>
+              <div class="activity-meta">2 minutes ago &middot; <span class="badge-status pending-text">Pending</span>
+              </div>
             </div>
           </div>
           <div class="activity-item">
             <div class="activity-dot resolved"></div>
             <div class="activity-body">
               <div class="activity-title">Complaint resolved — Water supply disruption in Ward 3</div>
-              <div class="activity-meta">18 minutes ago &middot; <span class="badge-status resolved-text">Resolved</span></div>
+              <div class="activity-meta">18 minutes ago &middot; <span
+                  class="badge-status resolved-text">Resolved</span></div>
             </div>
           </div>
           <div class="activity-item">
             <div class="activity-dot suggestion"></div>
             <div class="activity-body">
               <div class="activity-title">New citizen registered — Priya Mehta, Ward 12</div>
-              <div class="activity-meta">1 hour ago &middot; <span class="badge-status review-text">New Registration</span></div>
+              <div class="activity-meta">1 hour ago &middot; <span class="badge-status review-text">New
+                  Registration</span></div>
             </div>
           </div>
           <div class="activity-item">
             <div class="activity-dot announcement"></div>
             <div class="activity-body">
               <div class="activity-title">Announcement published — Water supply maintenance on 15 May</div>
-              <div class="activity-meta">3 hours ago &middot; <span class="badge-status info-text">Published</span></div>
+              <div class="activity-meta">3 hours ago &middot; <span class="badge-status info-text">Published</span>
+              </div>
             </div>
           </div>
           <div class="activity-item">
             <div class="activity-dot complaint"></div>
             <div class="activity-body">
               <div class="activity-title">Staff assigned — Rajesh Kumar assigned to Ward 5 complaints</div>
-              <div class="activity-meta">5 hours ago &middot; <span class="badge-status review-text">Assigned</span></div>
+              <div class="activity-meta">5 hours ago &middot; <span class="badge-status review-text">Assigned</span>
+              </div>
             </div>
           </div>
         </div>
@@ -320,7 +324,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <div class="area-action-buttons">
             <button class="btn-action btn-ghost" onclick="resetAreaData()">&#x21BA; Reset Data</button>
             <button class="btn-action btn-outline-red" onclick="saveDraft()">&#x1F4BE; Save Draft</button>
-            <button class="btn-action btn-outline-red" onclick="updateInfo()">&#x270F;&#xFE0F; Update Information</button>
+            <button class="btn-action btn-outline-red" onclick="updateInfo()">&#x270F;&#xFE0F; Update
+              Information</button>
             <button class="btn-action btn-primary" onclick="publishArea()">&#x1F4E4; Publish</button>
           </div>
         </div>
@@ -359,12 +364,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
 
         <!-- Hidden progress tracking elements (used by JS, not displayed) -->
 
-        
+
         <span id="completedCount" style="display:none">0</span>
-        <span id="partialCount"   style="display:none">0</span>
-        <span id="emptyCount"     style="display:none">0</span>
+        <span id="partialCount" style="display:none">0</span>
+        <span id="emptyCount" style="display:none">0</span>
         <span id="globalProgressFill" style="display:none"></span>
-        <span id="globalProgressPct"  style="display:none"></span>
+        <span id="globalProgressPct" style="display:none"></span>
 
         <!-- Section Cards Grid -->
         <div class="section-title">Area Sections</div>
@@ -385,10 +390,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
             <span class="sd-back-arrow">&#x2190;</span> Back to Area Overview
           </button>
           <div class="sd-action-right">
-            <button class="btn-action btn-ghost" id="sdBtnDelete" onclick="deleteSectionData()">&#x1F5D1; Delete Data</button>
-            <button class="btn-action btn-ghost" id="sdBtnSaveDraft" onclick="saveSectionDraft()">&#x1F4BE; Save Draft</button>
-            <button class="btn-action btn-outline-red" id="sdBtnUpdate" onclick="updateSectionData()">&#x270F;&#xFE0F; Update</button>
-            <button class="btn-action btn-primary" id="sdBtnSubmit" onclick="submitSectionData()">&#x2713; Submit</button>
+            <button class="btn-action btn-ghost" id="sdBtnDelete" onclick="deleteSectionData()">&#x1F5D1; Delete
+              Data</button>
+            <button class="btn-action btn-ghost" id="sdBtnSaveDraft" onclick="saveSectionDraft()">&#x1F4BE; Save
+              Draft</button>
+            <button class="btn-action btn-outline-red" id="sdBtnUpdate" onclick="updateSectionData()">&#x270F;&#xFE0F;
+              Update</button>
+            <button class="btn-action btn-primary" id="sdBtnSubmit" onclick="submitSectionData()">&#x2713;
+              Submit</button>
           </div>
         </div>
 
@@ -458,13 +467,15 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <div class="page-header">
           <div>
             <h1 class="page-title">Ward / Village Management</h1>
-            <p class="page-subtitle">Configure and manage complete ward and village information for your jurisdiction</p>
+            <p class="page-subtitle">Configure and manage complete ward and village information for your jurisdiction
+            </p>
           </div>
           <div class="area-action-buttons">
-            <button class="btn-action btn-ghost"        onclick="resetWardData()">&#x21BA; Reset Data</button>
-            <button class="btn-action btn-outline-red"  onclick="saveWardDraftTop()">&#x1F4BE; Save Draft</button>
-            <button class="btn-action btn-outline-red"  onclick="updateWardInfo()">&#x270F;&#xFE0F; Update Information</button>
-            <button class="btn-action btn-primary"      onclick="publishWard()">&#x1F4E4; Publish</button>
+            <button class="btn-action btn-ghost" onclick="resetWardData()">&#x21BA; Reset Data</button>
+            <button class="btn-action btn-outline-red" onclick="saveWardDraftTop()">&#x1F4BE; Save Draft</button>
+            <button class="btn-action btn-outline-red" onclick="updateWardInfo()">&#x270F;&#xFE0F; Update
+              Information</button>
+            <button class="btn-action btn-primary" onclick="publishWard()">&#x1F4E4; Publish</button>
           </div>
         </div>
 
@@ -502,8 +513,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
 
         <!-- Hidden progress tracking -->
         <span id="wardCompletedCount" style="display:none">0</span>
-        <span id="wardPartialCount"   style="display:none">0</span>
-        <span id="wardEmptyCount"     style="display:none">0</span>
+        <span id="wardPartialCount" style="display:none">0</span>
+        <span id="wardEmptyCount" style="display:none">0</span>
 
         <!-- Section Cards Grid -->
         <div class="section-title">Ward Sections</div>
@@ -524,9 +535,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
             <span class="sd-back-arrow">&#x2190;</span> Back to Ward / Village Management
           </button>
           <div class="sd-action-right">
-            <button class="btn-action btn-ghost"        id="wsdBtnDelete"    onclick="deleteWardSectionData()">&#x1F5D1; Delete Data</button>
-            <button class="btn-action btn-ghost"        id="wsdBtnSaveDraft" onclick="saveWardSectionDraft()">&#x1F4BE; Save Draft</button>
-            <button class="btn-action btn-outline-red"  id="wsdBtnUpdate"    onclick="updateWardSectionData()">&#x270F;&#xFE0F; Update</button>
+            <button class="btn-action btn-ghost" id="wsdBtnDelete" onclick="deleteWardSectionData()">&#x1F5D1; Delete
+              Data</button>
+            <button class="btn-action btn-ghost" id="wsdBtnSaveDraft" onclick="saveWardSectionDraft()">&#x1F4BE; Save
+              Draft</button>
+            <button class="btn-action btn-outline-red" id="wsdBtnUpdate"
+              onclick="updateWardSectionData()">&#x270F;&#xFE0F; Update</button>
             <!-- <button class="btn-action btn-primary"      id="wsdBtnSubmit"    onclick="submitWardSectionData()">&#x2713; Submit</button> -->
           </div>
         </div>
@@ -534,9 +548,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <!-- Section Header -->
         <div class="sd-header">
           <div class="sd-header-left">
-            <div class="sd-breadcrumb">Ward / Village Management &rsaquo; <span id="wsdBreadcrumbName">Section</span></div>
-            <h1 class="sd-title"    id="wsdTitle">Section Title</h1>
-            <p  class="sd-subtitle" id="wsdSubtitle">Section description</p>
+            <div class="sd-breadcrumb">Ward / Village Management &rsaquo; <span id="wsdBreadcrumbName">Section</span>
+            </div>
+            <h1 class="sd-title" id="wsdTitle">Section Title</h1>
+            <p class="sd-subtitle" id="wsdSubtitle">Section description</p>
             <div class="sd-last-saved" id="wsdLastSaved">Not saved yet</div>
           </div>
           <div class="sd-header-right">
@@ -587,243 +602,222 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
 
         </div>
       </div>
-
+        
       <div class="panel" id="panel-gis-management">
 
-    <!-- Page Header -->
-    <div class="page-header">
+        <!-- Page Header -->
+        <div class="page-header">
 
-        <div>
+          <div>
             <h1 class="page-title">
-                GIS Management
+              GIS Management
             </h1>
 
             <p class="page-subtitle">
-                Manage Ward and Locality Boundaries using an interactive GIS map.
+              Manage Ward and Locality Boundaries using an interactive GIS map.
             </p>
-        </div>
-
-    </div>
-
-    <!-- GIS Summary -->
-
-    <div class="area-info-card">
-
-        <div class="area-info-grid">
-
-            <div class="area-info-item">
-
-                <div class="area-info-label">
-                    Selected Ward
-                </div>
-
-                <div class="area-info-value"
-                     id="gisSelectedWard">
-
-                    -
-
-                </div>
-
-            </div>
-
-            <div class="area-info-item">
-
-                <div class="area-info-label">
-                    Selected Locality
-                </div>
-
-                <div class="area-info-value"
-                     id="gisSelectedLocality">
-
-                    -
-
-                </div>
-
-            </div>
-
-            <div class="area-info-item">
-
-                <div class="area-info-label">
-                    Boundary Status
-                </div>
-
-                <div class="area-info-value">
-
-                    <span
-                        class="area-status-badge draft"
-                        id="gisBoundaryStatus">
-
-                        Not Available
-
-                    </span>
-
-                </div>
-
-            </div>
+          </div>
 
         </div>
 
-    </div>
-    <div class="section-title">
+        <!-- GIS Summary -->
 
-    GIS Configuration
+        <div class="area-info-card">
 
-</div>
+          <div class="area-info-grid">
 
-<div class="sd-form-card">
+            <div class="area-info-item">
 
-    <div class="sd-form-body">
+              <div class="area-info-label">
+                Selected Ward
+              </div>
 
-        <div class="officer-form-grid">
+              <div class="area-info-value" id="gisSelectedWard">
+
+                -
+
+              </div>
+
+            </div>
+
+            <div class="area-info-item">
+
+              <div class="area-info-label">
+                Selected Locality
+              </div>
+
+              <div class="area-info-value" id="gisSelectedLocality">
+
+                -
+
+              </div>
+
+            </div>
+
+            <div class="area-info-item">
+
+              <div class="area-info-label">
+                Boundary Status
+              </div>
+
+              <div class="area-info-value">
+
+                <span class="area-status-badge draft" id="gisBoundaryStatus">
+
+                  Not Available
+
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+        <div class="section-title">
+
+          GIS Configuration
+        </div>
+    
+
+      <div class="sd-form-card">
+
+        <div class="sd-form-body">
+
+          <div class="officer-form-grid">
 
             <div class="sd-field-group">
 
-                <label class="sd-field-label">
+              <label class="sd-field-label">
 
-                    Ward
+                Ward
 
-                </label>
+              </label>
 
-                <select
-                    id="gisWard"
-                    class="sd-select">
+              <select id="gisWard" class="sd-select">
 
-                    <option value="">
+                <option value="">
 
-                        Select Ward
+                  Select Ward
 
-                    </option>
+                </option>
 
-                </select>
+              </select>
 
             </div>
 
             <div class="sd-field-group">
 
-                <label class="sd-field-label">
+              <label class="sd-field-label">
 
-                    Locality
+                Locality
 
-                </label>
+              </label>
 
-                <select
-                    id="gisLocality"
-                    class="sd-select">
+              <select id="gisLocality" class="sd-select">
 
-                    <option value="">
+                <option value="">
 
-                        Select Locality
+                  Select Locality
 
-                    </option>
+                </option>
 
-                </select>
+              </select>
 
             </div>
 
+          </div>
+
         </div>
 
-    </div>
+      </div>
+      <div class="section-title">
 
-</div>
-<div class="section-title">
+        GIS Map
 
-    GIS Map
+      </div>
 
-</div>
+      <div class="sd-preview-card">
 
-<div class="sd-preview-card">
-
-    <div
-        id="gisMap"
-        style="
+        <div id="gisMap" style="
             height:600px;
             border-radius:12px;">
-    </div>
+        </div>
 
-</div>
+      </div>
 
-<div
-    style="
+      <div style="
         display:flex;
         gap:15px;
         margin-top:20px;">
 
-    <button
-        class="btn-action btn-outline-red"
-        id="btnLoadBoundary">
+        <button class="btn-action btn-outline-red" id="btnLoadBoundary">
 
-        Load Boundary
+          Load Boundary
 
-    </button>
+        </button>
 
-    <button
-        class="btn-action btn-ghost"
-        id="btnDrawBoundary" onclick="drawBoundary()">
+        <button class="btn-action btn-ghost" id="btnDrawBoundary" onclick="drawBoundary()">
 
-        Draw Boundary
+          Draw Boundary
 
-    </button>
+        </button>
 
-    <button
-        class="btn-action btn-primary"
-        id="btnSaveBoundary" onclick="saveCurrentBoundary()">
+        <button class="btn-action btn-primary" id="btnSaveBoundary" onclick="saveCurrentBoundary()">
 
-        Save Boundary
+          Save Boundary
 
-    </button>
+        </button>
+
+      </div>
 
 </div>
-
       <!-- ============================================================
            PANEL: CITIZEN MANAGEMENT
            ============================================================ -->
       <div class="panel" id="panel-citizen-management">
 
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Citizen Management</h1>
-      <p class="page-subtitle">
-        View and manage all registered citizens
-      </p>
-    </div>
-  </div>
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Citizen Management</h1>
+            <p class="page-subtitle">
+              View and manage all registered citizens
+            </p>
+          </div>
+        </div>
 
-  <!-- FILTER -->
-  <div class="filter-bar">
-    <input
-      type="text"
-      class="filter-search"
-      id="citizenSearch"
-      placeholder="Search by name, email or mobile..."
-      oninput="searchCitizens(this.value)"
-    />
-  </div>
+        <!-- FILTER -->
+        <div class="filter-bar">
+          <input type="text" class="filter-search" id="citizenSearch" placeholder="Search by name, email or mobile..."
+            oninput="searchCitizens(this.value)" />
+        </div>
 
-  <!-- TABLE -->
-  <div class="citizen-table-wrapper">
+        <!-- TABLE -->
+        <div class="citizen-table-wrapper">
 
-    <table class="citizen-table">
+          <table class="citizen-table">
 
-      <thead>
-        <tr>
-          <th>Sr No</th>
-          <th>Full Name</th>
-          <th>Email</th>
-          <th>Mobile Number</th>
-          <th>Joined Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+            <thead>
+              <tr>
+                <th>Sr No</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Mobile Number</th>
+                <th>Joined Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-      <tbody id="citizenTableBody">
-        <!-- JS -->
-      </tbody>
+            <tbody id="citizenTableBody">
+              <!-- JS -->
+            </tbody>
 
-    </table>
+          </table>
 
-  </div>
+        </div>
 
-</div>
+      </div>
 
       <!-- ============================================================
            PANEL: COMPLAINTS MANAGEMENT
@@ -836,182 +830,169 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           </div>
         </div>
 
-<div class="complaint-status-summary">
+        <div class="complaint-status-summary">
 
-  <div class="status-card pending"
-       onclick="filterByStatusCard('pending')">
+          <div class="status-card pending" onclick="filterByStatusCard('pending')">
 
-    <div class="status-card-header">
-      <span class="status-card-label">Pending</span>
-      <i class="fa-solid fa-clock"></i>
-    </div>
+            <div class="status-card-header">
+              <span class="status-card-label">Pending</span>
+              <i class="fa-solid fa-clock"></i>
+            </div>
 
-    <div class="status-count" id="pendingCount">0</div>
+            <div class="status-count" id="pendingCount">0</div>
 
-  </div>
+          </div>
 
-  <div class="status-card assigned"
-     onclick="filterByStatusCard('assigned')">
+          <div class="status-card assigned" onclick="filterByStatusCard('assigned')">
 
-    <div class="status-card-header">
-      <span class="status-card-label">Assigned</span>
-      <i class="fa-solid fa-user-check"></i>
-    </div>
+            <div class="status-card-header">
+              <span class="status-card-label">Assigned</span>
+              <i class="fa-solid fa-user-check"></i>
+            </div>
 
-    <div class="status-count" id="assignedCount">0</div>
+            <div class="status-count" id="assignedCount">0</div>
 
-</div>
+          </div>
 
-  <div class="status-card resolved"
-       onclick="filterByStatusCard('resolved')">
+          <div class="status-card resolved" onclick="filterByStatusCard('resolved')">
 
-    <div class="status-card-header">
-      <span class="status-card-label">Resolved</span>
-      <i class="fa-solid fa-circle-check"></i>
-    </div>
+            <div class="status-card-header">
+              <span class="status-card-label">Resolved</span>
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
 
-    <div class="status-count" id="resolvedCount">0</div>
+            <div class="status-count" id="resolvedCount">0</div>
 
-  </div>
+          </div>
 
-  <div class="status-card rejected"
-       onclick="filterByStatusCard('rejected')">
+          <div class="status-card rejected" onclick="filterByStatusCard('rejected')">
 
-    <div class="status-card-header">
-      <span class="status-card-label">Rejected</span>
-      <i class="fa-solid fa-circle-xmark"></i>
-    </div>
+            <div class="status-card-header">
+              <span class="status-card-label">Rejected</span>
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
 
-    <div class="status-count" id="rejectedCount">0</div>
+            <div class="status-count" id="rejectedCount">0</div>
 
-  </div>
+          </div>
 
-  <div class="status-card all"
-       onclick="filterByStatusCard('all')">
+          <div class="status-card all" onclick="filterByStatusCard('all')">
 
-    <div class="status-card-header">
-      <span class="status-card-label">All Complaints</span>
-      <i class="fa-solid fa-list"></i>
-    </div>
+            <div class="status-card-header">
+              <span class="status-card-label">All Complaints</span>
+              <i class="fa-solid fa-list"></i>
+            </div>
 
-    <div class="status-count" id="allCount">0</div>
+            <div class="status-count" id="allCount">0</div>
 
-  </div>
+          </div>
 
-</div>
+        </div>
 
 
         <div class="filter-bar">
           <select class="filter-select" id="adminComplaintStatusFilter" onchange="filterAdminComplaints(this.value)">
             <option value="all">All Status</option>
-<option value="pending">Pending</option>
-<option value="assigned">Assigned</option>
-<option value="resolved">Resolved</option>
-<option value="rejected">Rejected</option>
+            <option value="pending">Pending</option>
+            <option value="assigned">Assigned</option>
+            <option value="resolved">Resolved</option>
+            <option value="rejected">Rejected</option>
           </select>
-          <input type="text" class="filter-search" id="adminComplaintSearch" placeholder="Search complaints..." oninput="searchAdminComplaints(this.value)" />
+          <input type="text" class="filter-search" id="adminComplaintSearch" placeholder="Search complaints..."
+            oninput="searchAdminComplaints(this.value)" />
         </div>
         <div class="items-list" id="adminComplaintsList">
           <!-- Populated by JS -->
         </div>
       </div>
-      
+
       <!-- ============================================================
      PANEL: SUGGESTIONS MANAGEMENT
 ============================================================ -->
-<div class="panel" id="panel-suggestions-management">
+      <div class="panel" id="panel-suggestions-management">
 
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Suggestions Management</h1>
-      <p class="page-subtitle">Review and manage citizen suggestions</p>
-    </div>
-  </div>
-
-
-<div class="complaint-status-summary">
-
-  <div class="status-card pending"
-     onclick="filterSuggestionByCard('pending')">
-    <div class="status-card-header">
-      <span class="status-card-label">Pending</span>
-      <i class="fa-solid fa-clock"></i>
-    </div>
-    <div class="status-count" id="suggestionPendingCount">0</div>
-  </div>
-
-  <div class="status-card progress"
-     onclick="filterSuggestionByCard('under review')">
-    <div class="status-card-header">
-      <span class="status-card-label">Under Review</span>
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </div>
-    <div class="status-count" id="suggestionReviewCount">0</div>
-  </div>
-
- <div class="status-card resolved"
-     onclick="filterSuggestionByCard('approved')">
-    <div class="status-card-header">
-      <span class="status-card-label">Approved</span>
-      <i class="fa-solid fa-thumbs-up"></i>
-    </div>
-    <div class="status-count" id="suggestionApprovedCount">0</div>
-  </div>
-
-  <div class="status-card implemented"
-     onclick="filterSuggestionByCard('implemented')">
-    <div class="status-card-header">
-      <span class="status-card-label">Implemented</span>
-      <i class="fa-solid fa-lightbulb"></i>
-    </div>
-    <div class="status-count" id="suggestionImplementedCount">0</div>
-  </div>
-
-  <div class="status-card rejected"
-     onclick="filterSuggestionByCard('rejected')">
-    <div class="status-card-header">
-      <span class="status-card-label">Rejected</span>
-      <i class="fa-solid fa-circle-xmark"></i>
-    </div>
-    <div class="status-count" id="suggestionRejectedCount">0</div>
-  </div>
-
-<div class="status-card all"
-     onclick="filterSuggestionByCard('all')">
-    <div class="status-card-header">
-      <span class="status-card-label">All Suggestions</span>
-      <i class="fa-solid fa-list"></i>
-    </div>
-    <div class="status-count" id="suggestionAllCount">0</div>
-  </div>
-
-</div>
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Suggestions Management</h1>
+            <p class="page-subtitle">Review and manage citizen suggestions</p>
+          </div>
+        </div>
 
 
-  <!-- FILTER BAR (same like complaints) -->
-  <div class="filter-bar">
-    <select class="filter-select" id="adminSuggestionStatusFilter" onchange="filterAdminSuggestions(this.value)">
-      <option value="all">All Status</option>
-      <option value="pending">Pending</option>
-      <option value="under review">Under Review</option>
-      <option value="approved">Approved</option>
-      <option value="implemented">Implemented</option>
-      <option value="rejected">Rejected</option>
-    </select>
+        <div class="complaint-status-summary">
 
-    <input type="text"
-           class="filter-search"
-           id="adminSuggestionSearch"
-           placeholder="Search suggestions..."
-           oninput="searchAdminSuggestions(this.value)" />
-  </div>
+          <div class="status-card pending" onclick="filterSuggestionByCard('pending')">
+            <div class="status-card-header">
+              <span class="status-card-label">Pending</span>
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="status-count" id="suggestionPendingCount">0</div>
+          </div>
 
-  <!-- LIST CONTAINER (IMPORTANT) -->
-  <div class="items-list" id="adminSuggestionsList">
-    <!-- Populated by JS -->
-  </div>
+          <div class="status-card progress" onclick="filterSuggestionByCard('under review')">
+            <div class="status-card-header">
+              <span class="status-card-label">Under Review</span>
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <div class="status-count" id="suggestionReviewCount">0</div>
+          </div>
 
-</div>
+          <div class="status-card resolved" onclick="filterSuggestionByCard('approved')">
+            <div class="status-card-header">
+              <span class="status-card-label">Approved</span>
+              <i class="fa-solid fa-thumbs-up"></i>
+            </div>
+            <div class="status-count" id="suggestionApprovedCount">0</div>
+          </div>
+
+          <div class="status-card implemented" onclick="filterSuggestionByCard('implemented')">
+            <div class="status-card-header">
+              <span class="status-card-label">Implemented</span>
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            <div class="status-count" id="suggestionImplementedCount">0</div>
+          </div>
+
+          <div class="status-card rejected" onclick="filterSuggestionByCard('rejected')">
+            <div class="status-card-header">
+              <span class="status-card-label">Rejected</span>
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div class="status-count" id="suggestionRejectedCount">0</div>
+          </div>
+
+          <div class="status-card all" onclick="filterSuggestionByCard('all')">
+            <div class="status-card-header">
+              <span class="status-card-label">All Suggestions</span>
+              <i class="fa-solid fa-list"></i>
+            </div>
+            <div class="status-count" id="suggestionAllCount">0</div>
+          </div>
+
+        </div>
+
+
+        <!-- FILTER BAR (same like complaints) -->
+        <div class="filter-bar">
+          <select class="filter-select" id="adminSuggestionStatusFilter" onchange="filterAdminSuggestions(this.value)">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="under review">Under Review</option>
+            <option value="approved">Approved</option>
+            <option value="implemented">Implemented</option>
+            <option value="rejected">Rejected</option>
+          </select>
+
+          <input type="text" class="filter-search" id="adminSuggestionSearch" placeholder="Search suggestions..."
+            oninput="searchAdminSuggestions(this.value)" />
+        </div>
+
+        <!-- LIST CONTAINER (IMPORTANT) -->
+        <div class="items-list" id="adminSuggestionsList">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
 
 
       <!-- ============================================================
@@ -1027,7 +1008,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <div class="placeholder-panel">
           <div class="placeholder-icon">&#x1F4E2;</div>
           <div class="placeholder-title">Announcements</div>
-          <div class="placeholder-desc">This module is under development. Announcement creation and publishing will be available here.</div>
+          <div class="placeholder-desc">This module is under development. Announcement creation and publishing will be
+            available here.</div>
         </div>
       </div>
 
@@ -1044,353 +1026,312 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <div class="placeholder-panel">
           <div class="placeholder-icon">&#x1F4DC;</div>
           <div class="placeholder-title">Schemes &amp; Services</div>
-          <div class="placeholder-desc">This module is under development. Scheme management and citizen enrollment will be available here.</div>
+          <div class="placeholder-desc">This module is under development. Scheme management and citizen enrollment will
+            be available here.</div>
         </div>
       </div>
 
-      
-<!-- ============================================================
+
+      <!-- ============================================================
      PANEL: STAFF MANAGEMENT
      ============================================================ -->
-<div class="panel" id="panel-staff-management">
+      <div class="panel" id="panel-staff-management">
 
-  <div class="page-header">
+        <div class="page-header">
 
-    <div>
-      <h1 class="page-title">
-        Staff Management
-      </h1>
+          <div>
+            <h1 class="page-title">
+              Staff Management
+            </h1>
 
-      <p class="page-subtitle">
-        Manage officers, departments and assignments
-      </p>
-    </div>
+            <p class="page-subtitle">
+              Manage officers, departments and assignments
+            </p>
+          </div>
 
-    <div class="area-action-buttons">
+          <div class="area-action-buttons">
 
-      <button class="btn-action btn-outline-red"
-              onclick="loadOfficers()">
+            <button class="btn-action btn-outline-red" onclick="loadOfficers()">
 
-        &#x21BB; Refresh
+              &#x21BB; Refresh
 
-      </button>
+            </button>
 
-      <button class="btn-action btn-primary"
-              onclick="openOfficerModal()">
+            <button class="btn-action btn-primary" onclick="openOfficerModal()">
 
-        + Add Officer
+              + Add Officer
 
-      </button>
+            </button>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-  <!-- =====================================================
+        <!-- =====================================================
        FILTER TOOLBAR
        ===================================================== -->
 
-  <div class="staff-toolbar">
+        <div class="staff-toolbar">
 
-    <div class="staff-search">
+          <div class="staff-search">
 
-      <input type="text"
-             id="officerSearch"
-             placeholder="Search officer..."
-             onkeyup="searchOfficers()" />
+            <input type="text" id="officerSearch" placeholder="Search officer..." onkeyup="searchOfficers()" />
 
-    </div>
+          </div>
 
-    <div class="staff-filters">
+          <div class="staff-filters">
 
-      <select id="departmentFilter"
-              onchange="filterOfficers()">
+            <select id="departmentFilter" onchange="filterOfficers()">
 
-        <option value="all">
-          All Departments
-        </option>
+              <option value="all">
+                All Departments
+              </option>
 
-      </select>
+            </select>
 
-      <select id="statusFilter"
-              onchange="filterOfficers()">
+            <select id="statusFilter" onchange="filterOfficers()">
 
-        <option value="all">
-          All Status
-        </option>
+              <option value="all">
+                All Status
+              </option>
 
-        <option value="true">
-          Active
-        </option>
+              <option value="true">
+                Active
+              </option>
 
-        <option value="false">
-          Inactive
-        </option>
+              <option value="false">
+                Inactive
+              </option>
 
-      </select>
+            </select>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-  <!-- =====================================================
+        <!-- =====================================================
        OFFICERS TABLE
        ===================================================== -->
 
-  <div class="staff-table-wrapper">
+        <div class="staff-table-wrapper">
 
-    <table class="staff-table">
+          <table class="staff-table">
 
-      <thead>
+            <thead>
 
-        <tr>
+              <tr>
 
-          <th>Officer</th>
+                <th>Officer</th>
 
-          <th>Email</th>
+                <th>Email</th>
 
-          <th>Mobile</th>
+                <th>Mobile</th>
 
-          <th>Department</th>
+                <th>Department</th>
 
-          <th>Category</th>
+                <th>Category</th>
 
-          <th>Designation</th>
+                <th>Designation</th>
 
-          <th>Status</th>
+                <th>Status</th>
 
-          <th>Actions</th>
+                <th>Actions</th>
 
-        </tr>
+              </tr>
 
-      </thead>
+            </thead>
 
-      <tbody id="officerTableBody">
+            <tbody id="officerTableBody">
 
-        <!-- Dynamic Officer Data -->
+              <!-- Dynamic Officer Data -->
 
-      </tbody>
+            </tbody>
 
-    </table>
+          </table>
 
-  </div>
+        </div>
 
-</div>
+      </div>
 
-<!-- ============================================================
+      <!-- ============================================================
      OFFICER MODAL
      ============================================================ -->
-<div class="modal-overlay hidden"
-     id="officerModalOverlay">
+      <div class="modal-overlay hidden" id="officerModalOverlay">
 
-  <div class="modal-card officer-modal-card">
+        <div class="modal-card officer-modal-card">
 
-    <!-- HEADER -->
+          <!-- HEADER -->
 
-    <div class="modal-header">
+          <div class="modal-header">
 
-      <div class="modal-title"
-           id="officerModalTitle">
+            <div class="modal-title" id="officerModalTitle">
 
-        Add Officer
+              Add Officer
 
-      </div>
+            </div>
 
-      <button class="modal-close"
-              onclick="closeOfficerModal()">
+            <button class="modal-close" onclick="closeOfficerModal()">
 
-        &#10005;
+              &#10005;
 
-      </button>
+            </button>
 
-    </div>
+          </div>
 
-    <!-- BODY -->
+          <!-- BODY -->
 
-    <div class="modal-body">
+          <div class="modal-body">
 
-      <div class="officer-form-grid">
+            <div class="officer-form-grid">
 
-        <!-- FIRST NAME -->
+              <!-- FIRST NAME -->
 
-        <div class="sd-field-group">
+              <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            First Name
-          </label>
+                <label class="sd-field-label">
+                  First Name
+                </label>
 
-        <input
-    type="text"
-    id="officerFirstName"
-    class="sd-input"
-    placeholder="Enter first name"
-    maxlength="50"
-    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
+                <input type="text" id="officerFirstName" class="sd-input" placeholder="Enter first name" maxlength="50"
+                  oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
 
-        </div>
+              </div>
 
-        <!-- LAST NAME -->
+              <!-- LAST NAME -->
 
-        <div class="sd-field-group">
+              <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Last Name
-          </label>
+                <label class="sd-field-label">
+                  Last Name
+                </label>
 
-          <input
-    type="text"
-    id="officerLastName"
-    class="sd-input"
-    placeholder="Enter last name"
-    maxlength="50"
-    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
+                <input type="text" id="officerLastName" class="sd-input" placeholder="Enter last name" maxlength="50"
+                  oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
 
-        </div>
+              </div>
 
-        <!-- EMAIL -->
+              <!-- EMAIL -->
 
-        <div class="sd-field-group">
+              <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Email
-          </label>
+                <label class="sd-field-label">
+                  Email
+                </label>
 
-          <input
-    type="email"
-    id="officerEmail"
-    class="sd-input"
-    placeholder="Enter email"
-    maxlength="150">
+                <input type="email" id="officerEmail" class="sd-input" placeholder="Enter email" maxlength="150">
 
-        </div>
+              </div>
 
-        <!-- MOBILE -->
+              <!-- MOBILE -->
 
-        <div class="sd-field-group">
+              <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Mobile Number
-          </label>
+                <label class="sd-field-label">
+                  Mobile Number
+                </label>
 
-        <input
-    type="tel"
-    id="officerMobile"
-    class="sd-input"
-    placeholder="Enter 10-digit mobile number"
-    maxlength="10"
-    inputmode="numeric"
-    pattern="[0-9]{10}"
-    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
+                <input type="tel" id="officerMobile" class="sd-input" placeholder="Enter 10-digit mobile number"
+                  maxlength="10" inputmode="numeric" pattern="[0-9]{10}"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
 
-        </div>
+              </div>
 
-        <!-- DESIGNATION -->
+              <!-- DESIGNATION -->
 
-        <div class="sd-field-group">
+              <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Designation
-          </label>
+                <label class="sd-field-label">
+                  Designation
+                </label>
 
-         <input
-    type="text"
-    id="officerDesignation"
-    class="sd-input"
-    placeholder="Enter designation"
-    maxlength="100">
+                <input type="text" id="officerDesignation" class="sd-input" placeholder="Enter designation"
+                  maxlength="100">
 
-        </div>
+              </div>
 
-        <!-- DEPARTMENT -->
+              <!-- DEPARTMENT -->
 
-        <div class="sd-field-group">
+              <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Department
-          </label>
+                <label class="sd-field-label">
+                  Department
+                </label>
 
-          <select id="officerDepartment"
-        class="sd-select"
-        onchange="loadCategoriesByDepartment(this.value)">   
+                <select id="officerDepartment" class="sd-select" onchange="loadCategoriesByDepartment(this.value)">
 
-            <option value="">
-              Select Department
-            </option>
+                  <option value="">
+                    Select Department
+                  </option>
 
-          </select>
+                </select>
 
-        </div>
-        
-       <!-- CATEGORY -->
+              </div>
 
-<div class="sd-field-group">
+              <!-- CATEGORY -->
 
-  <label class="sd-field-label">
-    Category
-  </label>
+              <div class="sd-field-group">
 
-  <select id="officerCategory"
-          class="sd-select">  
+                <label class="sd-field-label">
+                  Category
+                </label>
 
-    <option value="">
-      Select Category
-    </option>
+                <select id="officerCategory" class="sd-select">
 
-  </select>
+                  <option value="">
+                    Select Category
+                  </option>
 
-</div>  
+                </select>
 
-        <!-- STATUS -->
+              </div>
 
-        <div class="sd-field-group">
+              <!-- STATUS -->
 
-          <label class="sd-field-label">
-            Availability Status
-          </label>
+              <div class="sd-field-group">
 
-          <select id="officerAvailability"
-                  class="sd-select">
+                <label class="sd-field-label">
+                  Availability Status
+                </label>
 
-            <option value="true">
-              Available
-            </option>
+                <select id="officerAvailability" class="sd-select">
 
-            <option value="false">
-              Unavailable
-            </option>
+                  <option value="true">
+                    Available
+                  </option>
 
-          </select>
+                  <option value="false">
+                    Unavailable
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- FOOTER -->
+
+          <div class="modal-footer">
+
+            <button class="btn-action btn-ghost" onclick="closeOfficerModal()">
+
+              Cancel
+
+            </button>
+
+            <button class="btn-action btn-primary" id="saveOfficerBtn" onclick="saveOfficer()">
+
+              Save Officer
+
+            </button>
+
+          </div>
 
         </div>
 
       </div>
-
-    </div>
-
-    <!-- FOOTER -->
-
-    <div class="modal-footer">
-
-      <button class="btn-action btn-ghost"
-              onclick="closeOfficerModal()">
-
-        Cancel
-
-      </button>
-
-      <button class="btn-action btn-primary"
-              id="saveOfficerBtn"
-              onclick="saveOfficer()">
-
-        Save Officer
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
 
 
 
@@ -1407,7 +1348,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <div class="placeholder-panel">
           <div class="placeholder-icon">&#x1F4CA;</div>
           <div class="placeholder-title">Reports &amp; Analytics</div>
-          <div class="placeholder-desc">This module is under development. Comprehensive analytics and report generation will be available here.</div>
+          <div class="placeholder-desc">This module is under development. Comprehensive analytics and report generation
+            will be available here.</div>
         </div>
       </div>
 
@@ -1424,7 +1366,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
         <div class="placeholder-panel">
           <div class="placeholder-icon">&#x2699;&#xFE0F;</div>
           <div class="placeholder-title">Settings</div>
-          <div class="placeholder-desc">This module is under development. System configuration and preference management will be available here.</div>
+          <div class="placeholder-desc">This module is under development. System configuration and preference management
+            will be available here.</div>
         </div>
       </div>
 
@@ -1456,7 +1399,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
 
       <div class="modal-body">
         <p class="facility-modal-hint">
-          Create a custom section to track any facility or data category specific to this ward. It will behave exactly like the built-in ward sections.
+          Create a custom section to track any facility or data category specific to this ward. It will behave exactly
+          like the built-in ward sections.
         </p>
 
         <!-- Facility Name -->
@@ -1464,14 +1408,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <label class="sd-field-label" for="facilityNameInput">
             Facility Name <span class="facility-required">*</span>
           </label>
-          <input
-            type="text"
-            id="facilityNameInput"
-            class="sd-input facility-name-input"
-            placeholder="e.g. Community Park, Bus Stop, Market Yard…"
-            maxlength="80"
-            autocomplete="off"
-          />
+          <input type="text" id="facilityNameInput" class="sd-input facility-name-input"
+            placeholder="e.g. Community Park, Bus Stop, Market Yard…" maxlength="80" autocomplete="off" />
           <div class="facility-name-error hidden" id="facilityNameError">
             &#x26A0; Facility name is required.
           </div>
@@ -1483,20 +1421,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
           <label class="sd-field-label" for="facilityDescInput">
             Description <span class="sd-field-optional">(optional)</span>
           </label>
-          <textarea
-            id="facilityDescInput"
-            class="sd-textarea"
-            placeholder="Briefly describe what information will be tracked in this section…"
-            rows="3"
-            maxlength="200"
-          ></textarea>
+          <textarea id="facilityDescInput" class="sd-textarea"
+            placeholder="Briefly describe what information will be tracked in this section…" rows="3"
+            maxlength="200"></textarea>
           <div class="facility-char-count" id="facilityDescCount">0 / 200</div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn-action btn-ghost"    onclick="closeFacilityModal()">Cancel</button>
-        <button class="btn-action btn-primary"  onclick="createFacility()" id="createFacilityBtn">
+        <button class="btn-action btn-ghost" onclick="closeFacilityModal()">Cancel</button>
+        <button class="btn-action btn-primary" onclick="createFacility()" id="createFacilityBtn">
           &#x2713; Create Facility
         </button>
       </div>
@@ -1506,116 +1440,97 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
 
 
 
-<!-- ===== EDIT CITIZEN MODAL ===== -->
+  <!-- ===== EDIT CITIZEN MODAL ===== -->
 
-<div class="modal-overlay hidden"
-     id="editCitizenModal">
+  <div class="modal-overlay hidden" id="editCitizenModal">
 
-  <div class="modal-card officer-modal-card">
+    <div class="modal-card officer-modal-card">
 
-    <div class="modal-header">
+      <div class="modal-header">
 
-      <div class="modal-title">
+        <div class="modal-title">
 
-        Edit Citizen
+          Edit Citizen
+
+        </div>
+
+        <button class="modal-close" onclick="closeEditCitizenModal()">
+
+          ✕
+
+        </button>
 
       </div>
 
-      <button class="modal-close"
-              onclick="closeEditCitizenModal()">
+      <div class="modal-body">
 
-        ✕
+        <input type="hidden" id="editCitizenId">
 
-      </button>
+        <div class="officer-form-grid">
 
-    </div>
+          <div class="sd-field-group">
 
-    <div class="modal-body">
+            <label class="sd-field-label">
+              First Name
+            </label>
 
-      <input type="hidden"
-             id="editCitizenId">
+            <input type="text" id="editCitizenFirstName" class="sd-input">
 
-      <div class="officer-form-grid">
+          </div>
 
-        <div class="sd-field-group">
+          <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            First Name
-          </label>
+            <label class="sd-field-label">
+              Last Name
+            </label>
 
-          <input
-              type="text"
-              id="editCitizenFirstName"
-              class="sd-input">
+            <input type="text" id="editCitizenLastName" class="sd-input">
 
-        </div>
+          </div>
 
-        <div class="sd-field-group">
+          <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Last Name
-          </label>
+            <label class="sd-field-label">
+              Email
+            </label>
 
-          <input
-              type="text"
-              id="editCitizenLastName"
-              class="sd-input">
+            <input type="email" id="editCitizenEmail" class="sd-input">
 
-        </div>
+          </div>
 
-        <div class="sd-field-group">
+          <div class="sd-field-group">
 
-          <label class="sd-field-label">
-            Email
-          </label>
+            <label class="sd-field-label">
+              Mobile Number
+            </label>
 
-          <input
-              type="email"
-              id="editCitizenEmail"
-              class="sd-input">
+            <input type="text" id="editCitizenMobile" class="sd-input">
 
-        </div>
-
-        <div class="sd-field-group">
-
-          <label class="sd-field-label">
-            Mobile Number
-          </label>
-
-          <input
-              type="text"
-              id="editCitizenMobile"
-              class="sd-input">
+          </div>
 
         </div>
 
       </div>
 
-    </div>
+      <div class="modal-footer">
 
-    <div class="modal-footer">
+        <button class="btn-action btn-ghost" onclick="closeEditCitizenModal()">
 
-      <button
-          class="btn-action btn-ghost"
-          onclick="closeEditCitizenModal()">
+          Cancel
 
-        Cancel
+        </button>
 
-      </button>
+        <button class="btn-action btn-primary" onclick="updateCitizen()">
 
-      <button
-          class="btn-action btn-primary"
-          onclick="updateCitizen()">
+          Update Citizen
 
-        Update Citizen
+        </button>
 
-      </button>
+      </div>
 
     </div>
 
   </div>
-
-</div>
 
   <!-- ===== QUICK VIEW MODAL ===== -->
   <div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal()">
@@ -1631,107 +1546,96 @@ href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css
   <!-- ===== CONFIRMATION MODAL ===== -->
   <div class="modal-overlay hidden" id="confirmOverlay" onclick="confirmNo()">
     <div class="modal-card confirm-card" onclick="event.stopPropagation()">
-      
-      
-    <div class="modal-header confirm-header">
 
-    <div class="confirm-icon">
 
-        <i class="fa-solid fa-right-from-bracket"></i>
+      <div class="modal-header confirm-header">
 
-    </div>
+        <div class="confirm-icon">
 
-    <div class="modal-title" id="confirmTitle">
+          <i class="fa-solid fa-right-from-bracket"></i>
 
-        Confirm Action
+        </div>
 
-    </div>
+        <div class="modal-title" id="confirmTitle">
 
-    <button
-        class="modal-close"
-        onclick="confirmNo()">
+          Confirm Action
 
-        <i class="fa-solid fa-xmark"></i>
+        </div>
 
-    </button>
+        <button class="modal-close" onclick="confirmNo()">
 
-</div>
+          <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+      </div>
 
 
       <div class="modal-body">
         <p class="confirm-message" id="confirmMessage">Are you sure?</p>
         <div class="confirm-actions">
-          <button
-    id="confirmCancelBtn"
-    class="btn-action btn-ghost"
-    onclick="confirmNo()">
+          <button id="confirmCancelBtn" class="btn-action btn-ghost" onclick="confirmNo()">
 
-    Cancel
+            Cancel
 
-</button>
+          </button>
 
-<button
-    id="confirmOkBtn"
-    class="btn-action btn-primary"
-    onclick="confirmYes()">
+          <button id="confirmOkBtn" class="btn-action btn-primary" onclick="confirmYes()">
 
-    Confirm
+            Confirm
 
-</button>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-<script src="../home/shared/button-loading.js"></script>
-<script src="admin-dashboard.js"></script>
+  <script src="../home/shared/button-loading.js"></script>
+  <script src="admin-dashboard.js"></script>
 
 
-<div id="customAlertOverlay" class="custom-alert-overlay hidden">
+  <div id="customAlertOverlay" class="custom-alert-overlay hidden">
 
     <div id="customAlertBox" class="custom-alert-box">
 
-      <button
-    id="customAlertClose"
-    class="custom-alert-close"
-    onclick="closeCustomAlert()">
+      <button id="customAlertClose" class="custom-alert-close" onclick="closeCustomAlert()">
 
-    <i class="fa-solid fa-xmark"></i>
+        <i class="fa-solid fa-xmark"></i>
 
-</button>
+      </button>
 
-        <div id="customAlertIcon" class="custom-alert-icon">
-            ✓
-        </div>
+      <div id="customAlertIcon" class="custom-alert-icon">
+        ✓
+      </div>
 
-        <div class="custom-alert-content">
+      <div class="custom-alert-content">
 
-            <h2 id="customAlertTitle">
-                Success
-            </h2>
+        <h2 id="customAlertTitle">
+          Success
+        </h2>
 
-            <p id="customAlertMessage">
-                Message
-            </p>
+        <p id="customAlertMessage">
+          Message
+        </p>
 
-        </div>
+      </div>
 
-        <div class="custom-alert-footer">
+      <div class="custom-alert-footer">
 
-            <button
-                id="customAlertButton"
-                class="custom-alert-btn"
-                onclick="closeCustomAlert()">
+        <button id="customAlertButton" class="custom-alert-btn" onclick="closeCustomAlert()">
 
-                OK
+          OK
 
-            </button>
+        </button>
 
-        </div>
+      </div>
 
     </div>
 
-</div>
+  </div>
+
+  
 
 </body>
+
 </html>

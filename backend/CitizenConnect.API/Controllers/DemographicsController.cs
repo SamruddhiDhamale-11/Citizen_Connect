@@ -72,25 +72,23 @@ namespace CitizenConnect.API.Controllers
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(
-            int id,
-            [FromBody] UpdateDemographicDto dto)
+    int id,
+    [FromBody] UpdateDemographicDto dto)
         {
-            var result =
-                await _demographicService
-                    .UpdateAsync(id, dto);
+            Console.WriteLine($"PUT Id = {id}");
+            Console.WriteLine($"Population = {dto.TotalPopulation}");
+
+            var result = await _demographicService.UpdateAsync(id, dto);
 
             if (!result)
             {
-                return NotFound(
-                    $"Demographic with Id {id} not found.");
+                return NotFound($"Demographic with Id {id} not found.");
             }
 
-            return Ok(
-                new
-                {
-                    Message =
-                        "Demographic updated successfully."
-                });
+            return Ok(new
+            {
+                Message = "Demographic updated successfully."
+            });
         }
 
         // ==========================================

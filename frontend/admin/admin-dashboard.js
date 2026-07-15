@@ -28,6 +28,8 @@ let currentBoundaryType = null;
 var SUGGESTION_API_BASE = 'http://localhost:5079/api/Admin' + '/suggestions';
 let suggestionStatuses = [];
 let wardLocalities = [];
+let currentDemographicId = null;
+
 
 // =========================
 // GIS MANAGEMENT
@@ -68,6 +70,8 @@ var adminComplaintsData = [];
 const WARD_REPRESENTATIVE_API =
     "http://localhost:5079/api/WardRepresentative";
 
+    const DEMOGRAPHIC_API =
+    "http://localhost:5079/api/Demographics";
 
 const DEPARTMENT_API_BASE =
   'http://localhost:5079/api/departments';
@@ -387,23 +391,47 @@ function setDate() {
    type: 'success' | 'warning' | 'error' | 'info'
    ============================================================ */
 function showToast(msg, type) {
-  var toast    = document.getElementById('toast');
-  var toastMsg = document.getElementById('toastMsg');
-  var toastIcon= document.getElementById('toastIcon');
-  var icons    = { success:'\u2705', warning:'\u26A0\uFE0F', error:'\u274C', info:'\u2139\uFE0F' };
-  var t        = type || 'success';
 
-  toastMsg.textContent  = msg || 'Done.';
-  toastIcon.textContent = icons[t] || icons.success;
+    var toast = document.getElementById('toast');
+    var toastMsg = document.getElementById('toastMsg');
+    var toastIcon = document.getElementById('toastIcon');
 
-  toast.className = 'toast toast-' + t;
-  toast.classList.remove('hidden');
-  toast.style.animation = 'none';
-  void toast.offsetWidth;
-  toast.style.animation = '';
+    // If toast elements are not available,
+    // just log the message and exit safely.
+    if (!toast || !toastMsg || !toastIcon) {
 
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(function() { toast.classList.add('hidden'); }, 3400);
+        console.warn("Toast elements not found:", msg);
+
+        return;
+    }
+
+    var icons = {
+        success: "✅",
+        warning: "⚠️",
+        error: "❌",
+        info: "ℹ️"
+    };
+
+    var t = type || "success";
+
+    toastMsg.textContent = msg || "Done.";
+    toastIcon.textContent = icons[t] || icons.success;
+
+    toast.className = "toast toast-" + t;
+    toast.classList.remove("hidden");
+
+    toast.style.animation = "none";
+    void toast.offsetWidth;
+    toast.style.animation = "";
+
+    clearTimeout(window._toastTimer);
+
+    window._toastTimer = setTimeout(function () {
+
+        toast.classList.add("hidden");
+
+    }, 3400);
+
 }
 
 /* ============================================================
@@ -698,6 +726,10 @@ function openSection(sectionId) {
   if (!formConfig) { showToast('Form configuration not found.', 'warning'); return; }
 
   currentSectionId = sectionId;
+
+  if (sectionId === "population") {
+    loadDemographicData();
+}
 
   // Header
   document.getElementById('sdBreadcrumbName').textContent = section.name;
@@ -1207,50 +1239,216 @@ function saveSectionDraft() {
 async function submitSectionData() {
 
     console.log("submitSectionData called");
-
     console.log("currentSectionId =", currentSectionId);
 
-    var data = collectFormData();
+    const data = collectFormData();
 
     console.log("data =", data);
 
-    if (!currentSectionId){
+    if (!currentSectionId) {
         console.log("RETURN-1");
         return;
     }
 
-    if (!data){
+    if (!data) {
         console.log("RETURN-2");
         return;
     }
 
-    if (currentSectionId === "representatives"){
+    // ===========================
+    // Ward Representatives
+    // ===========================
+    if (currentSectionId === "representatives") {
 
         console.log("Inside representatives");
 
         await saveWardRepresentatives(data);
 
-        console.log("API Finished");
+        console.log("Representative API Finished");
 
         return;
     }
 
-    console.log("Current section is:", currentSectionId);
+    // ===========================
+    // Population & Demographics
+    // ===========================
+    if (currentSectionId === "population") {
+
+        const demographic = {
+
+            jurisdictionId: 1,
+            wardId: 1,
+
+            totalPopulation: Number(data.totalPop),
+            malePopulation: Number(data.malePop),
+            femalePopulation: Number(data.femalePop),
+
+            childPopulation: Number(data.childrenCount),
+            seniorCitizenPopulation: Number(data.seniorCount),
+
+            totalHouseholds: Number(data.totalHouses),
+
+            maleLiteracyRate: Number(data.maleLiteracy),
+            femaleLiteracyRate: Number(data.femaleLiteracy),
+            totalLiteracyRate: Number(data.overallLiteracy),
+
+            totalVoters: Number(data.totalVoters),
+            surveyYear: Number(data.SurveyYear),
+
+            isActive: true
+        };
+
+        console.log("Sending API:", demographic);
+
+        try {
+
+            const response = await fetch(DEMOGRAPHIC_API, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(demographic)
+
+            });
+
+            if (!response.ok) {
+
+                const error = await response.text();
+
+                console.error(error);
+
+                alert(error);
+
+                return;
+            }
+
+            alert("Demographic saved successfully.");
+
+            // Reload latest data
+            await loadDemographicData();
+
+            return;
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            alert("Failed to save demographic.");
+
+        }
+
+        return;
+    }
+
 }
 
-function updateSectionData() {
-  if (!currentSectionId) return;
-  var data = collectFormData();
-  if (!data) return;
-  var ts = nowTimestamp();
-  data._lastUpdated = ts.date;
-  data._lastSaved   = ts.time;
-  lsSet(currentSectionId, data);
-  syncSectionMeta(currentSectionId);
-  renderSectionPreview(currentSectionId);
-  syncAreaSummary();                          // refresh top summary
-  clearSectionForm();                         // reset form inputs after update
-  showToast('Section data updated successfully.', 'success');
+async function updateSectionData() {
+
+    if (!currentSectionId) return;
+
+    var data = collectFormData();
+
+    if (!data) return;
+
+    // -----------------------------
+    // Population & Demographics
+    // -----------------------------
+    if (currentSectionId === "population") {
+
+        const demographic = {
+
+            jurisdictionId: 1,
+            wardId: 1,
+
+            totalPopulation: Number(data.totalPop),
+            malePopulation: Number(data.malePop),
+            femalePopulation: Number(data.femalePop),
+
+            childPopulation: Number(data.childrenCount),
+            seniorCitizenPopulation: Number(data.seniorCount),
+
+            totalHouseholds: Number(data.totalHouses),
+
+            maleLiteracyRate: Number(data.maleLiteracy),
+            femaleLiteracyRate: Number(data.femaleLiteracy),
+            totalLiteracyRate: Number(data.overallLiteracy),
+
+            totalVoters: Number(data.totalVoters),
+            surveyYear: Number(data.SurveyYear),
+
+            isActive: true
+        };
+
+      if (!currentDemographicId) {
+
+    alert("No demographic record found.");
+
+    return;
+
+}
+
+// Debug Logs
+console.log("====================================");
+console.log("Updating Demographic");
+console.log("Current Demographic ID:", currentDemographicId);
+console.log("Payload:", demographic);
+console.log("====================================");
+
+const response = await fetch(
+    `${DEMOGRAPHIC_API}/${currentDemographicId}`,
+    {
+        method: "PUT",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(demographic)
+    });
+
+console.log("Response Status:", response.status);
+
+        if (!response.ok) {
+
+            const error = await response.text();
+
+            console.error(error);
+
+            return;
+
+        }
+
+        console.log("Demographic updated successfully.");
+
+        // Reload latest values from API
+        await loadDemographicData();
+
+        return;
+    }
+
+    // -----------------------------
+    // Existing LocalStorage logic
+    // -----------------------------
+    var ts = nowTimestamp();
+
+    data._lastUpdated = ts.date;
+    data._lastSaved = ts.time;
+
+    lsSet(currentSectionId, data);
+
+    syncSectionMeta(currentSectionId);
+
+    renderSectionPreview(currentSectionId);
+
+    syncAreaSummary();
+
+    clearSectionForm();
+
+    showToast("Section data updated successfully.", "success");
 }
 
 function deleteSectionData() {
@@ -6738,4 +6936,69 @@ function clearLocalityLayers(){
     localityBoundaryLayer =
         L.featureGroup().addTo(gisMap);
 
+}
+
+
+//Demofraphics API
+async function loadDemographicData() {
+
+    try {
+
+        const response = await fetch(`${DEMOGRAPHIC_API}/ward/1`);
+
+        if (!response.ok) {
+            throw new Error("Unable to load demographic data.");
+        }
+
+        const demographics = await response.json();
+
+        console.log("Demographic API Response:", demographics);
+
+        // No data found
+        if (!demographics || demographics.length === 0) {
+
+            currentDemographicId = null;
+
+            document.getElementById("sdBtnSubmit").style.display = "inline-flex";
+            document.getElementById("sdBtnUpdate").style.display = "none";
+
+            return;
+        }
+
+        // First record
+        const d = demographics[0];
+
+        currentDemographicId = d.demographicId;
+
+        console.log("Loaded Demographic ID:", currentDemographicId);
+        console.log("Loaded Data:", d);
+
+        document.getElementById("field-totalPop").value = d.totalPopulation ?? "";
+        document.getElementById("field-malePop").value = d.malePopulation ?? "";
+        document.getElementById("field-femalePop").value = d.femalePopulation ?? "";
+        document.getElementById("field-childrenCount").value = d.childPopulation ?? "";
+        document.getElementById("field-seniorCount").value = d.seniorCitizenPopulation ?? "";
+        document.getElementById("field-totalHouses").value = d.totalHouseholds ?? "";
+        document.getElementById("field-maleLiteracy").value = d.maleLiteracyRate ?? "";
+        document.getElementById("field-femaleLiteracy").value = d.femaleLiteracyRate ?? "";
+        document.getElementById("field-overallLiteracy").value = d.totalLiteracyRate ?? "";
+        document.getElementById("field-totalVoters").value = d.totalVoters ?? "";
+        document.getElementById("field-SurveyYear").value = d.surveyYear ?? "";
+
+        // Show Update, Hide Submit
+        document.getElementById("sdBtnSubmit").style.display = "none";
+        document.getElementById("sdBtnUpdate").style.display = "inline-flex";
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        currentDemographicId = null;
+
+        document.getElementById("sdBtnSubmit").style.display = "inline-flex";
+        document.getElementById("sdBtnUpdate").style.display = "none";
+
+        showToast("Failed to load demographic data.", "error");
+    }
 }

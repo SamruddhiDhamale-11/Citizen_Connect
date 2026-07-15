@@ -15,9 +15,19 @@ namespace CitizenConnect.API.Services
             _context = context;
         }
 
-        public async Task<ResponseDemographicDto>
-            CreateAsync(CreateDemographicDto dto)
+        public async Task<ResponseDemographicDto> CreateAsync(CreateDemographicDto dto)
         {
+            // Check whether a record already exists
+            var existing = await _context.Demographics
+                .FirstOrDefaultAsync(x =>
+                    x.JurisdictionId == dto.JurisdictionId &&
+                    x.WardId == dto.WardId);
+
+            if (existing != null)
+            {
+                throw new Exception("Demographic already exists for this ward. Please use Update.");
+            }
+
             var demographic = new Demographic
             {
                 JurisdictionId = dto.JurisdictionId,
@@ -109,22 +119,23 @@ namespace CitizenConnect.API.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<bool>
-            UpdateAsync(
-                int demographicId,
-                UpdateDemographicDto dto)
+        public async Task<bool> UpdateAsync(
+    int demographicId,
+    UpdateDemographicDto dto)
         {
             var demographic = await _context.Demographics
-                .FirstOrDefaultAsync(x =>
-                    x.DemographicId == demographicId);
+                .FirstOrDefaultAsync(x => x.DemographicId == demographicId);
 
             if (demographic == null)
             {
+                Console.WriteLine("Record not found.");
                 return false;
             }
 
-            demographic.JurisdictionId = dto.JurisdictionId;
-            demographic.WardId = dto.WardId;
+            Console.WriteLine("Before Update");
+            Console.WriteLine($"DB Population = {demographic.TotalPopulation}");
+            Console.WriteLine($"DTO Population = {dto.TotalPopulation}");
+
             demographic.TotalPopulation = dto.TotalPopulation;
             demographic.MalePopulation = dto.MalePopulation;
             demographic.FemalePopulation = dto.FemalePopulation;
@@ -137,8 +148,12 @@ namespace CitizenConnect.API.Services
             demographic.TotalVoters = dto.TotalVoters;
             demographic.SurveyYear = dto.SurveyYear;
             demographic.IsActive = dto.IsActive;
+            demographic.JurisdictionId = dto.JurisdictionId;
+            demographic.WardId = dto.WardId;
 
-            await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync();
+
+            Console.WriteLine($"Rows Updated = {rows}");
 
             return true;
         }
